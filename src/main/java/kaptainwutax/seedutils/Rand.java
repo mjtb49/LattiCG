@@ -93,10 +93,7 @@ public class Rand {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Rand{");
-        sb.append("seed=").append(this.seed);
-        sb.append('}');
-        return sb.toString();
+        return "Rand{" + "seed=" + this.seed + '}';
     }
 
 }

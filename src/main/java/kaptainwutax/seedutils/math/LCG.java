@@ -54,7 +54,6 @@ public class LCG {
         return new LCG(multiplier, addend, this.modulo);
     }
 
-
     @Override
     public boolean equals(Object obj) {
         if(obj == this)return true;
@@ -72,13 +71,8 @@ public class LCG {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("LCG{");
-        sb.append("multiplier=").append(multiplier);
-        sb.append(", addend=").append(addend);
-        sb.append(", modulo=").append(modulo);
-        sb.append(", canMask=").append(canMask);
-        sb.append('}');
-        return sb.toString();
+        return "LCG{" + "multiplier=" + this.multiplier +
+                ", addend=" + this.addend + ", modulo=" + this.modulo + '}';
     }
 
 }
