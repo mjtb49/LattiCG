@@ -8,7 +8,7 @@ public class Rand {
 
     public static final LCG JAVA_LCG = new LCG(0x5DEECE66DL, 0xBL, 1L << 48);
 
-    private long seed;
+    protected long seed;
 
     public Rand(long seed) {
         this.setSeed(seed, true);
