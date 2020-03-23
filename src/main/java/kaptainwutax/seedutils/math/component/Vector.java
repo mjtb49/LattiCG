@@ -4,27 +4,27 @@ import kaptainwutax.seedutils.math.component.number.NumberType;
 
 public class Vector<T extends NumberType<?, T>> implements IComponent<Vector<T>> {
 
-	private GenGrid<T> numbers;
+	private GenArray<T> numbers;
 
 	public Vector(int length) {
-		this.numbers = new GenGrid<>(length, 1);
+		this.numbers = new GenArray<>(length);
 	}
 
 	public Vector(NumberType<?, ?>... numbers) {
-		this.numbers = new GenGrid<>(numbers.length, 1);
+		this.numbers = new GenArray<>(numbers.length);
 		for(int i = 0; i < numbers.length; i++)this.set(i, (T)numbers[i]);
 	}
 
 	public int getLength() {
-		return this.numbers.getHeight();
+		return this.numbers.getLength();
 	}
 
 	public T get(int i) {
-		return this.numbers.get(i, 0);
+		return this.numbers.get(i);
 	}
 
 	public void set(int i, T value) {
-		this.numbers.set(i, 0, value);
+		this.numbers.set(i, value);
 	}
 
 	public T getMagnitudeSq() {

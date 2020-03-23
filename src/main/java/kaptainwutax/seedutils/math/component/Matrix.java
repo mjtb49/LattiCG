@@ -4,26 +4,32 @@ import kaptainwutax.seedutils.math.component.number.NumberType;
 
 public class Matrix<T extends NumberType<?, T>> implements IComponent<Matrix<T>> {
 
-	protected final GenGrid<T> grid;
+	protected GenArray<Vector<T>> grid;
+	private int width;
 
 	public Matrix(int height, int width) {
-		this.grid = new GenGrid<>(height, width);
+		this.grid = new GenArray<>(height);
+		this.width = width;
+
+		for(int i = 0; i < this.getHeight(); i++) {
+			this.grid.set(i, new Vector<>(this.width));
+		}
 	}
 
 	public int getHeight() {
-		return this.grid.getHeight();
+		return this.grid.getLength();
 	}
 
 	public int getWidth() {
-		return this.grid.getWidth();
+		return this.width;
 	}
 
 	public T get(int i, int j) {
-		return this.grid.get(i, j);
+		return this.grid.get(i).get(j);
 	}
 
 	public void set(int i, int j, T value) {
-		this.grid.set(i, j, value);
+		this.grid.get(i).set(j, value);
 	}
 
 	public void swap(int i, int j) {

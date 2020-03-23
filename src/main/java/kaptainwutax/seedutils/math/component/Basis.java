@@ -13,9 +13,7 @@ public class Basis<T extends NumberType<?, T>> extends Matrix<T> {
 		super(vectors.length, vectors[0].getLength());
 
 		for(int i = 0; i < this.getHeight(); i++) {
-			for(int j = 0; j < this.getWidth(); j++) {
-				this.set(i, j, ((Vector<T>)vectors[i]).get(j));
-			}
+			this.setVector(i, (Vector<T>)vectors[i]);
 		}
 	}
 
@@ -24,19 +22,11 @@ public class Basis<T extends NumberType<?, T>> extends Matrix<T> {
 	}
 
 	public Vector<T> getVector(int i) {
-		Vector<T> vector = new Vector<>(this.getWidth());
-
-		for(int j = 0; j < this.getWidth(); j++) {
-			vector.set(j, this.get(i, j));
-		}
-
-		return vector;
+		return this.grid.get(i);
 	}
 
-	public void setVector(int i, Vector<T> vector) {
-		for(int j = 0; j < this.getWidth(); j++) {
-			this.set(i, j, vector.get(j));
-		}
+	public void setVector(int i, Vector<T> value) {
+		this.grid.set(i, value);
 	}
 
 	public boolean isOrthogonal() {
