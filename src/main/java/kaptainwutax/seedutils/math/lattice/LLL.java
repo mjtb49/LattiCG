@@ -74,18 +74,6 @@ public class LLL<T extends NumberType<?, T>> extends LatticeReduction<T, LLL.Par
 		return b;
 	}
 
-	public Matrix<T> getGramSchmidtCoefficients(Basis<T> b, Basis<T> q) {
-		Matrix<T> u = new Matrix<>(b.getLength(), b.getLength() - 1);
-
-		for(int i = 0; i < b.getLength(); i++) {
-			for(int j = 0; j < i; j++) {
-				u.set(i, j, b.getVector(i).dot(q.getVector(i)).divide(q.getVector(j).getMagnitudeSq()));
-			}
-		}
-
-		return u;
-	}
-
 	public static class Parameters<T> {
 		protected T delta;
 		protected boolean debug;
