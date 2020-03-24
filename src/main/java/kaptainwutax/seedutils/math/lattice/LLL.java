@@ -1,92 +1,139 @@
 package kaptainwutax.seedutils.math.lattice;
 
-import kaptainwutax.seedutils.math.component.Basis;
+import kaptainwutax.seedutils.math.component.BigMatrix;
 import kaptainwutax.seedutils.math.component.Matrix;
-import kaptainwutax.seedutils.math.component.number.NumberType;
+import kaptainwutax.seedutils.math.decomposition.BigGramSchmidt;
 import kaptainwutax.seedutils.math.decomposition.GramSchmidt;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 
-public class LLL<T extends NumberType<?, T>> extends LatticeReduction<T, LLL.Parameters<T>> {
+public class LLL {
 
-	@Override
-	public Basis<T> reduce(Basis<T> b, Parameters<T> params) {
-		if(params.delta.getRaw().compareTo(BigDecimal.valueOf(0.25D)) <= 0
-				|| params.delta.getRaw().compareTo(BigDecimal.valueOf(1.0D)) > 0) {
+	public static Matrix reduce(Matrix m, Params params) {
+		if(params.delta <= 0.25D && params.delta > 1.0D) {
 			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
 		}
 
-		b = b.copy();
-
-		GramSchmidt<T> gramSchmidt = b.getGramSchmidt();
-		Basis<T> q = gramSchmidt.getBasis();
-		Matrix<T> u = gramSchmidt.getCoefficients();
+		GramSchmidt gs = new GramSchmidt(m.copy());
+		gs.compute();
 
 		if(params.debug) {
-			System.out.format("Initial basis: %s\n", b);
-			System.out.format("Initial GS basis: %s\n", q);
-			System.out.format("Initial GS coefficients: %s\n\n", u);
+			System.out.format("Initial basis: %s\n", gs.getBasis());
+			System.out.format("Initial GS basis: %s\n", gs.getNewBasis());
+			System.out.format("Initial GS coefficients: %s\n\n", gs.getCoefficients());
 		}
 
-		for(int k = 1; k < b.getLength(); ) {
+		for(int k = 1; k < gs.getBasis().getHeight(); ) {
 			if(params.debug)System.out.format("Iteration [%d] ===================\n", k);
 
 			for(int j = k - 1; j >= 0; j--) {
 				if(params.debug)System.out.format(" -> Iteration [%d] =====\n", j);
 
-				if(u.get(k, j).getRaw().compareTo(BigDecimal.valueOf(0.5D)) > 0) {
+				if(gs.getCoefficients().get(k, j) > 0.5D) {
 					if(params.debug)System.out.format(" -> Is bigger than 1 / 2\n");
 
-					b.getVector(k).subtractEquals(b.getVector(j).scale(u.get(k, j).round()));
+					gs.getBasis().getRow(k).subtractEquals(
+							gs.getBasis().getRow(j).scale(Math.round(gs.getCoefficients().get(k, j)))
+					);
 
-					//bad and naive
-					gramSchmidt = b.getGramSchmidt();
-					q = gramSchmidt.getBasis();
-					u = gramSchmidt.getCoefficients();
+					gs.compute(); //bad and naive
 
 					if(params.debug) {
-						System.out.format("    -> New basis: %s\n", b);
-						System.out.format("    -> New GS basis: %s\n", q);
-						System.out.format("    -> New GS coefficients: %s\n", u);
+						System.out.format("    -> New basis: %s\n", gs.getBasis());
+						System.out.format("    -> New GS basis: %s\n", gs.getNewBasis());
+						System.out.format("    -> New GS coefficients: %s\n", gs.getCoefficients());
 					}
 				}
 			}
 
-			T c = u.get(k, k - 1);
-			c.multiplyEquals(c);
+			double c = gs.getCoefficients().get(k, k - 1);
+			c = c * c;
 
-			T sub = params.delta.subtract(c).multiply(q.getVector(k - 1).getMagnitudeSq());
-
-			if(q.getVector(k).getMagnitudeSq().getRaw().compareTo(sub.getRaw()) >= 0) {
+			if(gs.getNewBasis().getRow(k).magnitudeSq() >=
+					(params.delta - c) * gs.getNewBasis().getRow(k - 1).magnitudeSq()) {
 				k++;
 			} else {
-				b.swap(k, k - 1);
-
-				//bad and naive
-				gramSchmidt = b.getGramSchmidt();
-				q = gramSchmidt.getBasis();
-				u = gramSchmidt.getCoefficients();
+				System.out.format(" -> Swapped %d and %d: was %s, is %s\n", k, k - 1, gs.getBasis(), gs.getBasis().swap(k, k - 1));
+				gs.getBasis().swapEquals(k, k - 1);
+				gs.compute(); //bad and naive
 				k = Math.max(k - 1, 1);
 			}
 		}
 
-		return b;
+		return gs.getBasis();
 	}
 
-	public static class Parameters<T> {
-		protected T delta;
-		protected boolean debug;
-
-		public Parameters() {
+	public static BigMatrix reduce(BigMatrix m, Params params) {
+		if(params.delta <= 0.25D && params.delta > 1.0D) {
+			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
 		}
 
-		public Parameters<T> setDelta(T delta) {
+		BigDecimal HALF = BigDecimal.valueOf(0.5D);
+		BigDecimal BIG_DELTA = BigDecimal.valueOf(params.delta);
+
+		BigGramSchmidt gs = new BigGramSchmidt(m.copy());
+		gs.compute();
+
+		if(params.debug) {
+			System.out.format("Initial basis: %s\n", gs.getBasis());
+			System.out.format("Initial GS basis: %s\n", gs.getNewBasis());
+			System.out.format("Initial GS coefficients: %s\n\n", gs.getCoefficients());
+		}
+
+		for(int k = 1; k < gs.getBasis().getHeight(); ) {
+			if(params.debug)System.out.format("Iteration [%d] ===================\n", k);
+
+			for(int j = k - 1; j >= 0; j--) {
+				if(params.debug)System.out.format(" -> Iteration [%d] =====\n", j);
+
+				if(gs.getCoefficients().get(k, j).compareTo(HALF) > 0) {
+					if(params.debug)System.out.format(" -> Is bigger than 1 / 2\n");
+
+					gs.getBasis().getRow(k).subtractEquals(
+							gs.getBasis().getRow(j).scale(gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP))
+					);
+
+					gs.compute(); //bad and naive
+
+					if(params.debug) {
+						System.out.format("    -> New basis: %s\n", gs.getBasis());
+						System.out.format("    -> New GS basis: %s\n", gs.getNewBasis());
+						System.out.format("    -> New GS coefficients: %s\n", gs.getCoefficients());
+					}
+				}
+			}
+
+			BigDecimal c = gs.getCoefficients().get(k, k - 1);
+			c = c.multiply(c);
+
+			if(gs.getNewBasis().getRow(k).magnitudeSq()
+					.compareTo(BIG_DELTA.subtract(c).multiply(gs.getNewBasis().getRow(k - 1).magnitudeSq())) >= 0) {
+				k++;
+			} else {
+				gs.getBasis().swapEquals(k, k - 1);
+				gs.compute(); //bad and naive
+				k = Math.max(k - 1, 1);
+			}
+		}
+
+		return gs.getBasis();
+	}
+
+	public static class Params {
+		protected double delta;
+		protected boolean debug;
+
+		public Params() {
+		}
+
+		public Params setDelta(double delta) {
 			this.delta = delta;
 			return this;
 		}
 
-		public Parameters<T> setDebug(boolean debug) {
+		public Params setDebug(boolean debug) {
 			this.debug = debug;
 			return this;
 		}

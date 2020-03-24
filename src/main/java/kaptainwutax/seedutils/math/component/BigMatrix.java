@@ -1,15 +1,16 @@
 package kaptainwutax.seedutils.math.component;
 
+import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
-public class Matrix implements ICopy<Matrix> {
+public class BigMatrix implements ICopy<BigMatrix> {
 
-	protected Vector[] rows;
+	protected BigVector[] rows;
 	protected int height;
 	protected int width;
 
-	public Matrix(int height, int width) {
+	public BigMatrix(int height, int width) {
 		this.height = height;
 		this.width = width;
 
@@ -17,7 +18,7 @@ public class Matrix implements ICopy<Matrix> {
 			throw new InvalidParameterException("Matrix dimensions cannot be less or equal to 0");
 		}
 
-		this.rows = new Vector[this.height];
+		this.rows = new BigVector[this.height];
 	}
 
 	public int getHeight() {
@@ -28,23 +29,23 @@ public class Matrix implements ICopy<Matrix> {
 		return this.width;
 	}
 
-	public double get(int i, int j) {
+	public BigDecimal get(int i, int j) {
 		return this.rows[i].get(j);
 	}
 
-	public void set(int i, int j, double value) {
+	public void set(int i, int j, BigDecimal value) {
 		if(this.rows[i] == null) {
-			this.rows[i] = new Vector(this.getWidth());
+			this.rows[i] = new BigVector(this.getWidth());
 		}
 
 		this.rows[i].set(j, value);
 	}
 
-	public Vector getRow(int i) {
+	public BigVector getRow(int i) {
 		return this.rows[i];
 	}
 
-	public void setRow(int i, Vector value) {
+	public void setRow(int i, BigVector value) {
 		if(value.getLength() != this.getWidth()) {
 			throw new InvalidParameterException("Invalid vector length, expected " + this.getWidth() + ", got " + value.getLength());
 		}
@@ -52,12 +53,12 @@ public class Matrix implements ICopy<Matrix> {
 		this.rows[i] = value;
 	}
 
-	public Matrix add(Matrix m) {
+	public BigMatrix add(BigMatrix m) {
 		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
 			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
 
 		for(int i = 0; i < this.getHeight(); i++) {
 			p.setRow(i, this.getRow(i).add(m.getRow(i)));
@@ -66,12 +67,12 @@ public class Matrix implements ICopy<Matrix> {
 		return p;
 	}
 
-	public Matrix subtract(Matrix m) {
+	public BigMatrix subtract(BigMatrix m) {
 		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
 			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
 
 		for(int i = 0; i < this.getHeight(); i++) {
 			p.setRow(i, this.getRow(i).subtract(m.getRow(i)));
@@ -80,19 +81,19 @@ public class Matrix implements ICopy<Matrix> {
 		return p;
 	}
 
-	public Matrix multiply(Matrix m) {
+	public BigMatrix multiply(BigMatrix m) {
 		if(this.getWidth() != m.getHeight()) {
 			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
 
 		for(int i = 0; i < p.getHeight(); i++) {
 			for(int j = 0; j < p.getWidth(); j++) {
-				p.set(i, j, 0);
+				p.set(i, j, BigDecimal.ZERO);
 
 				for(int k = 0; k < m.getHeight(); k++) {
-					p.set(i, j, p.get(i, j) + this.get(i, k) * m.get(k, j));
+					p.set(i, j, p.get(i, j).add(this.get(i, k).multiply(m.get(k, j))));
 				}
 			}
 		}
@@ -100,14 +101,14 @@ public class Matrix implements ICopy<Matrix> {
 		return p;
 	}
 
-	public Matrix swap(int i, int j) {
-		Matrix m = this.copy();
+	public BigMatrix swap(int i, int j) {
+		BigMatrix m = this.copy();
 		m.swapEquals(i, j);
 		return m;
 	}
 
-	public Matrix transpose() {
-		Matrix p = new Matrix(this.getWidth(), this.getHeight());
+	public BigMatrix transpose() {
+		BigMatrix p = new BigMatrix(this.getWidth(), this.getHeight());
 
 		for(int i = 0; i < this.getHeight(); i++) {
 			p.setRow(i, this.getRow(i).copy());
@@ -116,7 +117,7 @@ public class Matrix implements ICopy<Matrix> {
 		return p;
 	}
 
-	public void addEquals(Matrix m) {
+	public void addEquals(BigMatrix m) {
 		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
 			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
 		}
@@ -126,7 +127,7 @@ public class Matrix implements ICopy<Matrix> {
 		}
 	}
 
-	public void subtractEquals(Matrix m) {
+	public void subtractEquals(BigMatrix m) {
 		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
 			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
 		}
@@ -136,12 +137,12 @@ public class Matrix implements ICopy<Matrix> {
 		}
 	}
 
-	public void multiplyEquals(Matrix m) {
+	public void multiplyEquals(BigMatrix m) {
 		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
 			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
 		}
 
-		Matrix result = this.multiply(m);
+		BigMatrix result = this.multiply(m);
 
 		for(int i = 0; i < this.getHeight(); i++) {
 			this.setRow(i, result.getRow(i));
@@ -149,14 +150,14 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public void swapEquals(int i, int j) {
-		Vector temp = this.getRow(i);
+		BigVector temp = this.getRow(i);
 		this.setRow(i, this.getRow(j));
 		this.setRow(j, temp);
 	}
 
 	@Override
-	public Matrix copy() {
-		Matrix m = new Matrix(this.getHeight(), this.getWidth());
+	public BigMatrix copy() {
+		BigMatrix m = new BigMatrix(this.getHeight(), this.getWidth());
 
 		for(int i = 0; i < m.getHeight(); i++) {
 			m.setRow(i, this.getRow(i) == null ? null : this.getRow(i).copy());
@@ -179,7 +180,7 @@ public class Matrix implements ICopy<Matrix> {
 	public static class Builder {
 		private int height;
 		private int width;
-		private double defaultValue;
+		private BigDecimal defaultValue;
 
 		public Builder setSize(int height, int width) {
 			this.height = height;
@@ -187,17 +188,17 @@ public class Matrix implements ICopy<Matrix> {
 			return this;
 		}
 
-		public Builder fillWith(double defaultValue) {
+		public Builder fillWith(BigDecimal defaultValue) {
 			this.defaultValue = defaultValue;
 			return this;
 		}
 
-		public Matrix build() {
-			Matrix m = new Matrix(this.height, this.width);
+		public BigMatrix build() {
+			BigMatrix m = new BigMatrix(this.height, this.width);
 
-			if(this.defaultValue != 0.0D) {
+			if(this.defaultValue != null) {
 				for(int i = 0; i < m.getHeight(); i++) {
-					m.setRow(i, new Vector.Builder().setLength(m.getWidth()).fillWith(this.defaultValue).build());
+					m.setRow(i, new BigVector.Builder().setLength(m.getWidth()).fillWith(this.defaultValue).build());
 				}
 			}
 
@@ -206,8 +207,8 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public static class Factory {
-		public Matrix fromString(String raw) {
-			Matrix m = null;
+		public BigMatrix fromString(String raw) {
+			BigMatrix m = null;
 			int height = 0;
 			int width = 0;
 
@@ -222,11 +223,11 @@ public class Matrix implements ICopy<Matrix> {
 			height = data.length;
 
 			for(int i = 0; i < height; i++) {
-				Vector v = new Vector.Factory().fromString(data[i]);
+				BigVector v = new BigVector.Factory().fromString(data[i]);
 
 				if(i == 0) {
 					width = v.getLength();
-					m = new Matrix(height,width);
+					m = new BigMatrix(height,width);
 				}
 
 				m.setRow(i, v);
@@ -235,15 +236,14 @@ public class Matrix implements ICopy<Matrix> {
 			return m;
 		}
 
-		public Matrix fromBigMatrix(BigMatrix m) {
-			Matrix p = new Matrix(m.getHeight(), m.getWidth());
+		public BigMatrix fromMatrix(Matrix m) {
+			BigMatrix p = new BigMatrix(m.getHeight(), m.getWidth());
 
 			for(int i = 0; i < p.getHeight(); i++) {
-				p.setRow(i, new Vector.Factory().fromBigVector(m.getRow(i)));
+				p.setRow(i, new BigVector.Factory().fromVector(m.getRow(i)));
 			}
 
 			return p;
 		}
 	}
-
 }

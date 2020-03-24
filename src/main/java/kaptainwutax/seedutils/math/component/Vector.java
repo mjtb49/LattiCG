@@ -1,154 +1,117 @@
 package kaptainwutax.seedutils.math.component;
 
-import kaptainwutax.seedutils.math.component.number.NumberType;
+import java.util.regex.Pattern;
 
-public class Vector<T extends NumberType<?, T>> implements IComponent<Vector<T>> {
+public class Vector implements ICopy<Vector> {
 
-	private GenArray<T> numbers;
+	private double[] numbers;
+	private int length;
 
 	public Vector(int length) {
-		this.numbers = new GenArray<>(length);
+		this.length = length;
+		this.numbers = new double[this.length];
 	}
 
-	public Vector(NumberType<?, ?>... numbers) {
-		this.numbers = new GenArray<>(numbers.length);
-		for(int i = 0; i < numbers.length; i++)this.set(i, (T)numbers[i]);
+	public Vector(double[] numbers) {
+		this.numbers = numbers;
+		this.length = this.numbers.length;
 	}
+
 
 	public int getLength() {
-		return this.numbers.getLength();
+		return this.length;
 	}
 
-	public T get(int i) {
-		return this.numbers.get(i);
+	public double get(int i) {
+		return this.numbers[i];
 	}
 
-	public void set(int i, T value) {
-		this.numbers.set(i, value);
+	public void set(int i, double value) {
+		this.numbers[i] = value;
 	}
 
-	public T getMagnitudeSq() {
-		T result = this.get(0).getZero();
+	public double magnitudeSq() {
+		double magnitude = 0.0D;
 
 		for(int i = 0; i < this.getLength(); i++) {
-			result.addEquals(this.get(i).multiply(this.get(i)));
+			magnitude += this.get(i) * this.get(i);
 		}
 
-		return result;
+		return magnitude;
 	}
 
-	@Override
-	public Vector<T> add(Vector<T> v) {
-		if(this.getLength() != v.getLength()) {
-			//TODO: bad things
+	public Vector add(Vector a) {
+		Vector v = new Vector(this.getLength());
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i) + a.get(i));
 		}
 
-		Vector<T> p = new Vector<>(this.getLength());
+		return v;
+	}
+
+	public Vector subtract(Vector a) {
+		Vector v = new Vector(this.getLength());
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i) - a.get(i));
+		}
+
+		return v;
+	}
+
+	public Vector scale(double scalar) {
+		Vector v = this.copy();
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i) * scalar);
+		}
+
+		return v;
+	}
+
+	public void addEquals(Vector a) {
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, this.get(i) + a.get(i));
+		}
+	}
+
+	public void subtractEquals(Vector a) {
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, this.get(i) - a.get(i));
+		}
+	}
+
+	public void scaleEquals(double scalar) {
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, this.get(i) * scalar);
+		}
+	}
+
+	public double dot(Vector v) {
+		double dot = 0.0D;
 
 		for(int i = 0; i < this.getLength(); i++) {
-			p.set(i, this.get(i).add(v.get(i)));
-		}
-
-		return p;
-	}
-
-	@Override
-	public Vector<T> subtract(Vector<T> v) {
-		if(this.getLength() != v.getLength()) {
-			//TODO: bad things
-		}
-
-		Vector<T> p = new Vector<>(this.getLength());
-
-		for(int i = 0; i < this.getLength(); i++) {
-			p.set(i, this.get(i).subtract(v.get(i)));
-		}
-
-		return p;
-	}
-
-	@Override
-	public Vector<T> multiply(Vector<T> v) {
-		//TODO: bad things
-		return null;
-	}
-
-	@Override
-	public Vector<T> divide(Vector<T> v) {
-		//TODO: bad things
-		return null;
-	}
-
-	@Override
-	public void addEquals(Vector<T> v) {
-		if(this.getLength() != v.getLength()) {
-			//TODO: bad things
-		}
-
-		for(int i = 0; i < this.getLength(); i++) {
-			this.get(i).addEquals(v.get(i));
-		}
-	}
-
-	@Override
-	public void subtractEquals(Vector<T> v) {
-		if(this.getLength() != v.getLength()) {
-			//TODO: bad things
-		}
-
-		for(int i = 0; i < this.getLength(); i++) {
-			this.get(i).subtractEquals(v.get(i));
-		}
-	}
-
-	@Override
-	public void multiplyEquals(Vector<T> a) {
-		//TODO: bad things
-	}
-
-	@Override
-	public void divideEquals(Vector<T> a) {
-		//TODO: bad things
-	}
-
-	public Vector<T> scale(T scalar) {
-		Vector<T> p = new Vector<>(this.getLength());
-
-		for(int i = 0; i < this.getLength(); i++) {
-			p.set(i, this.get(i).multiply(scalar));
-		}
-
-		return p;
-	}
-
-	public T dot(Vector<T> v) {
-		if(this.getLength() != v.getLength()) {
-			//TODO: bad things
-		}
-
-		T dot = this.get(0).getZero();
-
-		for(int i = 0; i < this.getLength(); i++) {
-			dot.addEquals(this.get(i).multiply(v.get(i)));
+			dot += this.get(i) * v.get(i);
 		}
 
 		return dot;
 	}
 
-	public Vector<T> projectOnto(Vector<T> v) {
+	public double getScalarProjection(Vector v) {
+		return this.dot(v) / v.magnitudeSq();
+	}
+
+	public Vector projectOnto(Vector v) {
 		return v.scale(this.getScalarProjection(v));
 	}
 
-	public T getScalarProjection(Vector<T> v) {
-		return this.dot(v).divide(v.getMagnitudeSq());
-	}
-
 	@Override
-	public Vector<T> copy() {
-		Vector<T> v = new Vector<>(this.getLength());
+	public Vector copy() {
+		Vector v = new Vector(this.getLength());
 
-		for(int i = 0; i < this.getLength(); i++) {
-			v.set(i, this.get(i).copy());
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i));
 		}
 
 		return v;
@@ -165,4 +128,55 @@ public class Vector<T extends NumberType<?, T>> implements IComponent<Vector<T>>
 		return sb.append("}").toString();
 	}
 
+	public static class Builder {
+		private int length;
+		private double defaultValue;
+
+		public Builder setLength(int length) {
+			this.length = length;
+			return this;
+		}
+
+		public Builder fillWith(double defaultValue) {
+			this.defaultValue = defaultValue;
+			return this;
+		}
+
+		public Vector build() {
+			Vector v = new Vector(this.length);
+
+			if(this.defaultValue != 0.0D) {
+				for(int i = 0; i < v.getLength(); i++) {
+					v.set(i, this.defaultValue);
+				}
+			}
+
+			return v;
+		}
+	}
+
+	public static class Factory {
+		public Vector fromString(String raw) {
+			raw = raw.replaceAll("\\s+","");
+
+			String[] data = raw.split(Pattern.quote(","));
+			Vector v = new Vector(data.length);
+
+			for(int i = 0; i < data.length; i++) {
+				v.set(i, Double.parseDouble(data[i]));
+			}
+
+			return v;
+		}
+
+		public Vector fromBigVector(BigVector v) {
+			Vector p = new Vector(v.getLength());
+
+			for(int i = 0; i < p.getLength(); i++) {
+				p.set(i, v.get(i).doubleValue());
+			}
+
+			return p;
+		}
+	}
 }
