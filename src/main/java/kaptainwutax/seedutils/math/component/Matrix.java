@@ -75,9 +75,9 @@ public class Matrix<T extends NumberType<?, T>> implements IComponent<Matrix<T>>
 
 		Matrix<T> p = new Matrix<>(this.getHeight(), m.getWidth());
 
-		for(int i = 1; i <= p.getHeight(); i++) {
-			for(int j = 1; j <= p.getWidth(); j++) {
-				for(int k = 1; k <= this.getWidth(); k++) {
+		for(int i = 0; i < p.getHeight(); i++) {
+			for(int j = 0; j < p.getWidth(); j++) {
+				for(int k = 0; k < this.getWidth(); k++) {
 					p.get(i, j).addEquals(this.get(i, j).multiply(m.get(k, j)));
 				}
 			}
