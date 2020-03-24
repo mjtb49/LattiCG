@@ -1,7 +1,9 @@
 package kaptainwutax.seedutils.math.lattice;
 
 import kaptainwutax.seedutils.math.component.BigMatrix;
+import kaptainwutax.seedutils.math.component.BigVector;
 import kaptainwutax.seedutils.math.component.Matrix;
+import kaptainwutax.seedutils.math.component.Vector;
 import kaptainwutax.seedutils.math.decomposition.BigGramSchmidt;
 import kaptainwutax.seedutils.math.decomposition.GramSchmidt;
 
@@ -19,47 +21,28 @@ public class LLL {
 		GramSchmidt gs = new GramSchmidt(m.copy());
 		gs.compute();
 
-		if(params.debug) {
-			System.out.format("Initial basis: %s\n", gs.getBasis());
-			System.out.format("Initial GS basis: %s\n", gs.getNewBasis());
-			System.out.format("Initial GS coefficients: %s\n\n", gs.getCoefficients());
-		}
-
-		for(int k = 1; k < gs.getBasis().getHeight(); ) {
-			if(params.debug)System.out.format("Iteration [%d] ===================\n", k);
-
-			for(int j = k - 1; j >= 0; j--) {
-				if(params.debug)System.out.format(" -> Iteration [%d] =====\n", j);
-
-				if(gs.getCoefficients().get(k, j) > 0.5D) {
-					if(params.debug)System.out.format(" -> Is bigger than 1 / 2\n");
-
-					gs.getBasis().getRow(k).subtractEquals(
-							gs.getBasis().getRow(j).scale(Math.round(gs.getCoefficients().get(k, j)))
-					);
-
+		while(true) {
+			for(int k = 0; k < gs.getBasis().getHeight(); k++) {
+				for(int j = k - 1; j >= 0; j--) {
+					long nearestLong = Math.round(gs.getCoefficients().get(k, j));
+					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).scale(nearestLong));
 					gs.compute(); //bad and naive
-
-					if(params.debug) {
-						System.out.format("    -> New basis: %s\n", gs.getBasis());
-						System.out.format("    -> New GS basis: %s\n", gs.getNewBasis());
-						System.out.format("    -> New GS coefficients: %s\n", gs.getCoefficients());
-					}
 				}
 			}
 
-			double c = gs.getCoefficients().get(k, k - 1);
-			c = c * c;
+			boolean fullyCompleted = true;
 
-			if(gs.getNewBasis().getRow(k).magnitudeSq() >=
-					(params.delta - c) * gs.getNewBasis().getRow(k - 1).magnitudeSq()) {
-				k++;
-			} else {
-				System.out.format(" -> Swapped %d and %d: was %s, is %s\n", k, k - 1, gs.getBasis(), gs.getBasis().swap(k, k - 1));
-				gs.getBasis().swapEquals(k, k - 1);
-				gs.compute(); //bad and naive
-				k = Math.max(k - 1, 1);
+			for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
+				Vector v = gs.getNewBasis().getRow(k + 1).add(gs.getNewBasis().getRow(k).scale(gs.getCoefficients().get(k, k + 1)));
+				if(v.magnitudeSq() < params.delta * gs.getNewBasis().getRow(k).magnitudeSq()) {
+					gs.getBasis().swapEquals(k, k + 1);
+					gs.compute(); //bad and naive
+					fullyCompleted = false;
+					break;
+				}
 			}
+
+			if(fullyCompleted)break;
 		}
 
 		return gs.getBasis();
@@ -70,52 +53,34 @@ public class LLL {
 			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
 		}
 
-		BigDecimal HALF = BigDecimal.valueOf(0.5D);
 		BigDecimal BIG_DELTA = BigDecimal.valueOf(params.delta);
 
 		BigGramSchmidt gs = new BigGramSchmidt(m.copy());
 		gs.compute();
 
-		if(params.debug) {
-			System.out.format("Initial basis: %s\n", gs.getBasis());
-			System.out.format("Initial GS basis: %s\n", gs.getNewBasis());
-			System.out.format("Initial GS coefficients: %s\n\n", gs.getCoefficients());
-		}
-
-		for(int k = 1; k < gs.getBasis().getHeight(); ) {
-			if(params.debug)System.out.format("Iteration [%d] ===================\n", k);
-
-			for(int j = k - 1; j >= 0; j--) {
-				if(params.debug)System.out.format(" -> Iteration [%d] =====\n", j);
-
-				if(gs.getCoefficients().get(k, j).compareTo(HALF) > 0) {
-					if(params.debug)System.out.format(" -> Is bigger than 1 / 2\n");
-
-					gs.getBasis().getRow(k).subtractEquals(
-							gs.getBasis().getRow(j).scale(gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP))
-					);
-
+		while(true) {
+			for(int k = 0; k < gs.getBasis().getHeight(); k++) {
+				for(int j = k - 1; j >= 0; j--) {
+					BigDecimal rounded = gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP);
+					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).scale(rounded));
 					gs.compute(); //bad and naive
-
-					if(params.debug) {
-						System.out.format("    -> New basis: %s\n", gs.getBasis());
-						System.out.format("    -> New GS basis: %s\n", gs.getNewBasis());
-						System.out.format("    -> New GS coefficients: %s\n", gs.getCoefficients());
-					}
 				}
 			}
 
-			BigDecimal c = gs.getCoefficients().get(k, k - 1);
-			c = c.multiply(c);
+			boolean fullyCompleted = true;
 
-			if(gs.getNewBasis().getRow(k).magnitudeSq()
-					.compareTo(BIG_DELTA.subtract(c).multiply(gs.getNewBasis().getRow(k - 1).magnitudeSq())) >= 0) {
-				k++;
-			} else {
-				gs.getBasis().swapEquals(k, k - 1);
-				gs.compute(); //bad and naive
-				k = Math.max(k - 1, 1);
+			for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
+				BigVector v = gs.getNewBasis().getRow(k + 1).add(gs.getNewBasis().getRow(k).scale(gs.getCoefficients().get(k, k + 1)));
+
+				if(v.magnitudeSq().compareTo(gs.getNewBasis().getRow(k).magnitudeSq().multiply(BIG_DELTA)) < 0) {
+					gs.getBasis().swapEquals(k, k + 1);
+					gs.compute(); //bad and naive
+					fullyCompleted = false;
+					break;
+				}
 			}
+
+			if(fullyCompleted)break;
 		}
 
 		return gs.getBasis();

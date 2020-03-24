@@ -12,16 +12,15 @@ public class Test {
 		matrix.setRow(0, new Vector(new double[] {1.0D, 5.0D, 3.0D}));
 		matrix.setRow(1, new Vector(new double[] {4.0D, -2.0D, 9.0D}));
 		matrix.setRow(2, new Vector(new double[] {-7.0D, 1.0D, 2.0D}));
-		System.out.println("Some matrix: " + matrix);
+		System.out.println(matrix);
 
 		BigMatrix basis = new BigMatrix.Factory().fromString("{{1, 103, 107}, {0, 200, 0}, {0, 0, 200}}");
 		LLL.Params params = new LLL.Params().setDelta(1.0D).setDebug(false);
 
 		BigMatrix reducedBasis = LLL.reduce(basis, params);
 
-		System.out.println("Some basis: " + basis);
+		System.out.println("Basis: " + basis);
 		System.out.println("Reduced basis: " + reducedBasis);
-
 
 		BigMatrix m1 = new BigMatrix.Factory().fromString("{{1, 103, 107}, {0, 200, 0}, {0, 0, 200}}");
 		BigMatrix m2 = new BigMatrix.Factory().fromString("{{1, 103, 107}, {0, 200, 0}, {0, 0, 200}}");
