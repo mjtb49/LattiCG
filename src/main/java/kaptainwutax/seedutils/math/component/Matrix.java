@@ -124,11 +124,11 @@ public class Matrix<T extends NumberType<?, T>> implements IComponent<Matrix<T>>
 			//TODO: bad things
 		}
 
-		for(int i = 1; i <= this.getHeight(); i++) {
-			for(int j = 1; j <= m.getWidth(); j++) {
+		for(int i = 0; i < this.getHeight(); i++) {
+			for(int j = 0; j < m.getWidth(); j++) {
 				this.get(i, j).setToZero();
 
-				for(int k = 1; k <= this.getWidth(); k++) {
+				for(int k = 0; k < this.getWidth(); k++) {
 					T n = this.get(i, j).copy();
 					this.get(i, j).multiplyEquals(m.get(k, j));
 					this.get(i, j).addEquals(n);
