@@ -1,9 +1,9 @@
-package kaptainwutax.seedutils.magic;
+package seedutils.magic;
 
-import kaptainwutax.seedutils.math.component.BigMatrix;
-import kaptainwutax.seedutils.math.component.BigVector;
-import kaptainwutax.seedutils.math.MathHelper;
-import kaptainwutax.seedutils.math.lattice.LLL;
+import seedutils.math.MathHelper;
+import seedutils.math.component.BigMatrix;
+import seedutils.math.component.BigVector;
+import seedutils.math.lattice.LLL;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

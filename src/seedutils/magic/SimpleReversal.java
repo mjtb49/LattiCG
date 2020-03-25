@@ -1,7 +1,7 @@
-package kaptainwutax.seedutils.magic;
+package seedutils.magic;
 
-import kaptainwutax.seedutils.Rand;
-import kaptainwutax.seedutils.math.LCG;
+import seedutils.Rand;
+import seedutils.math.LCG;
 
 /**
  * All credits to Matthew... again. :P

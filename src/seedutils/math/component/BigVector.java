@@ -1,4 +1,4 @@
-package kaptainwutax.seedutils.math.component;
+package seedutils.math.component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

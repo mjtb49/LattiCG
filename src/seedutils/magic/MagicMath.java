@@ -1,4 +1,4 @@
-package kaptainwutax.seedutils.magic;
+package seedutils.magic;
 
 /**
  * Math utility library-- I have no idea how it works, don't ask.

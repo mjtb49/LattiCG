@@ -1,11 +1,9 @@
-package kaptainwutax.seedutils.math.lattice;
+package seedutils.math.lattice;
 
-import kaptainwutax.seedutils.math.component.BigMatrix;
-import kaptainwutax.seedutils.math.component.BigVector;
-import kaptainwutax.seedutils.math.component.Matrix;
-import kaptainwutax.seedutils.math.component.Vector;
-import kaptainwutax.seedutils.math.decomposition.BigGramSchmidt;
-import kaptainwutax.seedutils.math.decomposition.GramSchmidt;
+import seedutils.math.component.BigMatrix;
+import seedutils.math.component.Matrix;
+import seedutils.math.decomposition.BigGramSchmidt;
+import seedutils.math.decomposition.GramSchmidt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

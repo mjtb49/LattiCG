@@ -1,8 +1,8 @@
-package kaptainwutax.seedutils.magic;
+package seedutils.magic;
 
-import kaptainwutax.seedutils.Rand;
-import kaptainwutax.seedutils.Seeds;
-import kaptainwutax.seedutils.math.LCG;
+import seedutils.Rand;
+import seedutils.Seeds;
+import seedutils.math.LCG;
 
 import java.util.ArrayList;
 import java.util.List;

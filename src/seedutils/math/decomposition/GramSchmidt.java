@@ -1,7 +1,7 @@
-package kaptainwutax.seedutils.math.decomposition;
+package seedutils.math.decomposition;
 
-import kaptainwutax.seedutils.math.component.Matrix;
-import kaptainwutax.seedutils.math.component.Vector;
+import seedutils.math.component.Matrix;
+import seedutils.math.component.Vector;
 
 public class GramSchmidt {
 

@@ -1,7 +1,7 @@
-package kaptainwutax.seedutils.math.decomposition;
+package seedutils.math.decomposition;
 
-import kaptainwutax.seedutils.math.component.BigMatrix;
-import kaptainwutax.seedutils.math.component.BigVector;
+import seedutils.math.component.BigMatrix;
+import seedutils.math.component.BigVector;
 
 import java.math.BigDecimal;
 

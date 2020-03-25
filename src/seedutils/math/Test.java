@@ -1,10 +1,10 @@
-package kaptainwutax.seedutils.math;
+package seedutils.math;
 
-import kaptainwutax.seedutils.magic.RandomReverser;
-import kaptainwutax.seedutils.math.component.BigMatrix;
-import kaptainwutax.seedutils.math.component.Matrix;
-import kaptainwutax.seedutils.math.component.Vector;
-import kaptainwutax.seedutils.math.lattice.LLL;
+import seedutils.magic.RandomReverser;
+import seedutils.math.component.BigMatrix;
+import seedutils.math.component.Matrix;
+import seedutils.math.component.Vector;
+import seedutils.math.lattice.LLL;
 
 public class Test {
 

@@ -1,4 +1,4 @@
-package kaptainwutax.seedutils.math;
+package seedutils.math;
 
 import java.util.Objects;
 

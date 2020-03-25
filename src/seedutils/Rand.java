@@ -1,6 +1,6 @@
-package kaptainwutax.seedutils;
+package seedutils;
 
-import kaptainwutax.seedutils.math.LCG;
+import seedutils.math.LCG;
 
 import java.util.Random;
 

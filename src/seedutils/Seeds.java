@@ -1,4 +1,4 @@
-package kaptainwutax.seedutils;
+package seedutils;
 
 public class Seeds {
 
