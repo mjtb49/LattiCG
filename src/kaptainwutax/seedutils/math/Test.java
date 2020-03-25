@@ -1,5 +1,6 @@
 package kaptainwutax.seedutils.math;
 
+import kaptainwutax.seedutils.magic.RandomReverser;
 import kaptainwutax.seedutils.math.component.BigMatrix;
 import kaptainwutax.seedutils.math.component.Matrix;
 import kaptainwutax.seedutils.math.component.Vector;
@@ -15,7 +16,7 @@ public class Test {
 		System.out.println(matrix);
 
 		BigMatrix basis = new BigMatrix.Factory().fromString("{{1, 103, 107}, {0, 200, 0}, {0, 0, 200}}");
-		LLL.Params params = new LLL.Params().setDelta(1.0D).setDebug(false);
+		LLL.Params params = new LLL.Params().setDelta(0.75).setDebug(false);
 
 		BigMatrix reducedBasis = LLL.reduce(basis, params);
 
@@ -29,6 +30,22 @@ public class Test {
 		Matrix m3 = new Matrix.Factory().fromBigMatrix(m1);
 		Matrix m4 = new Matrix.Factory().fromBigMatrix(m2);
 		System.out.println(m3.multiply(m4));
+
+		RandomReverser reverser = new RandomReverser();
+		reverser.addNextIntCall(16,12,13);
+		reverser.addNextIntCall(128,12,13);
+		reverser.addNextIntCall(16,12,13);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+		reverser.addNextIntCall(4,2,3);
+
+		double s = System.currentTimeMillis();
+		reverser.findAllValidSeeds();
+		System.out.println(System.currentTimeMillis() - s);
 	}
 
 }

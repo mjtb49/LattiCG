@@ -21,28 +21,28 @@ public class LLL {
 		GramSchmidt gs = new GramSchmidt(m.copy());
 		gs.compute();
 
-		while(true) {
-			for(int k = 0; k < gs.getBasis().getHeight(); k++) {
-				for(int j = k - 1; j >= 0; j--) {
-					long nearestLong = Math.round(gs.getCoefficients().get(k, j));
+		int k = 1;
+		int n = gs.getBasis().getHeight();
+		while(k <= n) {
+			//for(int k = 0; k < gs.getBasis().getHeight(); k++) {
+			for(int j = k - 1; j >= 0; j--) {
+				long nearestLong = Math.round(gs.getCoefficients().get(k, j));
+				if (nearestLong != 0){
 					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).scale(nearestLong));
 					gs.compute(); //bad and naive
 				}
 			}
-
-			boolean fullyCompleted = true;
-
-			for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
-				Vector v = gs.getNewBasis().getRow(k + 1).add(gs.getNewBasis().getRow(k).scale(gs.getCoefficients().get(k, k + 1)));
-				if(v.magnitudeSq() < params.delta * gs.getNewBasis().getRow(k).magnitudeSq()) {
-					gs.getBasis().swapEquals(k, k + 1);
-					gs.compute(); //bad and naive
-					fullyCompleted = false;
-					break;
-				}
+			//}
+			double v = gs.getNewBasis().getRow(k).magnitudeSq() + (gs.getNewBasis().getRow(k-1).scale(gs.getCoefficients().get(k, k -1 ))).magnitudeSq();
+			if(v < params.delta * gs.getNewBasis().getRow(k-1).magnitudeSq()) {
+				gs.getBasis().swapEquals(k - 1, k );
+				gs.compute(); //bad and naive
+				k = (k >= 2) ? k - 1: 1;
+			}
+			else {
+				k += 1;
 			}
 
-			if(fullyCompleted)break;
 		}
 
 		return gs.getBasis();
@@ -58,29 +58,37 @@ public class LLL {
 		BigGramSchmidt gs = new BigGramSchmidt(m.copy());
 		gs.compute();
 
-		while(true) {
-			for(int k = 0; k < gs.getBasis().getHeight(); k++) {
-				for(int j = k - 1; j >= 0; j--) {
-					BigDecimal rounded = gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP);
+		int k = 1;
+		int n = gs.getBasis().getHeight() - 1;
+		while(k <= n) {
+			//for(int k = 0; k < gs.getBasis().getHeight(); k++) {
+			for(int j = k - 1; j >= 0; j--) {
+				BigDecimal rounded = gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP);
+				if (rounded.compareTo(BigDecimal.ZERO) != 0) {
 					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).scale(rounded));
 					gs.compute(); //bad and naive
 				}
 			}
+			//}
 
-			boolean fullyCompleted = true;
+			//boolean fullyCompleted = true;
 
-			for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
-				BigVector v = gs.getNewBasis().getRow(k + 1).add(gs.getNewBasis().getRow(k).scale(gs.getCoefficients().get(k, k + 1)));
+			//for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
+				//BigVector v = gs.getNewBasis().getRow(k).add(gs.getNewBasis().getRow(k-1).scale(gs.getCoefficients().get(k-1, k)));
+				BigDecimal a = gs.getNewBasis().getRow(k).magnitudeSq().add(gs.getNewBasis().getRow(k-1).scale(gs.getCoefficients().get(k, k-1)).magnitudeSq());
 
-				if(v.magnitudeSq().compareTo(gs.getNewBasis().getRow(k).magnitudeSq().multiply(BIG_DELTA)) < 0) {
-					gs.getBasis().swapEquals(k, k + 1);
+				if(a.compareTo(gs.getNewBasis().getRow(k-1).magnitudeSq().multiply(BIG_DELTA)) < 0) {
+					gs.getBasis().swapEquals(k-1, k);
 					gs.compute(); //bad and naive
-					fullyCompleted = false;
-					break;
+					k = (k >= 2) ? k - 1: 1;
+					//fullyCompleted = false;
+					//break;
+				} else {
+					k += 1;
 				}
-			}
+			//}
 
-			if(fullyCompleted)break;
+			//if(fullyCompleted)break;
 		}
 
 		return gs.getBasis();
