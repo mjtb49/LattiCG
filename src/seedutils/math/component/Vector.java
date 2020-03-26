@@ -40,6 +40,14 @@ public class Vector implements ICopy<Vector> {
 		return magnitude;
 	}
 
+	public boolean isZero() {
+		for(int i = 0; i < this.getLength(); i++) {
+			if(this.get(i) != 0.0D)return false;
+		}
+
+		return true;
+	}
+
 	public Vector add(Vector a) {
 		Vector v = new Vector(this.getLength());
 

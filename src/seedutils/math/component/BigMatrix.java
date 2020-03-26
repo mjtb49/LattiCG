@@ -1,5 +1,7 @@
 package seedutils.math.component;
 
+import seedutils.math.SystemSolver;
+
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
@@ -46,7 +48,7 @@ public class BigMatrix implements ICopy<BigMatrix> {
 	}
 
 	public void setRow(int i, BigVector value) {
-		if(value.getLength() != this.getWidth()) {
+		if(value != null && value.getLength() != this.getWidth()) {
 			throw new InvalidParameterException("Invalid vector length, expected " + this.getWidth() + ", got " + value.getLength());
 		}
 
@@ -99,6 +101,16 @@ public class BigMatrix implements ICopy<BigMatrix> {
 		}
 
 		return p;
+	}
+
+	public BigMatrix inverse() {
+		SystemSolver.BigResult result = SystemSolver.solve(this, new BigMatrix.Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
+
+		if(result.type != SystemSolver.BigResult.Type.ONE_SOLUTION) {
+			throw new UnsupportedOperationException("This matrix is not invertible");
+		}
+
+		return result.result;
 	}
 
 	public BigMatrix swap(int i, int j) {
@@ -164,6 +176,22 @@ public class BigMatrix implements ICopy<BigMatrix> {
 		}
 
 		return m;
+	}
+
+	public String toPrettyString() {
+		StringBuilder sb = new StringBuilder();
+
+		for(int i = 0; i < this.getHeight(); i++) {
+			sb.append("[");
+
+			for(int j = 0; j < this.getWidth(); j++) {
+				sb.append(" ").append(this.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+			}
+
+			sb.append("]\n");
+		}
+
+		return sb.toString();
 	}
 
 	@Override
@@ -244,6 +272,16 @@ public class BigMatrix implements ICopy<BigMatrix> {
 			}
 
 			return p;
+		}
+
+		public BigMatrix identityMatrix(int size) {
+			BigMatrix m = new BigMatrix(size, size);
+
+			for(int i = 0; i < size; i++) {
+				m.set(i, i, BigDecimal.ONE);
+			}
+
+			return m;
 		}
 	}
 }

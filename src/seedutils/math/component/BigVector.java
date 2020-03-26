@@ -45,6 +45,14 @@ public class BigVector implements ICopy<BigVector> {
 		return magnitude;
 	}
 
+	public boolean isZero() {
+		for(int i = 0; i < this.getLength(); i++) {
+			if(this.get(i).compareTo(BigDecimal.ZERO) == 0)return false;
+		}
+
+		return true;
+	}
+
 	public BigVector add(BigVector a) {
 		BigVector v = new BigVector(this.getLength());
 
@@ -116,7 +124,7 @@ public class BigVector implements ICopy<BigVector> {
 		BigVector v = new BigVector(this.getLength());
 
 		for(int i = 0; i < v.getLength(); i++) {
-			v.set(i, this.get(i));
+			v.set(i, this.get(i) == null ? BigDecimal.ZERO : this.get(i));
 		}
 
 		return v;

@@ -1,5 +1,7 @@
 package seedutils.math.component;
 
+import seedutils.math.SystemSolver;
+
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
@@ -29,6 +31,10 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public double get(int i, int j) {
+		if(this.rows[i] == null) {
+			return Double.NaN;
+		}
+
 		return this.rows[i].get(j);
 	}
 
@@ -45,7 +51,7 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public void setRow(int i, Vector value) {
-		if(value.getLength() != this.getWidth()) {
+		if(value != null && value.getLength() != this.getWidth()) {
 			throw new InvalidParameterException("Invalid vector length, expected " + this.getWidth() + ", got " + value.getLength());
 		}
 
@@ -98,6 +104,16 @@ public class Matrix implements ICopy<Matrix> {
 		}
 
 		return p;
+	}
+
+	public Matrix inverse() {
+		SystemSolver.Result result = SystemSolver.solve(this, new Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
+
+		if(result.type != SystemSolver.Result.Type.ONE_SOLUTION) {
+			throw new UnsupportedOperationException("This matrix is not invertible");
+		}
+
+		return result.result;
 	}
 
 	public Matrix swap(int i, int j) {
@@ -163,6 +179,22 @@ public class Matrix implements ICopy<Matrix> {
 		}
 
 		return m;
+	}
+
+	public String toPrettyString() {
+		StringBuilder sb = new StringBuilder();
+
+		for(int i = 0; i < this.getHeight(); i++) {
+			sb.append("[");
+
+			for(int j = 0; j < this.getWidth(); j++) {
+				sb.append(" ").append(this.get(i, j)).append(" ");
+			}
+
+			sb.append("]\n");
+		}
+
+		return sb.toString();
 	}
 
 	@Override
@@ -243,6 +275,16 @@ public class Matrix implements ICopy<Matrix> {
 			}
 
 			return p;
+		}
+
+		public Matrix identityMatrix(int size) {
+			Matrix m = new Matrix(size, size);
+
+			for(int i = 0; i < size; i++) {
+				m.set(i, i, 1.0D);
+			}
+
+			return m;
 		}
 	}
 
