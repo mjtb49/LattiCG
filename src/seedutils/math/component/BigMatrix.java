@@ -104,6 +104,10 @@ public class BigMatrix implements ICopy<BigMatrix> {
 	}
 
 	public BigMatrix inverse() {
+		if(this.getHeight() != this.getWidth()) {
+			throw new UnsupportedOperationException("Can only find the inverse of square matrices");
+		}
+
 		SystemSolver.BigResult result = SystemSolver.solve(this, new BigMatrix.Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
 
 		if(result.type != SystemSolver.BigResult.Type.ONE_SOLUTION) {

@@ -107,6 +107,10 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public Matrix inverse() {
+		if(this.getHeight() != this.getWidth()) {
+			throw new UnsupportedOperationException("Can only find the inverse of square matrices");
+		}
+		
 		SystemSolver.Result result = SystemSolver.solve(this, new Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
 
 		if(result.type != SystemSolver.Result.Type.ONE_SOLUTION) {
