@@ -73,11 +73,21 @@ public class BigVector implements ICopy<BigVector> {
 		return v;
 	}
 
-	public BigVector scale(BigDecimal scalar) {
+	public BigVector multiply(BigDecimal scalar) {
 		BigVector v = this.copy();
 
 		for(int i = 0; i < v.getLength(); i++) {
 			v.set(i, this.get(i).multiply(scalar));
+		}
+
+		return v;
+	}
+
+	public BigVector divide(BigDecimal scalar) {
+		BigVector v = this.copy();
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
 		}
 
 		return v;
@@ -95,9 +105,15 @@ public class BigVector implements ICopy<BigVector> {
 		}
 	}
 
-	public void scaleEquals(BigDecimal scalar) {
+	public void multiplyEquals(BigDecimal scalar) {
 		for(int i = 0; i < this.getLength(); i++) {
 			this.set(i, this.get(i).multiply(scalar));
+		}
+	}
+
+	public void divideEquals(BigDecimal scalar) {
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
 		}
 	}
 
@@ -116,7 +132,7 @@ public class BigVector implements ICopy<BigVector> {
 	}
 
 	public BigVector projectOnto(BigVector v) {
-		return v.scale(this.getScalarProjection(v));
+		return v.multiply(this.getScalarProjection(v));
 	}
 
 	@Override

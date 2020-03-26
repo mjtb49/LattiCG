@@ -14,7 +14,7 @@ public class SystemSolver {
 			Vector v = am.getBase().getRow(x);
 
 			if(v.get(x) != 0.0D && v.get(x) != 1.0D) {
-				am.multiplyRow(x, 1.0D / v.get(x));
+				am.divideRow(x, v.get(x));
 			} else if(v.get(x) == 0.0D) {
 				continue;
 			}
@@ -46,7 +46,7 @@ public class SystemSolver {
 			BigVector v = am.getBase().getRow(x);
 
 			if(v.get(x).compareTo(BigDecimal.ZERO) != 0 && v.get(x).compareTo(BigDecimal.ONE) != 0) {
-				am.multiplyRow(x, BigDecimal.ONE.setScale(v.get(x).scale(), RoundingMode.HALF_UP).divide(v.get(x), RoundingMode.HALF_UP));
+				am.divideRow(x, v.get(x));
 			} else if(v.get(x).compareTo(BigDecimal.ZERO) == 0) {
 				continue;
 			}
@@ -63,7 +63,7 @@ public class SystemSolver {
 			for(int i = 0; i < j; i++) {
 				BigVector v = am.getBase().getRow(i);
 				BigVector s = am.getBase().getRow(j);
-				if(v.get(j).compareTo(BigDecimal.ZERO) == 0 || s.get(j).compareTo(BigDecimal.ONE) != 0)continue;
+				if(v.get(j).compareTo(BigDecimal.ZERO) == 0)continue;
 				am.subtractScaledRow(i, v.get(j), j);
 			}
 		}

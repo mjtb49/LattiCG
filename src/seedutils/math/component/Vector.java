@@ -68,11 +68,21 @@ public class Vector implements ICopy<Vector> {
 		return v;
 	}
 
-	public Vector scale(double scalar) {
+	public Vector multiply(double scalar) {
 		Vector v = this.copy();
 
 		for(int i = 0; i < v.getLength(); i++) {
 			v.set(i, this.get(i) * scalar);
+		}
+
+		return v;
+	}
+
+	public Vector divide(double scalar) {
+		Vector v = this.copy();
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.get(i) / scalar);
 		}
 
 		return v;
@@ -90,9 +100,15 @@ public class Vector implements ICopy<Vector> {
 		}
 	}
 
-	public void scaleEquals(double scalar) {
+	public void multiplyEquals(double scalar) {
 		for(int i = 0; i < this.getLength(); i++) {
 			this.set(i, this.get(i) * scalar);
+		}
+	}
+
+	public void divideEquals(double scalar) {
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, this.get(i) / scalar);
 		}
 	}
 
@@ -111,7 +127,7 @@ public class Vector implements ICopy<Vector> {
 	}
 
 	public Vector projectOnto(Vector v) {
-		return v.scale(this.getScalarProjection(v));
+		return v.multiply(this.getScalarProjection(v));
 	}
 
 	@Override

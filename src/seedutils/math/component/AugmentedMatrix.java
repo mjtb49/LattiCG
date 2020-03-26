@@ -18,14 +18,14 @@ public class AugmentedMatrix {
 		return this.extra;
 	}
 
-	public void multiplyRow(int y, double scalar) {
-		this.base.getRow(y).scaleEquals(scalar);
-		this.extra.getRow(y).scaleEquals(scalar);
+	public void divideRow(int y, double scalar) {
+		this.base.getRow(y).divideEquals(scalar);
+		this.extra.getRow(y).divideEquals(scalar);
 	}
 
 	public void subtractScaledRow(int y1, double scalar, int y2) {
-		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).scale(scalar));
-		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).scale(scalar));
+		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).multiply(scalar));
+		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
 	}
 
 	public void nullifyRow(int y) {

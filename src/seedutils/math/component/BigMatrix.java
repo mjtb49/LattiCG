@@ -32,6 +32,10 @@ public class BigMatrix implements ICopy<BigMatrix> {
 	}
 
 	public BigDecimal get(int i, int j) {
+		if(this.rows[i] == null) {
+			return null;
+		}
+
 		return this.rows[i].get(j);
 	}
 
@@ -189,7 +193,7 @@ public class BigMatrix implements ICopy<BigMatrix> {
 			sb.append("[");
 
 			for(int j = 0; j < this.getWidth(); j++) {
-				sb.append(" ").append(this.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+				sb.append(" ").append(this.get(i, j) == null ? null : this.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
 			}
 
 			sb.append("]\n");

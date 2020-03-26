@@ -43,7 +43,7 @@ public class BigGramSchmidt {
 
 			for(int j = 0; j < i; j++) {
 				BigDecimal scalar = this.basis.getRow(i).getScalarProjection(this.newBasis.getRow(j));
-				v.subtractEquals(this.newBasis.getRow(j).scale(scalar));
+				v.subtractEquals(this.newBasis.getRow(j).multiply(scalar));
 				this.coefficients.set(i, j, scalar);
 			}
 		}

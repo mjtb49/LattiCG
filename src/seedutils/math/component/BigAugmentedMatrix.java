@@ -20,14 +20,14 @@ public class BigAugmentedMatrix {
 		return this.extra;
 	}
 
-	public void multiplyRow(int y, BigDecimal scalar) {
-		this.base.getRow(y).scaleEquals(scalar);
-		this.extra.getRow(y).scaleEquals(scalar);
+	public void divideRow(int y, BigDecimal scalar) {
+		this.base.getRow(y).divideEquals(scalar);
+		this.extra.getRow(y).divideEquals(scalar);
 	}
 
 	public void subtractScaledRow(int y1, BigDecimal scalar, int y2) {
-		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).scale(scalar));
-		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).scale(scalar));
+		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).multiply(scalar));
+		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
 	}
 
 	public void nullifyRow(int y) {
@@ -43,13 +43,13 @@ public class BigAugmentedMatrix {
 			sb.append("[");
 
 			for(int j = 0; j < this.base.getWidth(); j++) {
-				sb.append(" ").append(this.base.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+				sb.append(" ").append(this.base.get(i, j) == null ? null : this.base.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
 			}
 
 			sb.append("|");
 
 			for(int j = 0; j < this.extra.getWidth(); j++) {
-				sb.append(" ").append(this.extra.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+				sb.append(" ").append(this.extra.get(i, j) == null ? null : this.extra.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
 			}
 
 			sb.append("]\n");

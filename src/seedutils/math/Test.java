@@ -1,14 +1,12 @@
 package seedutils.math;
 
-import seedutils.magic.RandomReverser;
 import seedutils.math.component.BigMatrix;
 import seedutils.math.component.Matrix;
-import seedutils.math.component.Vector;
-import seedutils.math.lattice.LLL;
 
 public class Test {
 
 	public static void main(String[] args) {
+		/*
 		Matrix matrix = new Matrix.Builder().setSize(3, 3).fillWith(0.0D).build();
 		matrix.setRow(0, new Vector(new double[] {1.0D, 5.0D, 3.0D}));
 		matrix.setRow(1, new Vector(new double[] {4.0D, -2.0D, 9.0D}));
@@ -45,7 +43,17 @@ public class Test {
 
 		double s = System.currentTimeMillis();
 		reverser.findAllValidSeeds();
-		System.out.println(System.currentTimeMillis() - s);
+
+		System.out.println(System.currentTimeMillis() - s);*/
+
+		BigMatrix m = new BigMatrix.Factory().fromString("{{5, 2, 3}, {2, 1, 0}, {-1, 2, -3}}");
+		Matrix r = new Matrix.Factory().fromString("{{1}, {2}, {3}}");
+
+		System.out.println(m.inverse().toPrettyString());
+
+		//AugmentedMatrix am = new AugmentedMatrix(m, r);
+		//am.gauss(true);
+		//System.out.println(m + "====" + r);
 	}
 
 }
