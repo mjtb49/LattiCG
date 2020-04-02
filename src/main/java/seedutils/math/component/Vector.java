@@ -1,5 +1,6 @@
 package seedutils.math.component;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class Vector implements ICopy<Vector> {
@@ -17,6 +18,14 @@ public class Vector implements ICopy<Vector> {
 		this.length = this.numbers.length;
 	}
 
+	public Vector(int length, Function<Integer, Double> generator) {
+		this.length = length;
+		this.numbers = new double[this.length];
+
+		for(int i = 0; i < this.getLength(); i++) {
+			this.set(i, generator.apply(i));
+		}
+	}
 
 	public int getLength() {
 		return this.length;
@@ -73,6 +82,20 @@ public class Vector implements ICopy<Vector> {
 
 		for(int i = 0; i < v.getLength(); i++) {
 			v.set(i, this.get(i) * scalar);
+		}
+
+		return v;
+	}
+
+	public Vector multiply(Matrix m) {
+		if(this.getLength() != m.getHeight()) {
+			throw new UnsupportedOperationException("Vector length should equal the matrix height");
+		}
+
+		Vector v = new Vector(m.getWidth());
+
+		for(int i = 0; i < v.getLength(); i++) {
+			v.set(i, this.dot(m.getRow(i)));
 		}
 
 		return v;

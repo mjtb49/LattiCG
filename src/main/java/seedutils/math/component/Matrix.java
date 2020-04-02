@@ -106,6 +106,20 @@ public class Matrix implements ICopy<Matrix> {
 		return p;
 	}
 
+	public Vector multiply(Vector v) {
+		if(this.getWidth() != v.getLength()) {
+			throw new UnsupportedOperationException("Vector length should equal the matrix width");
+		}
+
+		Vector r = new Vector(this.getHeight());
+
+		for(int i = 0; i < this.getHeight(); i++) {
+			r.set(i, v.dot(this.getRow(i)));
+		}
+
+		return r;
+	}
+
 	public Matrix inverse() {
 		if(this.getHeight() != this.getWidth()) {
 			throw new UnsupportedOperationException("Can only find the inverse of square matrices");

@@ -14,4 +14,16 @@ public class MathHelper {
             return gcd(a.remainder(b), b);
         return gcd(a,  b.remainder(a));
     }
+
+    public static double gcd(double a, double b) {
+        while(b != 0) {
+            a %= b;
+            double temp = a;
+            a = b;
+            b = temp;
+        }
+
+        return a;
+    }
+
 }

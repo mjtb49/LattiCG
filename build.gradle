@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.sosy-lab:javasmt-solver-z3:z3-4.4.1-1558-gf96cfea"
+}
