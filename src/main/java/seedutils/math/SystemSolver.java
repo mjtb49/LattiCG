@@ -1,13 +1,13 @@
-package seedutils.math;
+package main.java.seedutils.math;
 
-import seedutils.math.component.*;
+import main.java.seedutils.math.component.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class SystemSolver {
 
-	public static SystemSolver.Result solve(Matrix base, Matrix extra, Phase phase) {
+	public static SystemSolver.Result solve( Matrix base, Matrix extra, Phase phase) {
 		AugmentedMatrix am = new AugmentedMatrix(base.copy(), extra.copy());
 
 		for(int x = 0; x < am.getBase().getWidth(); x++) {

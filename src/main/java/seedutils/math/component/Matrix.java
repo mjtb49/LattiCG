@@ -1,6 +1,6 @@
-package seedutils.math.component;
+package main.java.seedutils.math.component;
 
-import seedutils.math.SystemSolver;
+import main.java.seedutils.math.SystemSolver;
 
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
@@ -48,6 +48,14 @@ public class Matrix implements ICopy<Matrix> {
 
 	public Vector getRow(int i) {
 		return this.rows[i];
+	}
+
+	public Vector getColumn(int i) {
+		Vector col = new Vector(this.getHeight());
+		for (int j = 0; j < this.getHeight(); j++) {
+			col.set(j, this.get(j,i));
+		}
+		return col;
 	}
 
 	public void setRow(int i, Vector value) {
@@ -141,10 +149,10 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public Matrix transpose() {
-		Matrix p = new Matrix(this.getWidth(), this.getHeight());
+		Matrix p = new Matrix(this.getHeight(), this.getWidth());
 
 		for(int i = 0; i < this.getHeight(); i++) {
-			p.setRow(i, this.getRow(i).copy());
+			p.setRow(i, this.getColumn(i).copy());
 		}
 
 		return p;

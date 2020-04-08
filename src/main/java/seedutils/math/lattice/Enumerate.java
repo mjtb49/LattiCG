@@ -1,9 +1,9 @@
-package seedutils.math.lattice;
+package main.java.seedutils.math.lattice;
 
 import com.microsoft.z3.*;
-import seedutils.math.component.Matrix;
-import seedutils.math.component.Vector;
-import seedutils.util.Pair;
+import main.java.seedutils.math.component.Matrix;
+import main.java.seedutils.math.component.Vector;
+import main.java.seedutils.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +11,19 @@ import java.util.List;
 public class Enumerate {
 
 	public static List<Vector> enumerate(int dimensions, Vector lower, Vector upper, Matrix basis, Vector offset) {
+		/*System.out.println("Begin enumerate information: ");
+		System.out.println(dimensions);
+		System.out.println(basis);
+		System.out.println(upper);
+		System.out.println(lower);
+		System.out.println(offset);
+		System.out.println("End enumerate information");*/
 		Context context = new Context();
 		Optimize optimize = context.mkOptimize();
 		ArithExpr[] variables = new ArithExpr[dimensions];
 
 		for(int i = 0; i < dimensions; i++) {
-			variables[i] = context.mkRealConst("x{i}");
+			variables[i] = context.mkRealConst("x{"+i+"}");
 		}
 
 		BoolExpr[] constraints = new BoolExpr[2 * dimensions];
@@ -25,20 +32,25 @@ public class Enumerate {
 			int finalI = i;
 
 			Vector face = lower.subtract(offset);
+			System.out.println("Lower Face: "+face);
 			Vector normal = new Vector(dimensions, j -> j == finalI ? 1.0D : 0.0D);
 			constraints[2 * i] = inHalfPlane(context, variables, basis, face, normal);
 
 			face = upper.subtract(offset);
+			System.out.println("Upper Face: "+face);
 			normal = new Vector(dimensions, j -> j == finalI ? -1.0D : 0.0D);
 			constraints[2 * i + 1] = inHalfPlane(context, variables, basis, face, normal);
 		}
-
+		for (ArithExpr n : variables)
+			System.out.println(n);
 		Expr[] zeroes = new Expr[dimensions];
 
 		for(int i = 0; i < dimensions; ++i) {
 			zeroes[i] = context.mkReal(0);
 		}
 
+		for(BoolExpr c:constraints)
+		System.out.println("THE CONSTRAINTS: "+c);
 		optimize.Assert(constraints);
 
 		List<Vector> result = new ArrayList<>();
@@ -49,6 +61,7 @@ public class Enumerate {
 	private static void solve(Context context, Optimize optimize, ArithExpr[] variables, Double[] values, List<Vector> result, int index) {
 		if(index == -1) {
 			result.add(new Vector(variables.length, i -> (double)values[i]));
+			System.out.println(new Vector(variables.length, i -> (double)values[i]));
 			return;
 		}
 
@@ -72,13 +85,15 @@ public class Enumerate {
 		Optimize.Handle minHandle = optimize.MkMinimize(variable);
 		optimize.Check();
 
-		long min = Long.parseLong(minHandle.getValue().toString()); //TODO: fix this
+		//System.out.println("Min: " + minHandle);
+		long min = (long) Math.ceil(parseDoubleFromZ3Expr(minHandle.getValue())); //TODO: fix this
 		optimize.Pop();
 
 		optimize.Push();
 		Optimize.Handle maxHandle = optimize.MkMaximize(variable);
 		optimize.Check();
-		long max = Long.parseLong(maxHandle.getValue().toString()); //TODO: fix this
+		//System.out.println("Max: " + maxHandle);
+		long max =(long) Math.floor(parseDoubleFromZ3Expr(maxHandle.getValue())); //TODO: fix this
 
 		optimize.Pop();
 
@@ -95,8 +110,28 @@ public class Enumerate {
 		for(int i = 0; i < variables.length; ++i) {
 			lhsExprs[i] = context.mkMul(variables[i], context.mkInt((long)lhs.get(i)));
 		}
-
 		return context.mkGe(context.mkAdd(lhsExprs), rhsExpr);
+	}
+
+	private static double parseDoubleFromZ3Expr(Expr expr) {
+		//System.out.println("Doing stuff to: "+expr);
+		if (expr.isIntNum()) {
+			IntNum num = (IntNum) expr;
+			//System.out.println("Parsed as: "+(num.getBigInteger().doubleValue()));
+			return num.getBigInteger().doubleValue();
+		}
+			RatNum rational = (RatNum) expr;
+			IntNum num = rational.getNumerator();
+			IntNum den = rational.getDenominator();
+			//System.out.println("Parsed as: "+num.getBigInteger().doubleValue() / den.getBigInteger().doubleValue());
+			//TODO is this lossy?
+			return  (num.getBigInteger().doubleValue() / den.getBigInteger().doubleValue());
+		//}
+		//else {
+		//	//TODO Bad stuff
+		//	System.err.println("Tried to parse non rational expression");
+		//	return 0.0;
+		//}
 	}
 
 }

@@ -1,10 +1,10 @@
-package seedutils.math;
+package main.java.seedutils.math;
 
-import seedutils.Rand;
+import main.java.seedutils.Rand;
 
 import java.util.Random;
 
-import static seedutils.math.MathHelper.gcd;
+import static main.java.seedutils.math.MathHelper.gcd;
 
 public class Test {
 

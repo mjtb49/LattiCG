@@ -1,7 +1,7 @@
-package seedutils.math.decomposition;
+package main.java.seedutils.math.decomposition;
 
-import seedutils.math.component.BigMatrix;
-import seedutils.math.component.BigVector;
+import main.java.seedutils.math.component.BigMatrix;
+import main.java.seedutils.math.component.BigVector;
 
 import java.math.BigDecimal;
 

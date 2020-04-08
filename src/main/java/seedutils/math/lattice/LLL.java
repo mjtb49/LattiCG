@@ -1,9 +1,9 @@
-package seedutils.math.lattice;
+package main.java.seedutils.math.lattice;
 
-import seedutils.math.component.BigMatrix;
-import seedutils.math.component.Matrix;
-import seedutils.math.decomposition.BigGramSchmidt;
-import seedutils.math.decomposition.GramSchmidt;
+import main.java.seedutils.math.component.BigMatrix;
+import main.java.seedutils.math.component.Matrix;
+import main.java.seedutils.math.decomposition.BigGramSchmidt;
+import main.java.seedutils.math.decomposition.GramSchmidt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

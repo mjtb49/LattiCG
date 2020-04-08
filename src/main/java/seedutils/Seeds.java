@@ -1,4 +1,4 @@
-package seedutils;
+package main.java.seedutils;
 
 public class Seeds {
 

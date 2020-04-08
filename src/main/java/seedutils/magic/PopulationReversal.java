@@ -1,8 +1,8 @@
-package seedutils.magic;
+package main.java.seedutils.magic;
 
-import seedutils.Rand;
-import seedutils.Seeds;
-import seedutils.math.LCG;
+import main.java.seedutils.Rand;
+import main.java.seedutils.Seeds;
+import main.java.seedutils.math.LCG;
 
 import java.util.ArrayList;
 import java.util.List;

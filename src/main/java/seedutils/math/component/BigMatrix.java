@@ -1,6 +1,6 @@
-package seedutils.math.component;
+package main.java.seedutils.math.component;
 
-import seedutils.math.SystemSolver;
+import main.java.seedutils.math.SystemSolver;
 
 import java.math.BigDecimal;
 import java.security.InvalidParameterException;

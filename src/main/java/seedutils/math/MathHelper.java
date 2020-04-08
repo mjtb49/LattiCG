@@ -1,4 +1,4 @@
-package seedutils.math;
+package main.java.seedutils.math;
 
 import java.math.BigDecimal;
 

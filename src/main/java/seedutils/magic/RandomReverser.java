@@ -1,9 +1,13 @@
-package seedutils.magic;
+package main.java.seedutils.magic;
 
-import seedutils.math.MathHelper;
-import seedutils.math.component.BigMatrix;
-import seedutils.math.component.BigVector;
-import seedutils.math.lattice.LLL;
+import main.java.seedutils.math.MathHelper;
+import main.java.seedutils.math.component.BigMatrix;
+import main.java.seedutils.math.component.BigVector;
+import main.java.seedutils.math.component.Matrix;
+import main.java.seedutils.math.component.Vector;
+import main.java.seedutils.math.lattice.LLL;
+import main.java.seedutils.math.lattice.Enumerate;
+import main.java.seedutils.Rand;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -67,8 +71,26 @@ public class RandomReverser {
         LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
         System.out.println("Reducing: "+scaledLattice);
         BigMatrix result = LLL.reduce(scaledLattice, params);
-        System.out.println("Found Reduced Basis: " + result);
+        System.out.println("Found Reduced Basis: " + result.multiply(scales.inverse()));
 
+        Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
+        Vector vecMins = new Vector(dimensions);
+        Vector vecMaxes = new Vector(dimensions);
+        Vector offsets = new Vector(dimensions);
+        Rand rand = new Rand(0x5deece66dL);
+        for (int i = 0; i < dimensions; i++) {
+            vecMins.set(i, (double) mins.get(i));
+            vecMaxes.set(i, (double) maxes.get(i));
+            offsets.set(i,rand.getSeed());
+            if (i != dimensions-1)
+                rand.advance(gaps.get(i+1));
+        }
+        System.out.println(vecMins);
+        System.out.println(vecMaxes);
+        System.out.println(offsets);
+        for (Vector n :Enumerate.enumerate(dimensions, vecMins, vecMaxes, m, offsets)) {
+            System.out.println("Found: " +(m.transpose().multiply(n)).add(offsets)+" at "+n);
+        }
         //TODO undo the scale and return, perhaps chuck an enumerate in here and call the method solve or something.
 
         return null;

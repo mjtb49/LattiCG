@@ -1,4 +1,4 @@
-package seedutils.util;
+package main.java.seedutils.util;
 
 public class Pair<A, B> {
 

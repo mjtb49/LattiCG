@@ -1,6 +1,6 @@
-package seedutils.math.lattice;
+package main.java.seedutils.math.lattice;
 
-import seedutils.math.component.Matrix;
+import main.java.seedutils.math.component.Matrix;
 
 import java.util.List;
 

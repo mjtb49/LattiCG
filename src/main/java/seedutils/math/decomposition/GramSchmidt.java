@@ -1,7 +1,7 @@
-package seedutils.math.decomposition;
+package main.java.seedutils.math.decomposition;
 
-import seedutils.math.component.Matrix;
-import seedutils.math.component.Vector;
+import main.java.seedutils.math.component.Matrix;
+import main.java.seedutils.math.component.Vector;
 
 public class GramSchmidt {
 

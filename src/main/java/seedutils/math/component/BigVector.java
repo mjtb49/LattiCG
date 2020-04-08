@@ -1,4 +1,4 @@
-package seedutils.math.component;
+package main.java.seedutils.math.component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

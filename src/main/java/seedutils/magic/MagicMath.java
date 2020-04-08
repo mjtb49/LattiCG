@@ -1,4 +1,4 @@
-package seedutils.magic;
+package main.java.seedutils.magic;
 
 /**
  * Math utility library-- I have no idea how it works, don't ask.

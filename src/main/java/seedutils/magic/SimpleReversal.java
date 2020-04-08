@@ -1,7 +1,7 @@
-package seedutils.magic;
+package main.java.seedutils.magic;
 
-import seedutils.Rand;
-import seedutils.math.LCG;
+import main.java.seedutils.Rand;
+import main.java.seedutils.math.LCG;
 
 /**
  * All credits to Matthew... again. :P

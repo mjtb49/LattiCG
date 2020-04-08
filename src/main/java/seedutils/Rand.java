@@ -1,6 +1,6 @@
-package seedutils;
+package main.java.seedutils;
 
-import seedutils.math.LCG;
+import main.java.seedutils.math.LCG;
 
 import java.util.Random;
 

@@ -1,6 +1,6 @@
-package seedutils.math;
+package main.java.seedutils.math;
 
-import seedutils.Rand;
+import main.java.seedutils.Rand;
 
 import java.lang.reflect.Field;
 import java.util.Random;
