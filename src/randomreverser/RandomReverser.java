@@ -175,8 +175,8 @@ public class RandomReverser {
 
     public void addNextLongCall(long min, long max) {
         //TODO warn about / check for the sign bit making a result wrong, 1/4th of results can be false positives in worst case
-        boolean minSignBit = ((min & 0x8000_0000) == 0); //Would a long having value min run into a negative (int) cast
-        boolean maxSignBit = ((max & 0x8000_0000) == 0); //Would a long having value max run into a negative (int) cast
+        boolean minSignBit = ((min & 0x8000_0000) != 0); //Would a long having value min run into a negative (int) cast
+        boolean maxSignBit = ((max & 0x8000_0000) != 0); //Would a long having value max run into a negative (int) cast
         long minFirstSeed, maxFirstSeed;
 
         if (minSignBit) {
