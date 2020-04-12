@@ -19,7 +19,6 @@ public class RandomReverserTest {
         int k;
         for (int i = 0; i < NUM_COBBLE; i++ ) {
             k = r.nextInt(8);
-            //device.addNextIntCall(16, k,k);
             device.addNextIntCall(8,k,k);
         }
 
