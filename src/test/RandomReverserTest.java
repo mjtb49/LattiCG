@@ -1,8 +1,6 @@
 package test;
 
 import randomreverser.RandomReverser;
-
-import javax.naming.SizeLimitExceededException;
 import java.util.ArrayList;
 import java.util.Random;
 
