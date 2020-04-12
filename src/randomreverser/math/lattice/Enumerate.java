@@ -68,8 +68,6 @@ public class Enumerate {
 
 		Pair<Long, Long> bounds = getRange(context, optimize, variables[index]);
 
-		//var (min, max) = GetRange(context, optimize, variables[index]);
-
 		for(double x = bounds.getFirst(); x <= bounds.getSecond(); x++) {
 			values[index] = x;
 			optimize.Push();
