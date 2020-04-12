@@ -1,31 +1,29 @@
-package main.java.seedutils.math.component;
+package randomreverser.math.component;
 
-import java.math.BigDecimal;
+public class AugmentedMatrix {
 
-public class BigAugmentedMatrix {
+	private Matrix base;
+	private Matrix extra;
 
-	private BigMatrix base;
-	private BigMatrix extra;
-
-	public BigAugmentedMatrix(BigMatrix base, BigMatrix extra) {
+	public AugmentedMatrix(Matrix base, Matrix extra) {
 		this.base = base;
 		this.extra = extra;
 	}
 
-	public BigMatrix getBase() {
+	public Matrix getBase() {
 		return this.base;
 	}
 
-	public BigMatrix getExtra() {
+	public Matrix getExtra() {
 		return this.extra;
 	}
 
-	public void divideRow(int y, BigDecimal scalar) {
+	public void divideRow(int y, double scalar) {
 		this.base.getRow(y).divideEquals(scalar);
 		this.extra.getRow(y).divideEquals(scalar);
 	}
 
-	public void subtractScaledRow(int y1, BigDecimal scalar, int y2) {
+	public void subtractScaledRow(int y1, double scalar, int y2) {
 		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).multiply(scalar));
 		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
 	}
@@ -43,13 +41,13 @@ public class BigAugmentedMatrix {
 			sb.append("[");
 
 			for(int j = 0; j < this.base.getWidth(); j++) {
-				sb.append(" ").append(this.base.get(i, j) == null ? null : this.base.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+				sb.append(" ").append(this.base.get(i, j)).append(" ");
 			}
 
 			sb.append("|");
 
 			for(int j = 0; j < this.extra.getWidth(); j++) {
-				sb.append(" ").append(this.extra.get(i, j) == null ? null : this.extra.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+				sb.append(" ").append(this.extra.get(i, j)).append(" ");
 			}
 
 			sb.append("]\n");

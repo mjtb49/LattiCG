@@ -1,4 +1,4 @@
-package main.java.seedutils.math;
+package randomreverser.util;
 
 import java.util.Objects;
 

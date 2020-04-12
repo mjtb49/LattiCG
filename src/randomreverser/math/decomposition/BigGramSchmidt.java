@@ -1,7 +1,7 @@
-package main.java.seedutils.math.decomposition;
+package randomreverser.math.decomposition;
 
-import main.java.seedutils.math.component.BigMatrix;
-import main.java.seedutils.math.component.BigVector;
+import randomreverser.math.component.BigMatrix;
+import randomreverser.math.component.BigVector;
 
 import java.math.BigDecimal;
 

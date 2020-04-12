@@ -1,4 +1,4 @@
-package main.java.seedutils.math.component;
+package randomreverser.math.component;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;

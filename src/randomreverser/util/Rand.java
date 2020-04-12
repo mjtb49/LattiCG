@@ -1,6 +1,4 @@
-package main.java.seedutils;
-
-import main.java.seedutils.math.LCG;
+package randomreverser.util;
 
 import java.util.Random;
 

@@ -1,8 +1,8 @@
-package main.java.seedutils.math.component;
-
-import main.java.seedutils.math.SystemSolver;
+package randomreverser.math.component;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
@@ -111,7 +111,11 @@ public class BigMatrix implements ICopy<BigMatrix> {
 		if(this.getHeight() != this.getWidth()) {
 			throw new UnsupportedOperationException("Can only find the inverse of square matrices");
 		}
-
+		if (this.getHeight() == 1) {
+			BigMatrix r = new BigMatrix(1,1);
+			r.set(0,0,BigDecimal.ONE.divide(this.get(0,0), RoundingMode.HALF_UP));
+			return r;
+		}
 		SystemSolver.BigResult result = SystemSolver.solve(this, new BigMatrix.Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
 
 		if(result.type != SystemSolver.BigResult.Type.ONE_SOLUTION) {

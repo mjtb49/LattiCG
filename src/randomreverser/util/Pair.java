@@ -1,4 +1,4 @@
-package main.java.seedutils.util;
+package randomreverser.util;
 
 public class Pair<A, B> {
 

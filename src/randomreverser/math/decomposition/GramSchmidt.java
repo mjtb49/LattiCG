@@ -1,7 +1,7 @@
-package main.java.seedutils.math.decomposition;
+package randomreverser.math.decomposition;
 
-import main.java.seedutils.math.component.Matrix;
-import main.java.seedutils.math.component.Vector;
+import randomreverser.math.component.Matrix;
+import randomreverser.math.component.Vector;
 
 public class GramSchmidt {
 

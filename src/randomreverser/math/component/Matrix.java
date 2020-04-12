@@ -1,6 +1,4 @@
-package main.java.seedutils.math.component;
-
-import main.java.seedutils.math.SystemSolver;
+package randomreverser.math.component;
 
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;

@@ -1,9 +1,9 @@
-package main.java.seedutils.math.lattice;
+package randomreverser.math.lattice;
 
-import main.java.seedutils.math.component.BigMatrix;
-import main.java.seedutils.math.component.Matrix;
-import main.java.seedutils.math.decomposition.BigGramSchmidt;
-import main.java.seedutils.math.decomposition.GramSchmidt;
+import randomreverser.math.component.BigMatrix;
+import randomreverser.math.component.Matrix;
+import randomreverser.math.decomposition.BigGramSchmidt;
+import randomreverser.math.decomposition.GramSchmidt;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

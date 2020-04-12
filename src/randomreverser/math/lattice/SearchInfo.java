@@ -1,6 +1,6 @@
-package main.java.seedutils.math.lattice;
+package randomreverser.math.lattice;
 
-import main.java.seedutils.math.component.Matrix;
+import randomreverser.math.component.Matrix;
 
 import java.util.List;
 

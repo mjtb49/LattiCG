@@ -1,9 +1,9 @@
-package main.java.seedutils.math.lattice;
+package randomreverser.math.lattice;
 
 import com.microsoft.z3.*;
-import main.java.seedutils.math.component.Matrix;
-import main.java.seedutils.math.component.Vector;
-import main.java.seedutils.util.Pair;
+import randomreverser.math.component.Matrix;
+import randomreverser.math.component.Vector;
+import randomreverser.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,25 +32,25 @@ public class Enumerate {
 			int finalI = i;
 
 			Vector face = lower.subtract(offset);
-			System.out.println("Lower Face: "+face);
+			//System.out.println("Lower Face: "+face);
 			Vector normal = new Vector(dimensions, j -> j == finalI ? 1.0D : 0.0D);
 			constraints[2 * i] = inHalfPlane(context, variables, basis, face, normal);
 
 			face = upper.subtract(offset);
-			System.out.println("Upper Face: "+face);
+			//System.out.println("Upper Face: "+face);
 			normal = new Vector(dimensions, j -> j == finalI ? -1.0D : 0.0D);
 			constraints[2 * i + 1] = inHalfPlane(context, variables, basis, face, normal);
 		}
-		for (ArithExpr n : variables)
-			System.out.println(n);
+		//for (ArithExpr n : variables)
+		//	System.out.println(n);
 		Expr[] zeroes = new Expr[dimensions];
 
 		for(int i = 0; i < dimensions; ++i) {
 			zeroes[i] = context.mkReal(0);
 		}
 
-		for(BoolExpr c:constraints)
-		System.out.println("THE CONSTRAINTS: "+c);
+		//for(BoolExpr c:constraints)
+		//System.out.println("THE CONSTRAINTS: "+c);
 		optimize.Assert(constraints);
 
 		List<Vector> result = new ArrayList<>();
@@ -59,9 +59,10 @@ public class Enumerate {
 	}
 
 	private static void solve(Context context, Optimize optimize, ArithExpr[] variables, Double[] values, List<Vector> result, int index) {
+		//System.out.println(index);
 		if(index == -1) {
 			result.add(new Vector(variables.length, i -> (double)values[i]));
-			System.out.println(new Vector(variables.length, i -> (double)values[i]));
+			//System.out.println(new Vector(variables.length, i -> (double)values[i]));
 			return;
 		}
 
