@@ -47,6 +47,10 @@ public class LLL {
 	}
 
 	public static BigMatrix reduce(BigMatrix m, Params params) {
+		return reduce( m,  params, null);
+	}
+
+	public static BigMatrix reduce(BigMatrix m, Params params, BigMatrix transformations) {
 		if(params.delta <= 0.25D && params.delta > 1.0D) {
 			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
 		}
@@ -64,6 +68,8 @@ public class LLL {
 				BigDecimal rounded = gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP);
 				if (rounded.compareTo(BigDecimal.ZERO) != 0) {
 					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).multiply(rounded));
+					if (transformations != null)
+						transformations.getRow(k).subtractEquals(transformations.getRow(j).multiply(rounded));
 					gs.compute(); //bad and naive
 				}
 			}
@@ -77,6 +83,8 @@ public class LLL {
 
 				if(a.compareTo(gs.getNewBasis().getRow(k-1).magnitudeSq().multiply(BIG_DELTA)) < 0) {
 					gs.getBasis().swapEquals(k-1, k);
+					if (transformations != null)
+						transformations.swapEquals(k-1, k);
 					gs.compute(); //bad and naive
 					k = (k >= 2) ? k - 1: 1;
 					//fullyCompleted = false;

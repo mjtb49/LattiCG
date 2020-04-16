@@ -288,7 +288,8 @@ public class BigMatrix implements ICopy<BigMatrix> {
 
 		public BigMatrix identityMatrix(int size) {
 			BigMatrix m = new BigMatrix(size, size);
-
+			for (int i = 0; i < size; i++) for (int j = 0; j < size; j++)
+				m.set(i, j, BigDecimal.ZERO);
 			for(int i = 0; i < size; i++) {
 				m.set(i, i, BigDecimal.ONE);
 			}

@@ -59,6 +59,7 @@ public class RandomReverser {
             for (int j = 0; j < dimensions; j++)
                 scales.set(i,j,ZERO);
             scales.set(i,i,lcm.divide(sideLengths.get(i)));
+            // Hacky solution: scales.set(i,i,ONE);
         }
 
         BigMatrix unscaledLattice = new BigMatrix(dimensions,dimensions);
@@ -84,11 +85,19 @@ public class RandomReverser {
 
         LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
         if(verbose)
-            System.out.println("Reducing: "+scaledLattice.toPrettyString());
-        BigMatrix result = LLL.reduce(scaledLattice, params);
-        if(verbose)
-            System.out.println("Found Reduced Basis: " + result.multiply(scales.inverse()).toPrettyString());
-        Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
+            System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
+
+        BigMatrix transformations = new BigMatrix.Factory().identityMatrix(dimensions);
+        BigMatrix result = LLL.reduce(scaledLattice, params, transformations);
+        //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
+
+        if(verbose) {
+            System.out.println("Found Reduced Scaled Basis:\n" + result.toPrettyString());
+            System.out.println("Found Reduced Basis:\n" + transformations.multiply(unscaledLattice).toPrettyString());
+            //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
+        }
+        //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
+        Matrix m = new Matrix.Factory().fromBigMatrix(transformations.multiply(unscaledLattice));
         Vector vecMins = new Vector(dimensions);
         Vector vecMaxes = new Vector(dimensions);
         Vector offsets = new Vector(dimensions);
