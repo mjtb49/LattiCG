@@ -1,8 +1,13 @@
-<<<<<<< HEAD
+
 .idea/
 out/
 .gradle/
 build/
+*.iml
+*.ipr
+.classpath
+.project
+.settings/
 
 =======
 # Compiled class file
@@ -28,4 +33,3 @@ build/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
->>>>>>> 7e7a0206f2e75f8eeb286d0d639b9b8f1a1ff15d

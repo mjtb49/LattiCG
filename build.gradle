@@ -2,6 +2,8 @@ plugins {
     id 'java'
 }
 
+sourceSets.main.java.srcDirs = ['src']
+
 repositories {
     mavenCentral()
 }
