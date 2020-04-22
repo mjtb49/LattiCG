@@ -12,6 +12,7 @@ import randomreverser.util.Rand;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class RandomReverser {
@@ -20,6 +21,8 @@ public class RandomReverser {
     private static final BigDecimal MULT = new BigDecimal(25214903917L);
     private static final BigDecimal ONE = new BigDecimal(1);
     private static final BigDecimal ZERO = new BigDecimal(0);
+
+    private Matrix lattice;
 
     private ArrayList<Long> mins;
     private ArrayList<Long> maxes;
@@ -38,11 +41,40 @@ public class RandomReverser {
 
     //TODO Make this pick and choose which dimensions to use instead of using all of them
     public ArrayList<Long> findAllValidSeeds() {
+        createLattice();
+        Vector vecMins = new Vector(dimensions);
+        Vector vecMaxes = new Vector(dimensions);
+        Vector offsets = new Vector(dimensions);
+        Rand rand = new Rand(0x5deece66dL);
+        for (int i = 0; i < dimensions; i++) {
+            vecMins.set(i, (double) mins.get(i));
+            vecMaxes.set(i, (double) maxes.get(i));
+            offsets.set(i,rand.getSeed());
+            if (i != dimensions-1)
+                rand.advance(gaps.get(i+1));
+        }
+        if (verbose) {
+            System.out.println("Mins: "+vecMins);
+            System.out.println("Maxes: "+vecMaxes);
+            System.out.println("Offsets: "+offsets);
+        }
+        LCG r = Rand.JAVA_LCG.combine(-gaps.get(0));
+
+        ArrayList<Long> results = new ArrayList<>();
+        for (Vector n : Enumerate.enumerate(dimensions, vecMins, vecMaxes, lattice, offsets)) {
+            if(verbose)
+                System.out.println("Found: " + r.nextSeed((long) lattice.getColumn(0).dot(n))+" at "+n);
+            results.add(r.nextSeed((long) lattice.getColumn(0).dot(n)));
+        }
+        return results;
+    }
+
+    private void createLattice() {
         if (verbose)
             System.out.println("Gaps: " + gaps);
         if (mins.size() != dimensions || maxes.size() != dimensions || gaps.size() -1 != dimensions){
             //TODO Bad Input What Do
-            return null;
+            return;
         }
 
         BigVector sideLengths =  new BigVector(dimensions);
@@ -51,14 +83,14 @@ public class RandomReverser {
         }
         BigDecimal lcm = ONE;
         for (int i = 0; i < dimensions; i++) {
-            lcm = sideLengths.get(i).multiply(lcm).divide(MathHelper.gcd(lcm, sideLengths.get(i)));
+            lcm = sideLengths.get(i).multiply(lcm).divide(MathHelper.gcd(lcm, sideLengths.get(i)), RoundingMode.UNNECESSARY);
         }
 
         BigMatrix scales = new BigMatrix(dimensions,dimensions);
         for (int i = 0; i < dimensions; i++) {
             for (int j = 0; j < dimensions; j++)
                 scales.set(i,j,ZERO);
-            scales.set(i,i,lcm.divide(sideLengths.get(i)));
+            scales.set(i,i,lcm.divide(sideLengths.get(i), RoundingMode.UNNECESSARY));
             // Hacky solution: scales.set(i,i,ONE);
         }
 
@@ -97,34 +129,7 @@ public class RandomReverser {
             //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
         }
         //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-        Matrix m = new Matrix.Factory().fromBigMatrix(transformations.multiply(unscaledLattice));
-        Vector vecMins = new Vector(dimensions);
-        Vector vecMaxes = new Vector(dimensions);
-        Vector offsets = new Vector(dimensions);
-        Rand rand = new Rand(0x5deece66dL);
-        for (int i = 0; i < dimensions; i++) {
-            vecMins.set(i, (double) mins.get(i));
-            vecMaxes.set(i, (double) maxes.get(i));
-            offsets.set(i,rand.getSeed());
-            if (i != dimensions-1)
-                rand.advance(gaps.get(i+1));
-        }
-        if (verbose) {
-            System.out.println("Mins: "+vecMins);
-            System.out.println("Maxes: "+vecMaxes);
-            System.out.println("Offsets: "+offsets);
-        }
-        LCG r = Rand.JAVA_LCG.combine(-gaps.get(0));
-
-        ArrayList<Long> results = new ArrayList<>();
-        for (Vector n : Enumerate.enumerate(dimensions, vecMins, vecMaxes, m, offsets)) {
-            if(verbose)
-                System.out.println("Found: " + r.nextSeed((long) m.getColumn(0).dot(n))+" at "+n);
-            results.add(r.nextSeed((long) m.getColumn(0).dot(n)));
-        }
-        //TODO undo the scale and return, perhaps chuck an enumerate in here and call the method solve or something.
-
-        return results;
+        lattice = new Matrix.Factory().fromBigMatrix(transformations.multiply(unscaledLattice));
     }
 
     private void addMeasuredSeed(long min, long max) {
@@ -168,8 +173,8 @@ public class RandomReverser {
         }
     }
 
-    public void consumeNextBooleanCall() {
-        addUnmeasuredSeeds(1);
+    public void consumeNextBooleanCalls( int numCalls) {
+        addUnmeasuredSeeds(numCalls);
     }
 
     public void addNextFloatCall(float min, float max) {
@@ -213,7 +218,6 @@ public class RandomReverser {
     }
 
     public void addNextDoubleCall(double min, double max) {
-        //TODO make sure this works
         long minAsLong = (long) (min * (double) (1L << 53));
         long maxAsLong = (long) (max * (double) (1L << 53));
         addMeasuredSeed((minAsLong >>> 27) << 22, (((maxAsLong >>> 27) +1 )<<22) - 1);
@@ -232,4 +236,5 @@ public class RandomReverser {
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
+
 }
