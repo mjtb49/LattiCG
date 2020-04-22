@@ -2,17 +2,16 @@ package randomreverser.util;
 
 import java.math.BigDecimal;
 
-public class MathHelper {
+public class Mth {
     public static BigDecimal gcd(BigDecimal a, BigDecimal b) {
-        if (a.compareTo(BigDecimal.ZERO) == 0)
-            return b;
-        if (b.compareTo(BigDecimal.ZERO) == 0)
-            return a;
-        if (a.compareTo(b) == 0)
-            return a;
-        if (a.compareTo(b) > 0)
-            return gcd(a.remainder(b), b);
-        return gcd(a,  b.remainder(a));
+        while (b.signum() != 0) {
+            a = a.remainder(b);
+            BigDecimal temp = a;
+            a = b;
+            b = temp;
+        }
+
+        return a;
     }
 
     public static double gcd(double a, double b) {
@@ -26,19 +25,16 @@ public class MathHelper {
         return a;
     }
 
+    @Deprecated // use Long.numberOfTrailingZeros() instead
     public static int countTrailingZeroes(long v) {
-        int c;  // output: c will count v's trailing zero bits,
-        // so if v is 1101000 (base 2), then c will be 3
-        v = (v ^ (v - 1)) >> 1;  // Set v's trailing 0s to 1s and zero rest
-
-        for(c = 0; v != 0; c++)  {
-            v >>>= 1;
-        }
-
-        return c;
+        return Long.numberOfTrailingZeros(v);
     }
 
     public static long modInverse(long x, int mod) { //Fast method for modular inverse mod powers of 2
+        if ((x & 1) == 0) {
+            throw new IllegalArgumentException("x is not coprime with the modulus");
+        }
+
         long inv = 0;
         long b = 1;
 

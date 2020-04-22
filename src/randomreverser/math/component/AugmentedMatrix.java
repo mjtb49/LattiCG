@@ -1,5 +1,7 @@
 package randomreverser.math.component;
 
+import randomreverser.util.StringUtils;
+
 public class AugmentedMatrix {
 
 	private Matrix base;
@@ -35,25 +37,32 @@ public class AugmentedMatrix {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		for(int i = 0; i < this.base.getHeight(); i++) {
-			sb.append("[");
-
-			for(int j = 0; j < this.base.getWidth(); j++) {
-				sb.append(" ").append(this.base.get(i, j)).append(" ");
+		return StringUtils.tableToString(Math.max(base.getHeight(), extra.getHeight()), base.getWidth() + extra.getWidth(), (row, column) -> {
+			if (column < base.getWidth()) {
+				if (row >= base.getHeight()) {
+					return "";
+				} else {
+					return String.valueOf(base.get(row, column));
+				}
+			} else {
+				column -= base.getWidth();
+				if (row >= extra.getHeight()) {
+					return "";
+				} else {
+					return String.valueOf(extra.get(row, column));
+				}
 			}
-
-			sb.append("|");
-
-			for(int j = 0; j < this.extra.getWidth(); j++) {
-				sb.append(" ").append(this.extra.get(i, j)).append(" ");
+		}, (row, column) -> {
+			if (column == 0) {
+				return "[";
+			} else if (column == base.getWidth()) {
+				return "|";
+			} else if (column == base.getWidth() + extra.getWidth()) {
+				return "]";
+			} else {
+				return " ";
 			}
-
-			sb.append("]\n");
-		}
-
-		return sb.toString();
+		});
 	}
 
 }

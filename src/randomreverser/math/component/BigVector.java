@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.regex.Pattern;
 
-public class BigVector implements ICopy<BigVector> {
+public class BigVector {
 
 	private BigDecimal[] numbers;
 	private int length;
@@ -135,7 +135,6 @@ public class BigVector implements ICopy<BigVector> {
 		return v.multiply(this.getScalarProjection(v));
 	}
 
-	@Override
 	public BigVector copy() {
 		BigVector v = new BigVector(this.getLength());
 

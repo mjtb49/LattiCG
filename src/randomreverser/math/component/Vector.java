@@ -3,7 +3,7 @@ package randomreverser.math.component;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class Vector implements ICopy<Vector> {
+public class Vector {
 
 	private double[] numbers;
 	private int length;
@@ -153,7 +153,6 @@ public class Vector implements ICopy<Vector> {
 		return v.multiply(this.getScalarProjection(v));
 	}
 
-	@Override
 	public Vector copy() {
 		Vector v = new Vector(this.getLength());
 

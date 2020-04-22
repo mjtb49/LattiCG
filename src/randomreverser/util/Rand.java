@@ -1,37 +1,78 @@
 package randomreverser.util;
 
+import java.lang.reflect.Field;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Rand {
 
-    public static final LCG JAVA_LCG = new LCG(0x5DEECE66DL, 0xBL, 1L << 48);
+    private final LCG lcg;
+    private long seed;
 
-    protected long seed;
-
-    public Rand(long seed) {
-        this.setSeed(seed, true);
+    private Rand(LCG lcg) {
+        this.lcg = lcg;
     }
 
-    public Rand(long seed, boolean scramble) {
-        this.setSeed(seed, scramble);
+    public static Rand ofInternalSeed(LCG lcg, long seed) {
+        Rand rand = new Rand(lcg);
+        rand.setInternalSeed(seed);
+        return rand;
+    }
+
+    public static Rand ofSeedScrambled(LCG lcg, long seed) {
+        Rand rand = new Rand(lcg);
+        rand.setSeedScrambled(seed);
+        return rand;
+    }
+
+    public static Rand ofInternalSeed(long seed) {
+        return ofInternalSeed(LCG.JAVA, seed);
+    }
+
+    public static Rand ofSeedScrambled(long seed) {
+        return ofSeedScrambled(LCG.JAVA, seed);
+    }
+
+    public static Rand copyOf(Rand other) {
+        Rand rand = new Rand(other.lcg);
+        rand.seed = other.seed;
+        return rand;
+    }
+
+    public static Rand copyOf(Random random) {
+        if (random instanceof RandomWrapper) {
+            return copyOf(((RandomWrapper) random).delegate);
+        } else if (random.getClass() == Random.class) {
+            try {
+                AtomicLong seed = (AtomicLong) SeedFieldHolder.FIELD.get(random);
+                return ofInternalSeed(seed.get());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new IllegalArgumentException("Don't know how to Rand.copyOf() an instance of " + random.getClass().getName() + ", it may not even be an LCG!");
+        }
     }
 
     public long getSeed() {
         return this.seed;
     }
 
-    public void setSeed(long seed, boolean scramble) {
-        this.seed = seed ^ (scramble ? JAVA_LCG.multiplier : 0L);
-        this.seed &= JAVA_LCG.modulo - 1;
+    public void setInternalSeed(long seed) {
+        this.seed = lcg.mod(seed);
+    }
+
+    public void setSeedScrambled(long seed) {
+        setInternalSeed(seed ^ LCG.JAVA.multiplier);
     }
 
     public int next(int bits) {
-        this.seed = JAVA_LCG.nextSeed(this.seed);
+        this.seed = lcg.nextSeed(this.seed);
         return (int)(this.seed >>> (48 - bits));
     }
 
     public void advance(int calls) {
-        this.advance(JAVA_LCG.combine(calls));
+        this.advance(lcg.combine(calls));
     }
 
     public void advance(LCG skip) {
@@ -77,8 +118,19 @@ public class Rand {
         return (((long)this.next(27) << 27) + this.next(27)) / (double)(1L << 54);
     }
 
-    public Random toRandom() {
-        return new Random(this.seed ^ JAVA_LCG.multiplier);
+    public Random asRandomView() {
+        return new RandomWrapper(this);
+    }
+
+    public Random copyToRandom() {
+        return copyOf(this).asRandomView();
+    }
+
+    public Random copyToThreadSafeRandom() {
+        if (!lcg.equals(LCG.JAVA)) {
+            throw new UnsupportedOperationException("Rand.copyToThreadSafeRandom() only works for LCG.JAVA");
+        }
+        return new Random(seed ^ lcg.multiplier);
     }
 
     @Override
@@ -92,6 +144,41 @@ public class Rand {
     @Override
     public String toString() {
         return "Rand{" + "seed=" + this.seed + '}';
+    }
+
+    private static final class RandomWrapper extends Random {
+        private final Rand delegate;
+
+        private RandomWrapper(Rand delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        protected int next(int bits) {
+            return delegate.next(bits);
+        }
+
+        @Override
+        public void setSeed(long seed) {
+            delegate.setSeedScrambled(seed);
+        }
+
+        @Override
+        public double nextGaussian() {
+            throw new UnsupportedOperationException("Rand.asRandomView() and Rand.copyToRandom() do not support nextGaussian()! Use Rand.copyToThreadSafeRandom() instead.");
+        }
+    }
+
+    private static class SeedFieldHolder {
+        static final Field FIELD;
+        static {
+            try {
+                FIELD = Random.class.getDeclaredField("seed");
+                FIELD.setAccessible(true);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }
