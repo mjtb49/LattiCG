@@ -1,7 +1,7 @@
 package randomreverser;
 
 import randomreverser.util.LCG;
-import randomreverser.util.LCGMath;
+import randomreverser.util.Mth;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
 import randomreverser.math.component.Matrix;
@@ -51,7 +51,7 @@ public class RandomReverser {
         }
         BigDecimal lcm = ONE;
         for (int i = 0; i < dimensions; i++) {
-            lcm = sideLengths.get(i).multiply(lcm).divide(LCGMath.gcd(lcm, sideLengths.get(i)));
+            lcm = sideLengths.get(i).multiply(lcm).divide(Mth.gcd(lcm, sideLengths.get(i)));
         }
 
         BigMatrix scales = new BigMatrix(dimensions,dimensions);

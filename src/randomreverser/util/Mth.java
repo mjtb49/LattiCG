@@ -2,7 +2,7 @@ package randomreverser.util;
 
 import java.math.BigDecimal;
 
-public class LCGMath {
+public class Mth {
     public static BigDecimal gcd(BigDecimal a, BigDecimal b) {
         while (b.signum() != 0) {
             a = a.remainder(b);
