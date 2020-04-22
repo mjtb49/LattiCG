@@ -1,7 +1,7 @@
 package randomreverser;
 
 import randomreverser.util.LCG;
-import randomreverser.util.MathHelper;
+import randomreverser.util.LCGMath;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
 import randomreverser.math.component.Matrix;
@@ -51,7 +51,7 @@ public class RandomReverser {
         }
         BigDecimal lcm = ONE;
         for (int i = 0; i < dimensions; i++) {
-            lcm = sideLengths.get(i).multiply(lcm).divide(MathHelper.gcd(lcm, sideLengths.get(i)));
+            lcm = sideLengths.get(i).multiply(lcm).divide(LCGMath.gcd(lcm, sideLengths.get(i)));
         }
 
         BigMatrix scales = new BigMatrix(dimensions,dimensions);
@@ -101,7 +101,7 @@ public class RandomReverser {
         Vector vecMins = new Vector(dimensions);
         Vector vecMaxes = new Vector(dimensions);
         Vector offsets = new Vector(dimensions);
-        Rand rand = new Rand(0x5deece66dL);
+        Rand rand = Rand.ofInternalSeed(0);
         for (int i = 0; i < dimensions; i++) {
             vecMins.set(i, (double) mins.get(i));
             vecMaxes.set(i, (double) maxes.get(i));
@@ -114,7 +114,7 @@ public class RandomReverser {
             System.out.println("Maxes: "+vecMaxes);
             System.out.println("Offsets: "+offsets);
         }
-        LCG r = Rand.JAVA_LCG.combine(-gaps.get(0));
+        LCG r = LCG.JAVA.combine(-gaps.get(0));
 
         ArrayList<Long> results = new ArrayList<>();
         for (Vector n : Enumerate.enumerate(dimensions, vecMins, vecMaxes, m, offsets)) {
@@ -141,7 +141,7 @@ public class RandomReverser {
 
     public void addNextIntCall(int n, int min, int max) {
         if ((n & (-n)) == n) {// if n is a power of 2
-            int log = MathHelper.countTrailingZeroes(n);
+            int log = Long.numberOfTrailingZeros(n);
             addMeasuredSeed(min * (1L << (48 - log)), (max+1) * (1L << (48 - log)) - 1);
         }
         else {

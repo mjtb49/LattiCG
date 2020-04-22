@@ -1,5 +1,7 @@
 package randomreverser.math.component;
 
+import randomreverser.util.StringUtils;
+
 import java.math.BigDecimal;
 
 public class BigAugmentedMatrix {
@@ -37,25 +39,34 @@ public class BigAugmentedMatrix {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		for(int i = 0; i < this.base.getHeight(); i++) {
-			sb.append("[");
-
-			for(int j = 0; j < this.base.getWidth(); j++) {
-				sb.append(" ").append(this.base.get(i, j) == null ? null : this.base.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+		return StringUtils.tableToString(Math.max(base.getHeight(), extra.getHeight()), base.getWidth() + extra.getWidth(), (row, column) -> {
+			if (column < base.getWidth()) {
+				if (row >= base.getHeight()) {
+					return "";
+				} else {
+					return base.get(row, column) == null ? "null" :
+							base.get(row, column).stripTrailingZeros().toPlainString();
+				}
+			} else {
+				column -= base.getWidth();
+				if (row >= extra.getHeight()) {
+					return "";
+				} else {
+					return extra.get(row, column) == null ? "null" :
+							extra.get(row, column).stripTrailingZeros().toPlainString();
+				}
 			}
-
-			sb.append("|");
-
-			for(int j = 0; j < this.extra.getWidth(); j++) {
-				sb.append(" ").append(this.extra.get(i, j) == null ? null : this.extra.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
+		}, (row, column) -> {
+			if (column == 0) {
+				return "[";
+			} else if (column == base.getWidth()) {
+				return "|";
+			} else if (column == base.getWidth() + extra.getWidth()) {
+				return "]";
+			} else {
+				return " ";
 			}
-
-			sb.append("]\n");
-		}
-
-		return sb.toString();
+		});
 	}
 
 }

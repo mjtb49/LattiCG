@@ -4,26 +4,24 @@ import java.util.Objects;
 
 public class LCG {
 
+    public static final LCG JAVA = new LCG(0x5DEECE66DL, 0xBL, 1L << 48);
+
     public final long multiplier;
     public final long addend;
-    public final long modulo;
+    public final long modulus;
 
     private final boolean canMask;
 
-    public LCG(long multiplier, long addend, long modulo) {
+    public LCG(long multiplier, long addend, long modulus) {
         this.multiplier = multiplier;
         this.addend = addend;
-        this.modulo = modulo;
+        this.modulus = modulus;
 
-        this.canMask = (this.modulo & -this.modulo) == this.modulo;
+        this.canMask = (this.modulus & -this.modulus) == this.modulus;
     }
 
     public long nextSeed(long seed) {
-        if(this.canMask) {
-            return (seed * this.multiplier + this.addend) & (this.modulo - 1);
-        }
-
-        return (seed * this.multiplier + this.addend) % this.modulo;
+        return mod(seed * multiplier + addend);
     }
 
     public LCG combine(long steps) {
@@ -43,15 +41,22 @@ public class LCG {
             intermediateMultiplier *= intermediateMultiplier;
         }
 
-        if(this.canMask) {
-            multiplier &= (this.modulo - 1);
-            addend &= (this.modulo - 1);
-        } else {
-            multiplier %= this.modulo;
-            addend %= this.modulo;
-        }
+        multiplier = mod(multiplier);
+        addend = mod(addend);
 
-        return new LCG(multiplier, addend, this.modulo);
+        return new LCG(multiplier, addend, this.modulus);
+    }
+
+    public LCG invert() {
+        return combine(-1);
+    }
+
+    public long mod(long n) {
+        if (canMask) {
+            return n & (modulus - 1);
+        } else {
+            return n % modulus; // TODO: does not work for modulus > 2^32
+        }
     }
 
     @Override
@@ -61,18 +66,18 @@ public class LCG {
         LCG lcg = (LCG)obj;
         return this.multiplier == lcg.multiplier &&
                 this.addend == lcg.addend &&
-                this.modulo == lcg.modulo;
+                this.modulus == lcg.modulus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.multiplier, this.addend, this.modulo);
+        return Objects.hash(this.multiplier, this.addend, this.modulus);
     }
 
     @Override
     public String toString() {
         return "LCG{" + "multiplier=" + this.multiplier +
-                ", addend=" + this.addend + ", modulo=" + this.modulo + '}';
+                ", addend=" + this.addend + ", modulo=" + this.modulus + '}';
     }
 
 }

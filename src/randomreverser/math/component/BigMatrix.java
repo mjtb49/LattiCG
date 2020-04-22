@@ -1,12 +1,13 @@
 package randomreverser.math.component;
 
+import randomreverser.util.StringUtils;
+
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
-public class BigMatrix implements ICopy<BigMatrix> {
+public class BigMatrix {
 
 	protected BigVector[] rows;
 	protected int height;
@@ -31,12 +32,12 @@ public class BigMatrix implements ICopy<BigMatrix> {
 		return this.width;
 	}
 
-	public BigDecimal get(int i, int j) {
-		if(this.rows[i] == null) {
+	public BigDecimal get(int row, int col) {
+		if(this.rows[row] == null) {
 			return null;
 		}
 
-		return this.rows[i].get(j);
+		return this.rows[row].get(col);
 	}
 
 	public void set(int i, int j, BigDecimal value) {
@@ -179,7 +180,6 @@ public class BigMatrix implements ICopy<BigMatrix> {
 		this.setRow(j, temp);
 	}
 
-	@Override
 	public BigMatrix copy() {
 		BigMatrix m = new BigMatrix(this.getHeight(), this.getWidth());
 
@@ -191,19 +191,7 @@ public class BigMatrix implements ICopy<BigMatrix> {
 	}
 
 	public String toPrettyString() {
-		StringBuilder sb = new StringBuilder();
-
-		for(int i = 0; i < this.getHeight(); i++) {
-			sb.append("[");
-
-			for(int j = 0; j < this.getWidth(); j++) {
-				sb.append(" ").append(this.get(i, j) == null ? null : this.get(i, j).stripTrailingZeros().toPlainString()).append(" ");
-			}
-
-			sb.append("]\n");
-		}
-
-		return sb.toString();
+		return StringUtils.tableToString(getHeight(), getWidth(), (row, column) -> get(row, column) == null ? "null" : get(row, column).stripTrailingZeros().toPlainString());
 	}
 
 	@Override

@@ -1,9 +1,11 @@
 package randomreverser.math.component;
 
+import randomreverser.util.StringUtils;
+
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
-public class Matrix implements ICopy<Matrix> {
+public class Matrix {
 
 	protected Vector[] rows;
 	protected int height;
@@ -28,12 +30,12 @@ public class Matrix implements ICopy<Matrix> {
 		return this.width;
 	}
 
-	public double get(int i, int j) {
-		if(this.rows[i] == null) {
+	public double get(int row, int col) {
+		if(this.rows[row] == null) {
 			return Double.NaN;
 		}
 
-		return this.rows[i].get(j);
+		return this.rows[row].get(col);
 	}
 
 	public void set(int i, int j, double value) {
@@ -194,7 +196,6 @@ public class Matrix implements ICopy<Matrix> {
 		this.setRow(j, temp);
 	}
 
-	@Override
 	public Matrix copy() {
 		Matrix m = new Matrix(this.getHeight(), this.getWidth());
 
@@ -206,19 +207,7 @@ public class Matrix implements ICopy<Matrix> {
 	}
 
 	public String toPrettyString() {
-		StringBuilder sb = new StringBuilder();
-
-		for(int i = 0; i < this.getHeight(); i++) {
-			sb.append("[");
-
-			for(int j = 0; j < this.getWidth(); j++) {
-				sb.append(" ").append(this.get(i, j)).append(" ");
-			}
-
-			sb.append("]\n");
-		}
-
-		return sb.toString();
+		return StringUtils.tableToString(height, width, (row, column) -> String.valueOf(get(row, column)));
 	}
 
 	@Override

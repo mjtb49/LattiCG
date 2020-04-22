@@ -3,6 +3,7 @@ plugins {
 }
 
 sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['test']
 
 repositories {
     mavenCentral()
@@ -10,4 +11,5 @@ repositories {
 
 dependencies {
     compile "org.sosy-lab:javasmt-solver-z3:z3-4.4.1-1558-gf96cfea"
+    testCompile "junit:junit:4.12"
 }

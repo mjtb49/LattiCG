@@ -1,7 +1,4 @@
-package test;
-
-import randomreverser.RandomReverser;
-import randomreverser.util.Rand;
+package randomreverser;
 
 import java.util.ArrayList;
 import java.util.Random;
