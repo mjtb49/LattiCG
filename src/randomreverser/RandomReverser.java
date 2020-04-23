@@ -119,7 +119,7 @@ public class RandomReverser {
         if(verbose)
             System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
 
-        BigMatrix transformations = new BigMatrix.Factory().identityMatrix(dimensions);
+        BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
         BigMatrix result = LLL.reduce(scaledLattice, params, transformations);
         //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
 
@@ -129,7 +129,7 @@ public class RandomReverser {
             //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
         }
         //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-        lattice = new Matrix.Factory().fromBigMatrix(transformations.multiply(unscaledLattice));
+        lattice = Matrix.fromBigMatrix(transformations.multiply(unscaledLattice));
     }
 
     private void addMeasuredSeed(long min, long max) {
@@ -146,7 +146,7 @@ public class RandomReverser {
 
     public void addNextIntCall(int n, int min, int max) {
         if ((n & (-n)) == n) {// if n is a power of 2
-            int log = Mth.countTrailingZeroes(n);
+            int log = Long.numberOfTrailingZeros(n);
             addMeasuredSeed(min * (1L << (48 - log)), (max+1) * (1L << (48 - log)) - 1);
         }
         else {

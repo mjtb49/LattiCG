@@ -2,29 +2,42 @@ package randomreverser.math.component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class BigVector {
+public final class BigVector {
 
 	private BigDecimal[] numbers;
-	private int length;
+	private int dimension;
 
-	public BigVector(int length) {
-		this.length = length;
-		this.numbers = new BigDecimal[this.length];
+	public BigVector(int dimension) {
+		this.dimension = dimension;
+		this.numbers = new BigDecimal[this.dimension];
 	}
 
-	public BigVector(BigDecimal[] numbers) {
-		this.length = numbers.length;
-		this.numbers = new BigDecimal[this.length];
+	public BigVector(double... numbers) {
+		this(toBigDecimals(numbers));
+	}
 
-		for(int i = 0; i < this.length; i++) {
+	private static BigDecimal[] toBigDecimals(double[] numbers) {
+		BigDecimal[] decimals = new BigDecimal[numbers.length];
+		for (int i = 0; i < numbers.length; i++) {
+			decimals[i] = BigDecimal.valueOf(numbers[i]);
+		}
+		return decimals;
+	}
+
+	public BigVector(BigDecimal... numbers) {
+		this.dimension = numbers.length;
+		this.numbers = new BigDecimal[this.dimension];
+
+		for(int i = 0; i < this.dimension; i++) {
 			this.set(i, numbers[i]);
 		}
 	}
 
-	public int getLength() {
-		return this.length;
+	public int getDimension() {
+		return this.dimension;
 	}
 
 	public BigDecimal get(int i) {
@@ -38,7 +51,7 @@ public class BigVector {
 	public BigDecimal magnitudeSq() {
 		BigDecimal magnitude = BigDecimal.ZERO;
 
-		for(int i = 0; i < this.getLength(); i++) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			magnitude = magnitude.add(this.get(i).multiply(this.get(i)));
 		}
 
@@ -46,17 +59,19 @@ public class BigVector {
 	}
 
 	public boolean isZero() {
-		for(int i = 0; i < this.getLength(); i++) {
-			if(this.get(i).compareTo(BigDecimal.ZERO) == 0)return false;
+		for(int i = 0; i < this.getDimension(); i++) {
+			if(this.get(i).compareTo(BigDecimal.ZERO) != 0) return false;
 		}
 
 		return true;
 	}
 
 	public BigVector add(BigVector a) {
-		BigVector v = new BigVector(this.getLength());
+		assertSameDimension(a);
 
-		for(int i = 0; i < v.getLength(); i++) {
+		BigVector v = new BigVector(this.getDimension());
+
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i).add(a.get(i)));
 		}
 
@@ -64,9 +79,11 @@ public class BigVector {
 	}
 
 	public BigVector subtract(BigVector a) {
-		BigVector v = new BigVector(this.getLength());
+		assertSameDimension(a);
 
-		for(int i = 0; i < v.getLength(); i++) {
+		BigVector v = new BigVector(this.getDimension());
+
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i).subtract(a.get(i)));
 		}
 
@@ -76,7 +93,7 @@ public class BigVector {
 	public BigVector multiply(BigDecimal scalar) {
 		BigVector v = this.copy();
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i).multiply(scalar));
 		}
 
@@ -86,126 +103,142 @@ public class BigVector {
 	public BigVector divide(BigDecimal scalar) {
 		BigVector v = this.copy();
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
 		}
 
 		return v;
 	}
 
-	public void addEquals(BigVector a) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public BigVector addEquals(BigVector a) {
+		assertSameDimension(a);
+
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i).add(a.get(i)));
 		}
+
+		return this;
 	}
 
-	public void subtractEquals(BigVector a) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public BigVector subtractEquals(BigVector a) {
+		assertSameDimension(a);
+
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i).subtract(a.get(i)));
 		}
+
+		return this;
 	}
 
-	public void multiplyEquals(BigDecimal scalar) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public BigVector multiplyEquals(BigDecimal scalar) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i).multiply(scalar));
 		}
+
+		return this;
 	}
 
-	public void divideEquals(BigDecimal scalar) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public BigVector divideEquals(BigDecimal scalar) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
 		}
+
+		return this;
 	}
 
 	public BigDecimal dot(BigVector v) {
+		assertSameDimension(v);
+
 		BigDecimal dot = BigDecimal.ZERO;
 
-		for(int i = 0; i < this.getLength(); i++) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			dot = dot.add(this.get(i).multiply(v.get(i)));
 		}
 
 		return dot;
 	}
 
-	public BigDecimal getScalarProjection(BigVector v) {
+	public BigDecimal gramSchmidtCoefficient(BigVector v) {
 		return this.dot(v).divide(v.magnitudeSq(), RoundingMode.HALF_UP);
 	}
 
 	public BigVector projectOnto(BigVector v) {
-		return v.multiply(this.getScalarProjection(v));
+		return v.multiply(this.gramSchmidtCoefficient(v));
 	}
 
 	public BigVector copy() {
-		BigVector v = new BigVector(this.getLength());
+		BigVector v = new BigVector(this.getDimension());
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i) == null ? BigDecimal.ZERO : this.get(i));
 		}
 
 		return v;
 	}
 
+	private void assertSameDimension(BigVector other) {
+		if (other.dimension != this.dimension) {
+			throw new IllegalArgumentException("The other vector is not the same dimension");
+		}
+	}
+
+	public boolean equals(BigVector other, BigDecimal tolerance) {
+		if (this.dimension != other.dimension) {
+			return false;
+		}
+		for (int i = 0; i < dimension; i++) {
+			if (this.get(i).subtract(other.get(i)).abs().compareTo(tolerance) > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(numbers);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) return true;
+		if (other == null || other.getClass() != BigVector.class) return false;
+		BigVector that = (BigVector) other;
+		return this.equals(that, BigDecimal.ZERO);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("{");
 
-		for(int i = 0; i < this.getLength(); i++) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			sb.append(this.get(i) == null ? null : this.get(i).stripTrailingZeros().toPlainString())
-					.append(i == this.getLength() - 1 ? "" : ", ");
+					.append(i == this.getDimension() - 1 ? "" : ", ");
 		}
 
 		return sb.append("}").toString();
 	}
 
-	public static class Builder {
-		private int length;
-		private BigDecimal defaultValue;
+	public static BigVector fromString(String raw) {
+		raw = raw.replaceAll("\\s+","");
 
-		public Builder setLength(int length) {
-			this.length = length;
-			return this;
+		String[] data = raw.split(Pattern.quote(","));
+		BigVector v = new BigVector(data.length);
+
+		for(int i = 0; i < data.length; i++) {
+			v.set(i, new BigDecimal(data[i]));
 		}
 
-		public Builder fillWith(BigDecimal defaultValue) {
-			this.defaultValue = defaultValue;
-			return this;
-		}
-
-		public BigVector build() {
-			BigVector v = new BigVector(this.length);
-
-			if(this.defaultValue != null) {
-				for(int i = 0; i < v.getLength(); i++) {
-					v.set(i, this.defaultValue);
-				}
-			}
-
-			return v;
-		}
+		return v;
 	}
 
-	public static class Factory {
-		public BigVector fromString(String raw) {
-			raw = raw.replaceAll("\\s+","");
+	public static BigVector fromVector(Vector v) {
+		BigVector p = new BigVector(v.getDimension());
 
-			String[] data = raw.split(Pattern.quote(","));
-			BigVector v = new BigVector(data.length);
-
-			for(int i = 0; i < data.length; i++) {
-				v.set(i, new BigDecimal(data[i]));
-			}
-
-			return v;
+		for(int i = 0; i < p.getDimension(); i++) {
+			p.set(i, BigDecimal.valueOf(v.get(i)));
 		}
 
-		public BigVector fromVector(Vector v) {
-			BigVector p = new BigVector(v.getLength());
-
-			for(int i = 0; i < p.getLength(); i++) {
-				p.set(i, BigDecimal.valueOf(v.get(i)));
-			}
-
-			return p;
-		}
+		return p;
 	}
 }

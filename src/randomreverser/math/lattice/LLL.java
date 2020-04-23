@@ -20,7 +20,7 @@ public class LLL {
 		gs.compute();
 
 		int k = 1;
-		int n = gs.getBasis().getHeight();
+		int n = gs.getBasis().getRowCount();
 		while(k <= n) {
 			//for(int k = 0; k < gs.getBasis().getHeight(); k++) {
 			for(int j = k - 1; j >= 0; j--) {
@@ -33,7 +33,7 @@ public class LLL {
 			//}
 			double v = gs.getNewBasis().getRow(k).magnitudeSq() + (gs.getNewBasis().getRow(k-1).multiply(gs.getCoefficients().get(k, k -1 ))).magnitudeSq();
 			if(v < params.delta * gs.getNewBasis().getRow(k-1).magnitudeSq()) {
-				gs.getBasis().swapEquals(k - 1, k );
+				gs.getBasis().swapRowsEquals(k - 1, k );
 				gs.compute(); //bad and naive
 				k = (k >= 2) ? k - 1: 1;
 			}
@@ -61,7 +61,7 @@ public class LLL {
 		gs.compute();
 
 		int k = 1;
-		int n = gs.getBasis().getHeight() - 1;
+		int n = gs.getBasis().getRowCount() - 1;
 		while(k <= n) {
 			//for(int k = 0; k < gs.getBasis().getHeight(); k++) {
 			for(int j = k - 1; j >= 0; j--) {
@@ -82,9 +82,9 @@ public class LLL {
 				BigDecimal a = gs.getNewBasis().getRow(k).magnitudeSq().add(gs.getNewBasis().getRow(k-1).multiply(gs.getCoefficients().get(k, k-1)).magnitudeSq());
 
 				if(a.compareTo(gs.getNewBasis().getRow(k-1).magnitudeSq().multiply(BIG_DELTA)) < 0) {
-					gs.getBasis().swapEquals(k-1, k);
+					gs.getBasis().swapRowsEquals(k-1, k);
 					if (transformations != null)
-						transformations.swapEquals(k-1, k);
+						transformations.swapRowsEquals(k-1, k);
 					gs.compute(); //bad and naive
 					k = (k >= 2) ? k - 1: 1;
 					//fullyCompleted = false;
@@ -100,12 +100,9 @@ public class LLL {
 		return gs.getBasis();
 	}
 
-	public static class Params {
+	public static final class Params {
 		protected double delta;
 		protected boolean debug;
-
-		public Params() {
-		}
 
 		public Params setDelta(double delta) {
 			this.delta = delta;

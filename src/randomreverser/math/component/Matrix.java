@@ -2,32 +2,31 @@ package randomreverser.math.component;
 
 import randomreverser.util.StringUtils;
 
-import java.security.InvalidParameterException;
-import java.util.regex.Pattern;
+import java.util.Arrays;
 
-public class Matrix {
+public final class Matrix {
 
 	protected Vector[] rows;
-	protected int height;
-	protected int width;
+	protected int rowCount;
+	protected int columnCount;
 
-	public Matrix(int height, int width) {
-		this.height = height;
-		this.width = width;
+	public Matrix(int rowCount, int columnCount) {
+		this.rowCount = rowCount;
+		this.columnCount = columnCount;
 
-		if(this.height <= 0 || this.width <= 0) {
-			throw new InvalidParameterException("Matrix dimensions cannot be less or equal to 0");
+		if(this.rowCount <= 0 || this.columnCount <= 0) {
+			throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
 		}
 
-		this.rows = new Vector[this.height];
+		this.rows = new Vector[this.rowCount];
 	}
 
-	public int getHeight() {
-		return this.height;
+	public int getRowCount() {
+		return this.rowCount;
 	}
 
-	public int getWidth() {
-		return this.width;
+	public int getColumnCount() {
+		return this.columnCount;
 	}
 
 	public double get(int row, int col) {
@@ -38,12 +37,12 @@ public class Matrix {
 		return this.rows[row].get(col);
 	}
 
-	public void set(int i, int j, double value) {
-		if(this.rows[i] == null) {
-			this.rows[i] = new Vector(this.getWidth());
+	public void set(int row, int col, double value) {
+		if(this.rows[row] == null) {
+			this.rows[row] = new Vector(this.getColumnCount());
 		}
 
-		this.rows[i].set(j, value);
+		this.rows[row].set(col, value);
 	}
 
 	public Vector getRow(int i) {
@@ -51,29 +50,29 @@ public class Matrix {
 	}
 
 	public Vector getColumn(int i) {
-		Vector col = new Vector(this.getHeight());
-		for (int j = 0; j < this.getHeight(); j++) {
+		Vector col = new Vector(this.getRowCount());
+		for (int j = 0; j < this.getRowCount(); j++) {
 			col.set(j, this.get(j,i));
 		}
 		return col;
 	}
 
 	public void setRow(int i, Vector value) {
-		if(value != null && value.getLength() != this.getWidth()) {
-			throw new InvalidParameterException("Invalid vector length, expected " + this.getWidth() + ", got " + value.getLength());
+		if(value != null && value.getDimension() != this.getColumnCount()) {
+			throw new IllegalArgumentException("Invalid vector length, expected " + this.getColumnCount() + ", got " + value.getDimension());
 		}
 
 		this.rows[i] = value;
 	}
 
 	public Matrix add(Matrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Adding two matrices with different dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		Matrix p = new Matrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			p.setRow(i, this.getRow(i).add(m.getRow(i)));
 		}
 
@@ -81,31 +80,41 @@ public class Matrix {
 	}
 
 	public Matrix subtract(Matrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		Matrix p = new Matrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			p.setRow(i, this.getRow(i).subtract(m.getRow(i)));
 		}
 
 		return p;
 	}
 
+	public Matrix multiply(double scalar) {
+		Matrix p = new Matrix(getRowCount(), getColumnCount());
+		for (int i = 0; i < getRowCount(); i++) {
+			for (int j = 0; j < getColumnCount(); j++) {
+				p.set(i, j, get(i, j) * scalar);
+			}
+		}
+		return p;
+	}
+
 	public Matrix multiply(Matrix m) {
-		if(this.getWidth() != m.getHeight()) {
-			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
+		if(this.getColumnCount() != m.getRowCount()) {
+			throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
 		}
 
-		Matrix p = new Matrix(this.getHeight(), m.getWidth());
+		Matrix p = new Matrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < p.getHeight(); i++) {
-			for(int j = 0; j < p.getWidth(); j++) {
+		for(int i = 0; i < p.getRowCount(); i++) {
+			for(int j = 0; j < p.getColumnCount(); j++) {
 				p.set(i, j, 0);
 
-				for(int k = 0; k < m.getHeight(); k++) {
+				for(int k = 0; k < m.getRowCount(); k++) {
 					p.set(i, j, p.get(i, j) + this.get(i, k) * m.get(k, j));
 				}
 			}
@@ -115,91 +124,103 @@ public class Matrix {
 	}
 
 	public Vector multiply(Vector v) {
-		if(this.getWidth() != v.getLength()) {
-			throw new UnsupportedOperationException("Vector length should equal the matrix width");
+		if(this.getColumnCount() != v.getDimension()) {
+			throw new IllegalArgumentException("Vector length should equal the number of matrix columns");
 		}
 
-		Vector r = new Vector(this.getHeight());
+		Vector r = new Vector(this.getRowCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			r.set(i, v.dot(this.getRow(i)));
 		}
 
 		return r;
 	}
 
+	public Matrix divide(double scalar) {
+		return multiply(1 / scalar);
+	}
+
 	public Matrix inverse() {
-		if(this.getHeight() != this.getWidth()) {
+		if(this.getRowCount() != this.getColumnCount()) {
 			throw new UnsupportedOperationException("Can only find the inverse of square matrices");
 		}
 
-		SystemSolver.Result result = SystemSolver.solve(this, new Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
+		SystemSolver.Result result = SystemSolver.solve(this, identityMatrix(this.getRowCount()), SystemSolver.Phase.BASIS);
 
 		if(result.type != SystemSolver.Result.Type.ONE_SOLUTION) {
-			throw new UnsupportedOperationException("This matrix is not invertible");
+			throw new IllegalStateException("This matrix is not invertible");
 		}
 
 		return result.result;
 	}
 
-	public Matrix swap(int i, int j) {
+	public Matrix swapRows(int i, int j) {
 		Matrix m = this.copy();
-		m.swapEquals(i, j);
+		m.swapRowsEquals(i, j);
 		return m;
 	}
 
 	public Matrix transpose() {
-		Matrix p = new Matrix(this.getHeight(), this.getWidth());
+		Matrix p = new Matrix(this.getColumnCount(), this.getRowCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getColumnCount(); i++) {
 			p.setRow(i, this.getColumn(i).copy());
 		}
 
 		return p;
 	}
 
-	public void addEquals(Matrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
+	public Matrix addEquals(Matrix m) {
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Adding two matrices with different dimensions");
 		}
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.getRow(i).addEquals(m.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void subtractEquals(Matrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
+	public Matrix subtractEquals(Matrix m) {
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
 		}
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.getRow(i).subtractEquals(m.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void multiplyEquals(Matrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
+	public Matrix multiplyEquals(Matrix m) {
+		// We have to modify this matrix, which means its dimensions must stay the same, which means it has to be square, and the same size as the other matrix
+		if(this.getRowCount() != this.getColumnCount() || m.getRowCount() != m.getColumnCount() || this.getRowCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
 		}
 
 		Matrix result = this.multiply(m);
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.setRow(i, result.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void swapEquals(int i, int j) {
+	public Matrix swapRowsEquals(int i, int j) {
 		Vector temp = this.getRow(i);
 		this.setRow(i, this.getRow(j));
 		this.setRow(j, temp);
+		return this;
 	}
 
 	public Matrix copy() {
-		Matrix m = new Matrix(this.getHeight(), this.getWidth());
+		Matrix m = new Matrix(this.getRowCount(), this.getColumnCount());
 
-		for(int i = 0; i < m.getHeight(); i++) {
+		for(int i = 0; i < m.getRowCount(); i++) {
 			m.setRow(i, this.getRow(i) == null ? null : this.getRow(i).copy());
 		}
 
@@ -207,98 +228,95 @@ public class Matrix {
 	}
 
 	public String toPrettyString() {
-		return StringUtils.tableToString(height, width, (row, column) -> String.valueOf(get(row, column)));
+		return StringUtils.tableToString(rowCount, columnCount, (row, column) -> String.valueOf(get(row, column)));
+	}
+
+	public boolean equals(Matrix other, double tolerance) {
+		if (this.rowCount != other.rowCount || this.columnCount != other.columnCount) {
+			return false;
+		}
+		for (int i = 0; i < rows.length; i++) {
+			if (!rows[i].equals(other.rows[i], tolerance)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int h = Arrays.hashCode(rows);
+		h = 31 * h + columnCount;
+		h = 31 * h + rowCount;
+		return h;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) return true;
+		if (other == null || other.getClass() != Matrix.class) return false;
+		Matrix that = (Matrix) other;
+		return this.columnCount == that.columnCount && this.rowCount == that.rowCount && Arrays.equals(this.rows, that.rows);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("{");
 
-		for(int i = 0; i < this.getHeight(); i++) {
-			sb.append(this.getRow(i)).append(i == this.getHeight() - 1 ? "" : ", ");
+		for(int i = 0; i < this.getRowCount(); i++) {
+			sb.append(this.getRow(i)).append(i == this.getRowCount() - 1 ? "" : ", ");
 		}
 
 		return sb.append("}").toString();
 	}
 
-	public static class Builder {
-		private int height;
-		private int width;
-		private double defaultValue;
+	public static Matrix fromString(String raw) {
+		Matrix m = null;
+		int height;
+		int width;
 
-		public Builder setSize(int height, int width) {
-			this.height = height;
-			this.width = width;
-			return this;
+		raw = raw.replaceAll("\\s+","");
+
+		if (!raw.startsWith("{") || !raw.endsWith("}")) {
+			throw new IllegalArgumentException("Malformed matrix");
 		}
 
-		public Builder fillWith(double defaultValue) {
-			this.defaultValue = defaultValue;
-			return this;
-		}
+		raw = raw.substring(2, raw.length() - 2);
+		String[] data = raw.split("},\\{");
+		height = data.length;
 
-		public Matrix build() {
-			Matrix m = new Matrix(this.height, this.width);
+		for(int i = 0; i < height; i++) {
+			Vector v = Vector.fromString(data[i]);
 
-			if(this.defaultValue != 0.0D) {
-				for(int i = 0; i < m.getHeight(); i++) {
-					m.setRow(i, new Vector.Builder().setLength(m.getWidth()).fillWith(this.defaultValue).build());
-				}
+			if(i == 0) {
+				width = v.getDimension();
+				m = new Matrix(height,width);
 			}
 
-			return m;
+			m.setRow(i, v);
 		}
+
+		return m;
 	}
 
-	public static class Factory {
-		public Matrix fromString(String raw) {
-			Matrix m = null;
-			int height = 0;
-			int width = 0;
+	public static Matrix fromBigMatrix(BigMatrix m) {
+		Matrix p = new Matrix(m.getRowCount(), m.getColumnCount());
 
-			raw = raw.replaceAll("\\s+","");
-
-			if(!raw.startsWith("{") || !raw.endsWith("}")) {
-				throw new InvalidParameterException("Malformated query");
-			}
-
-			raw = raw.substring(2, raw.length() - 2);
-			String[] data = raw.split(Pattern.quote("},{"));
-			height = data.length;
-
-			for(int i = 0; i < height; i++) {
-				Vector v = new Vector.Factory().fromString(data[i]);
-
-				if(i == 0) {
-					width = v.getLength();
-					m = new Matrix(height,width);
-				}
-
-				m.setRow(i, v);
-			}
-
-			return m;
+		for(int i = 0; i < p.getRowCount(); i++) {
+			p.setRow(i, Vector.fromBigVector(m.getRow(i)));
 		}
 
-		public Matrix fromBigMatrix(BigMatrix m) {
-			Matrix p = new Matrix(m.getHeight(), m.getWidth());
+		return p;
+	}
 
-			for(int i = 0; i < p.getHeight(); i++) {
-				p.setRow(i, new Vector.Factory().fromBigVector(m.getRow(i)));
-			}
+	public static Matrix identityMatrix(int size) {
+		Matrix m = new Matrix(size, size);
 
-			return p;
+		for(int i = 0; i < size; i++) {
+			m.set(i, i, 1.0D);
 		}
 
-		public Matrix identityMatrix(int size) {
-			Matrix m = new Matrix(size, size);
-
-			for(int i = 0; i < size; i++) {
-				m.set(i, i, 1.0D);
-			}
-
-			return m;
-		}
+		return m;
 	}
 
 }
