@@ -7,7 +7,7 @@ public class SystemSolver {
 	public static SystemSolver.Result solve( Matrix base, Matrix extra, Phase phase) {
 		AugmentedMatrix am = new AugmentedMatrix(base.copy(), extra.copy());
 
-		for(int x = 0; x < am.getBase().getWidth(); x++) {
+		for(int x = 0; x < am.getBase().getColumnCount(); x++) {
 			Vector v = am.getBase().getRow(x);
 
 			if(v.get(x) != 0.0D && v.get(x) != 1.0D) {
@@ -16,7 +16,7 @@ public class SystemSolver {
 				continue;
 			}
 
-			for(int y = x + 1; y < am.getBase().getHeight(); y++) {
+			for(int y = x + 1; y < am.getBase().getRowCount(); y++) {
 				if(am.getBase().get(y, x) == 0.0D)continue;
 				am.subtractScaledRow(y, am.getBase().get(y, x), x);
 			}
@@ -24,7 +24,7 @@ public class SystemSolver {
 
 		if(phase == Phase.ROW_ECHELON)return new Result(am);
 
-		for(int j = 0; j < am.getBase().getWidth(); j++) {
+		for(int j = 0; j < am.getBase().getColumnCount(); j++) {
 			for(int i = 0; i < j; i++) {
 				Vector v = am.getBase().getRow(i);
 				Vector s = am.getBase().getRow(j);
@@ -39,7 +39,7 @@ public class SystemSolver {
 	public static SystemSolver.BigResult solve(BigMatrix base, BigMatrix extra, Phase phase) {
 		BigAugmentedMatrix am = new BigAugmentedMatrix(base.copy(), extra.copy());
 
-		for(int x = 0; x < am.getBase().getWidth(); x++) {
+		for(int x = 0; x < am.getBase().getColumnCount(); x++) {
 			BigVector v = am.getBase().getRow(x);
 
 			if(v.get(x).compareTo(BigDecimal.ZERO) != 0 && v.get(x).compareTo(BigDecimal.ONE) != 0) {
@@ -48,7 +48,7 @@ public class SystemSolver {
 				continue;
 			}
 
-			for(int y = x + 1; y < am.getBase().getHeight(); y++) {
+			for(int y = x + 1; y < am.getBase().getRowCount(); y++) {
 				if(am.getBase().get(y, x).compareTo(BigDecimal.ZERO) == 0)continue;
 				am.subtractScaledRow(y, am.getBase().get(y, x), x);
 			}
@@ -56,7 +56,7 @@ public class SystemSolver {
 
 		if(phase == Phase.ROW_ECHELON)return new BigResult(am);
 
-		for(int j = 0; j < am.getBase().getWidth(); j++) {
+		for(int j = 0; j < am.getBase().getColumnCount(); j++) {
 			for(int i = 0; i < j; i++) {
 				BigVector v = am.getBase().getRow(i);
 				BigVector s = am.getBase().getRow(j);
@@ -78,11 +78,11 @@ public class SystemSolver {
 		public Type type;
 
 		public Result(AugmentedMatrix am) {
-			this.result = new Matrix(am.getExtra().getHeight(), am.getExtra().getWidth());
+			this.result = new Matrix(am.getExtra().getRowCount(), am.getExtra().getColumnCount());
 			this.remainder = am;
 			this.type = Type.ONE_SOLUTION;
 
-			for(int i = 0; i < am.getBase().getHeight(); i++) {
+			for(int i = 0; i < am.getBase().getRowCount(); i++) {
 				Vector baseV = am.getBase().getRow(i);
 				Vector extraV = am.getExtra().getRow(i);
 				boolean isBaseZero = baseV.isZero();
@@ -127,11 +127,11 @@ public class SystemSolver {
 		public Type type;
 
 		public BigResult(BigAugmentedMatrix am) {
-			this.result = new BigMatrix(am.getExtra().getHeight(), am.getExtra().getWidth());
+			this.result = new BigMatrix(am.getExtra().getRowCount(), am.getExtra().getColumnCount());
 			this.remainder = am;
 			this.type = Type.ONE_SOLUTION;
 
-			for(int i = 0; i < am.getBase().getHeight(); i++) {
+			for(int i = 0; i < am.getBase().getRowCount(); i++) {
 				BigVector baseV = am.getBase().getRow(i);
 				BigVector extraV = am.getExtra().getRow(i);
 				boolean isBaseZero = baseV.isZero();

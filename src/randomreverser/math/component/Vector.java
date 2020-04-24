@@ -1,34 +1,35 @@
 package randomreverser.math.component;
 
-import java.util.function.Function;
+import java.util.Arrays;
+import java.util.function.IntToDoubleFunction;
 import java.util.regex.Pattern;
 
-public class Vector {
+public final class Vector {
 
 	private double[] numbers;
-	private int length;
+	private int dimension;
 
-	public Vector(int length) {
-		this.length = length;
-		this.numbers = new double[this.length];
+	public Vector(int dimension) {
+		this.dimension = dimension;
+		this.numbers = new double[this.dimension];
 	}
 
-	public Vector(double[] numbers) {
+	public Vector(double... numbers) {
 		this.numbers = numbers;
-		this.length = this.numbers.length;
+		this.dimension = this.numbers.length;
 	}
 
-	public Vector(int length, Function<Integer, Double> generator) {
-		this.length = length;
-		this.numbers = new double[this.length];
+	public Vector(int dimension, IntToDoubleFunction generator) {
+		this.dimension = dimension;
+		this.numbers = new double[this.dimension];
 
-		for(int i = 0; i < this.getLength(); i++) {
-			this.set(i, generator.apply(i));
+		for(int i = 0; i < this.getDimension(); i++) {
+			this.set(i, generator.applyAsDouble(i));
 		}
 	}
 
-	public int getLength() {
-		return this.length;
+	public int getDimension() {
+		return this.dimension;
 	}
 
 	public double get(int i) {
@@ -39,10 +40,14 @@ public class Vector {
 		this.numbers[i] = value;
 	}
 
+	public double magnitude() {
+		return Math.sqrt(magnitudeSq());
+	}
+
 	public double magnitudeSq() {
 		double magnitude = 0.0D;
 
-		for(int i = 0; i < this.getLength(); i++) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			magnitude += this.get(i) * this.get(i);
 		}
 
@@ -50,17 +55,19 @@ public class Vector {
 	}
 
 	public boolean isZero() {
-		for(int i = 0; i < this.getLength(); i++) {
-			if(this.get(i) != 0.0D)return false;
+		for(int i = 0; i < this.getDimension(); i++) {
+			if(this.get(i) != 0.0D) return false;
 		}
 
 		return true;
 	}
 
 	public Vector add(Vector a) {
-		Vector v = new Vector(this.getLength());
+		assertSameDimension(a);
 
-		for(int i = 0; i < v.getLength(); i++) {
+		Vector v = new Vector(this.getDimension());
+
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i) + a.get(i));
 		}
 
@@ -68,9 +75,11 @@ public class Vector {
 	}
 
 	public Vector subtract(Vector a) {
-		Vector v = new Vector(this.getLength());
+		assertSameDimension(a);
 
-		for(int i = 0; i < v.getLength(); i++) {
+		Vector v = new Vector(this.getDimension());
+
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i) - a.get(i));
 		}
 
@@ -80,7 +89,7 @@ public class Vector {
 	public Vector multiply(double scalar) {
 		Vector v = this.copy();
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i) * scalar);
 		}
 
@@ -88,14 +97,14 @@ public class Vector {
 	}
 
 	public Vector multiply(Matrix m) {
-		if(this.getLength() != m.getHeight()) {
-			throw new UnsupportedOperationException("Vector length should equal the matrix height");
+		if(this.getDimension() != m.getRowCount()) {
+			throw new IllegalArgumentException("Vector dimension should equal the number of matrix rows");
 		}
 
-		Vector v = new Vector(m.getWidth());
+		Vector v = new Vector(m.getColumnCount());
 
-		for(int i = 0; i < v.getLength(); i++) {
-			v.set(i, this.dot(m.getRow(i)));
+		for(int i = 0; i < v.getDimension(); i++) {
+			v.set(i, this.dot(m.getColumn(i)));
 		}
 
 		return v;
@@ -104,125 +113,141 @@ public class Vector {
 	public Vector divide(double scalar) {
 		Vector v = this.copy();
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i) / scalar);
 		}
 
 		return v;
 	}
 
-	public void addEquals(Vector a) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public Vector addEquals(Vector a) {
+		assertSameDimension(a);
+
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i) + a.get(i));
 		}
+
+		return this;
 	}
 
-	public void subtractEquals(Vector a) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public Vector subtractEquals(Vector a) {
+		assertSameDimension(a);
+
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i) - a.get(i));
 		}
+
+		return this;
 	}
 
-	public void multiplyEquals(double scalar) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public Vector multiplyEquals(double scalar) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i) * scalar);
 		}
+
+		return this;
 	}
 
-	public void divideEquals(double scalar) {
-		for(int i = 0; i < this.getLength(); i++) {
+	public Vector divideEquals(double scalar) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			this.set(i, this.get(i) / scalar);
 		}
+
+		return this;
 	}
 
 	public double dot(Vector v) {
+		assertSameDimension(v);
+
 		double dot = 0.0D;
 
-		for(int i = 0; i < this.getLength(); i++) {
+		for(int i = 0; i < this.getDimension(); i++) {
 			dot += this.get(i) * v.get(i);
 		}
 
 		return dot;
 	}
 
-	public double getScalarProjection(Vector v) {
+	public double gramSchmidtCoefficient(Vector v) {
 		return this.dot(v) / v.magnitudeSq();
 	}
 
 	public Vector projectOnto(Vector v) {
-		return v.multiply(this.getScalarProjection(v));
+		return v.multiply(this.gramSchmidtCoefficient(v));
 	}
 
 	public Vector copy() {
-		Vector v = new Vector(this.getLength());
+		Vector v = new Vector(this.getDimension());
 
-		for(int i = 0; i < v.getLength(); i++) {
+		for(int i = 0; i < v.getDimension(); i++) {
 			v.set(i, this.get(i));
 		}
 
 		return v;
 	}
 
+	private void assertSameDimension(Vector other) {
+		if (other.dimension != this.dimension) {
+			throw new IllegalArgumentException("The other vector is not the same dimension");
+		}
+	}
+
+	public boolean equals(Vector other, double tolerance) {
+		if (other.dimension != this.dimension) {
+			return false;
+		}
+		for (int i = 0; i < dimension; i++) {
+			if (Math.abs(other.get(i) - this.get(i)) > tolerance) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(numbers);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) return true;
+		if (other == null || other.getClass() != Vector.class) return false;
+		Vector that = (Vector) other;
+		return Arrays.equals(this.numbers, that.numbers);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("{");
 
-		for(int i = 0; i < this.getLength(); i++) {
-			sb.append(this.get(i)).append(i == this.getLength() - 1 ? "" : ", ");
+		for(int i = 0; i < this.getDimension(); i++) {
+			sb.append(this.get(i)).append(i == this.getDimension() - 1 ? "" : ", ");
 		}
 
 		return sb.append("}").toString();
 	}
 
-	public static class Builder {
-		private int length;
-		private double defaultValue;
+	public static Vector fromString(String raw) {
+		raw = raw.replaceAll("\\s+","");
 
-		public Builder setLength(int length) {
-			this.length = length;
-			return this;
+		String[] data = raw.split(Pattern.quote(","));
+		Vector v = new Vector(data.length);
+
+		for(int i = 0; i < data.length; i++) {
+			v.set(i, Double.parseDouble(data[i]));
 		}
 
-		public Builder fillWith(double defaultValue) {
-			this.defaultValue = defaultValue;
-			return this;
-		}
-
-		public Vector build() {
-			Vector v = new Vector(this.length);
-
-			if(this.defaultValue != 0.0D) {
-				for(int i = 0; i < v.getLength(); i++) {
-					v.set(i, this.defaultValue);
-				}
-			}
-
-			return v;
-		}
+		return v;
 	}
 
-	public static class Factory {
-		public Vector fromString(String raw) {
-			raw = raw.replaceAll("\\s+","");
+	public static Vector fromBigVector(BigVector v) {
+		Vector p = new Vector(v.getDimension());
 
-			String[] data = raw.split(Pattern.quote(","));
-			Vector v = new Vector(data.length);
-
-			for(int i = 0; i < data.length; i++) {
-				v.set(i, Double.parseDouble(data[i]));
-			}
-
-			return v;
+		for(int i = 0; i < p.getDimension(); i++) {
+			p.set(i, v.get(i).doubleValue());
 		}
 
-		public Vector fromBigVector(BigVector v) {
-			Vector p = new Vector(v.getLength());
-
-			for(int i = 0; i < p.getLength(); i++) {
-				p.set(i, v.get(i).doubleValue());
-			}
-
-			return p;
-		}
+		return p;
 	}
 }

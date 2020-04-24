@@ -101,7 +101,7 @@ public class Enumerate {
 
 	private static BoolExpr inHalfPlane(Context context, ArithExpr[] variables, Matrix basis, Vector offset, Vector normal) {
 		double rhs = normal.dot(offset);
-		Vector lhs = normal.multiply(basis);
+		Vector lhs = basis.multiply(normal);
 
 		IntNum rhsExpr = context.mkInt((long)rhs);
 		ArithExpr[] lhsExprs = new ArithExpr[variables.length];

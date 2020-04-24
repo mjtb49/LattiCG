@@ -5,31 +5,32 @@ import randomreverser.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class BigMatrix {
+public final class BigMatrix {
 
 	protected BigVector[] rows;
-	protected int height;
-	protected int width;
+	protected int rowCount;
+	protected int columnCount;
 
-	public BigMatrix(int height, int width) {
-		this.height = height;
-		this.width = width;
+	public BigMatrix(int rowCount, int columnCount) {
+		this.rowCount = rowCount;
+		this.columnCount = columnCount;
 
-		if(this.height <= 0 || this.width <= 0) {
-			throw new InvalidParameterException("Matrix dimensions cannot be less or equal to 0");
+		if(this.rowCount <= 0 || this.columnCount <= 0) {
+			throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
 		}
 
-		this.rows = new BigVector[this.height];
+		this.rows = new BigVector[this.rowCount];
 	}
 
-	public int getHeight() {
-		return this.height;
+	public int getRowCount() {
+		return this.rowCount;
 	}
 
-	public int getWidth() {
-		return this.width;
+	public int getColumnCount() {
+		return this.columnCount;
 	}
 
 	public BigDecimal get(int row, int col) {
@@ -42,7 +43,7 @@ public class BigMatrix {
 
 	public void set(int i, int j, BigDecimal value) {
 		if(this.rows[i] == null) {
-			this.rows[i] = new BigVector(this.getWidth());
+			this.rows[i] = new BigVector(this.getColumnCount());
 		}
 
 		this.rows[i].set(j, value);
@@ -53,21 +54,21 @@ public class BigMatrix {
 	}
 
 	public void setRow(int i, BigVector value) {
-		if(value != null && value.getLength() != this.getWidth()) {
-			throw new InvalidParameterException("Invalid vector length, expected " + this.getWidth() + ", got " + value.getLength());
+		if(value != null && value.getDimension() != this.getColumnCount()) {
+			throw new IllegalArgumentException("Invalid vector length, expected " + this.getColumnCount() + ", got " + value.getDimension());
 		}
 
 		this.rows[i] = value;
 	}
 
 	public BigMatrix add(BigMatrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Adding two matrices with different dimensions");
 		}
 
-		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			p.setRow(i, this.getRow(i).add(m.getRow(i)));
 		}
 
@@ -75,31 +76,41 @@ public class BigMatrix {
 	}
 
 	public BigMatrix subtract(BigMatrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
 		}
 
-		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			p.setRow(i, this.getRow(i).subtract(m.getRow(i)));
 		}
 
 		return p;
 	}
 
+	public BigMatrix multiply(BigDecimal scalar) {
+		BigMatrix p = new BigMatrix(getRowCount(), getColumnCount());
+		for (int i = 0; i < getRowCount(); i++) {
+			for (int j = 0; j < getColumnCount(); j++) {
+				p.set(i, j, get(i, j).multiply(scalar));
+			}
+		}
+		return p;
+	}
+
 	public BigMatrix multiply(BigMatrix m) {
-		if(this.getWidth() != m.getHeight()) {
-			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
+		if(this.getColumnCount() != m.getRowCount()) {
+			throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
 		}
 
-		BigMatrix p = new BigMatrix(this.getHeight(), m.getWidth());
+		BigMatrix p = new BigMatrix(this.getRowCount(), m.getColumnCount());
 
-		for(int i = 0; i < p.getHeight(); i++) {
-			for(int j = 0; j < p.getWidth(); j++) {
+		for(int i = 0; i < p.getRowCount(); i++) {
+			for(int j = 0; j < p.getColumnCount(); j++) {
 				p.set(i, j, BigDecimal.ZERO);
 
-				for(int k = 0; k < m.getHeight(); k++) {
+				for(int k = 0; k < m.getRowCount(); k++) {
 					p.set(i, j, p.get(i, j).add(this.get(i, k).multiply(m.get(k, j))));
 				}
 			}
@@ -108,82 +119,95 @@ public class BigMatrix {
 		return p;
 	}
 
+	public BigMatrix divide(BigDecimal scalar) {
+		return multiply(BigDecimal.ONE.divide(scalar));
+	}
+
 	public BigMatrix inverse() {
-		if(this.getHeight() != this.getWidth()) {
+		if(this.getRowCount() != this.getColumnCount()) {
 			throw new UnsupportedOperationException("Can only find the inverse of square matrices");
 		}
-		if (this.getHeight() == 1) {
+		if (this.getRowCount() == 1) {
 			BigMatrix r = new BigMatrix(1,1);
 			r.set(0,0,BigDecimal.ONE.divide(this.get(0,0), RoundingMode.HALF_UP));
 			return r;
 		}
-		SystemSolver.BigResult result = SystemSolver.solve(this, new BigMatrix.Factory().identityMatrix(this.getHeight()), SystemSolver.Phase.BASIS);
+		SystemSolver.BigResult result = SystemSolver.solve(this, BigMatrix.identityMatrix(this.getRowCount()), SystemSolver.Phase.BASIS);
 
 		if(result.type != SystemSolver.BigResult.Type.ONE_SOLUTION) {
-			throw new UnsupportedOperationException("This matrix is not invertible");
+			throw new IllegalStateException("This matrix is not invertible");
 		}
 
 		return result.result;
 	}
 
-	public BigMatrix swap(int i, int j) {
+	public BigMatrix swapRows(int i, int j) {
 		BigMatrix m = this.copy();
-		m.swapEquals(i, j);
+		m.swapRowsEquals(i, j);
 		return m;
 	}
 
 	public BigMatrix transpose() {
-		BigMatrix p = new BigMatrix(this.getWidth(), this.getHeight());
+		BigMatrix p = new BigMatrix(this.getColumnCount(), this.getRowCount());
 
-		for(int i = 0; i < this.getHeight(); i++) {
-			p.setRow(i, this.getRow(i).copy());
+		for (int i = 0; i < getRowCount(); i++) {
+			for (int j = 0; j < getColumnCount(); j++) {
+				p.set(j, i, get(i, j));
+			}
 		}
 
 		return p;
 	}
 
-	public void addEquals(BigMatrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Adding two matrices with different dimensions");
+	public BigMatrix addEquals(BigMatrix m) {
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Adding two matrices with different dimensions");
 		}
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.getRow(i).addEquals(m.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void subtractEquals(BigMatrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Subtracting two matrices with different dimensions");
+	public BigMatrix subtractEquals(BigMatrix m) {
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
 		}
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.getRow(i).subtractEquals(m.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void multiplyEquals(BigMatrix m) {
-		if(this.getHeight() != m.getHeight() || this.getWidth() != m.getWidth()) {
-			throw new UnsupportedOperationException("Multiplying two matrices with disallowed dimensions");
+	public BigMatrix multiplyEquals(BigMatrix m) {
+		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+			throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
 		}
 
 		BigMatrix result = this.multiply(m);
 
-		for(int i = 0; i < this.getHeight(); i++) {
+		for(int i = 0; i < this.getRowCount(); i++) {
 			this.setRow(i, result.getRow(i));
 		}
+
+		return this;
 	}
 
-	public void swapEquals(int i, int j) {
+	public BigMatrix swapRowsEquals(int i, int j) {
 		BigVector temp = this.getRow(i);
 		this.setRow(i, this.getRow(j));
 		this.setRow(j, temp);
+		return this;
 	}
 
 	public BigMatrix copy() {
-		BigMatrix m = new BigMatrix(this.getHeight(), this.getWidth());
+		BigMatrix m = new BigMatrix(this.getRowCount(), this.getColumnCount());
 
-		for(int i = 0; i < m.getHeight(); i++) {
+		for(int i = 0; i < m.getRowCount(); i++) {
 			m.setRow(i, this.getRow(i) == null ? null : this.getRow(i).copy());
 		}
 
@@ -191,98 +215,95 @@ public class BigMatrix {
 	}
 
 	public String toPrettyString() {
-		return StringUtils.tableToString(getHeight(), getWidth(), (row, column) -> get(row, column) == null ? "null" : get(row, column).stripTrailingZeros().toPlainString());
+		return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> get(row, column) == null ? "null" : get(row, column).stripTrailingZeros().toPlainString());
+	}
+
+	public boolean equals(BigMatrix other, BigDecimal tolerance) {
+		if (this.rowCount != other.rowCount || this.columnCount != other.columnCount) {
+			return false;
+		}
+		for (int i = 0; i < rowCount; i++) {
+			if (!rows[i].equals(other.rows[i], tolerance)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int h = Arrays.hashCode(rows);
+		h = 31 * h + columnCount;
+		h = 31 * h + rowCount;
+		return h;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) return true;
+		if (other == null || other.getClass() != BigMatrix.class) return false;
+		BigMatrix that = (BigMatrix) other;
+		return this.columnCount == that.columnCount && this.rowCount == that.rowCount && Arrays.equals(this.rows, that.rows);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("{");
 
-		for(int i = 0; i < this.getHeight(); i++) {
-			sb.append(this.getRow(i)).append(i == this.getHeight() - 1 ? "" : ", ");
+		for(int i = 0; i < this.getRowCount(); i++) {
+			sb.append(this.getRow(i)).append(i == this.getRowCount() - 1 ? "" : ", ");
 		}
 
 		return sb.append("}").toString();
 	}
 
-	public static class Builder {
-		private int height;
-		private int width;
-		private BigDecimal defaultValue;
+	public static BigMatrix fromString(String raw) {
+		BigMatrix m = null;
+		int height;
+		int width;
 
-		public Builder setSize(int height, int width) {
-			this.height = height;
-			this.width = width;
-			return this;
+		raw = raw.replaceAll("\\s+","");
+
+		if(!raw.startsWith("{") || !raw.endsWith("}")) {
+			throw new IllegalArgumentException("Malformed matrix");
 		}
 
-		public Builder fillWith(BigDecimal defaultValue) {
-			this.defaultValue = defaultValue;
-			return this;
-		}
+		raw = raw.substring(2, raw.length() - 2);
+		String[] data = raw.split(Pattern.quote("},{"));
+		height = data.length;
 
-		public BigMatrix build() {
-			BigMatrix m = new BigMatrix(this.height, this.width);
+		for(int i = 0; i < height; i++) {
+			BigVector v = BigVector.fromString(data[i]);
 
-			if(this.defaultValue != null) {
-				for(int i = 0; i < m.getHeight(); i++) {
-					m.setRow(i, new BigVector.Builder().setLength(m.getWidth()).fillWith(this.defaultValue).build());
-				}
+			if(i == 0) {
+				width = v.getDimension();
+				m = new BigMatrix(height,width);
 			}
 
-			return m;
+			m.setRow(i, v);
 		}
+
+		return m;
 	}
 
-	public static class Factory {
-		public BigMatrix fromString(String raw) {
-			BigMatrix m = null;
-			int height = 0;
-			int width = 0;
+	public static BigMatrix fromMatrix(Matrix m) {
+		BigMatrix p = new BigMatrix(m.getRowCount(), m.getColumnCount());
 
-			raw = raw.replaceAll("\\s+","");
-
-			if(!raw.startsWith("{") || !raw.endsWith("}")) {
-				throw new InvalidParameterException("Malformated query");
-			}
-
-			raw = raw.substring(2, raw.length() - 2);
-			String[] data = raw.split(Pattern.quote("},{"));
-			height = data.length;
-
-			for(int i = 0; i < height; i++) {
-				BigVector v = new BigVector.Factory().fromString(data[i]);
-
-				if(i == 0) {
-					width = v.getLength();
-					m = new BigMatrix(height,width);
-				}
-
-				m.setRow(i, v);
-			}
-
-			return m;
+		for(int i = 0; i < p.getRowCount(); i++) {
+			p.setRow(i, BigVector.fromVector(m.getRow(i)));
 		}
 
-		public BigMatrix fromMatrix(Matrix m) {
-			BigMatrix p = new BigMatrix(m.getHeight(), m.getWidth());
+		return p;
+	}
 
-			for(int i = 0; i < p.getHeight(); i++) {
-				p.setRow(i, new BigVector.Factory().fromVector(m.getRow(i)));
-			}
-
-			return p;
+	public static BigMatrix identityMatrix(int size) {
+		BigMatrix m = new BigMatrix(size, size);
+		for (int i = 0; i < size; i++) for (int j = 0; j < size; j++)
+			m.set(i, j, BigDecimal.ZERO);
+		for(int i = 0; i < size; i++) {
+			m.set(i, i, BigDecimal.ONE);
 		}
 
-		public BigMatrix identityMatrix(int size) {
-			BigMatrix m = new BigMatrix(size, size);
-			for (int i = 0; i < size; i++) for (int j = 0; j < size; j++)
-				m.set(i, j, BigDecimal.ZERO);
-			for(int i = 0; i < size; i++) {
-				m.set(i, i, BigDecimal.ONE);
-			}
-
-			return m;
-		}
+		return m;
 	}
 }

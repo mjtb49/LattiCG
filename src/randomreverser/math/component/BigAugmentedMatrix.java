@@ -39,17 +39,17 @@ public class BigAugmentedMatrix {
 
 	@Override
 	public String toString() {
-		return StringUtils.tableToString(Math.max(base.getHeight(), extra.getHeight()), base.getWidth() + extra.getWidth(), (row, column) -> {
-			if (column < base.getWidth()) {
-				if (row >= base.getHeight()) {
+		return StringUtils.tableToString(Math.max(base.getRowCount(), extra.getRowCount()), base.getColumnCount() + extra.getColumnCount(), (row, column) -> {
+			if (column < base.getColumnCount()) {
+				if (row >= base.getRowCount()) {
 					return "";
 				} else {
 					return base.get(row, column) == null ? "null" :
 							base.get(row, column).stripTrailingZeros().toPlainString();
 				}
 			} else {
-				column -= base.getWidth();
-				if (row >= extra.getHeight()) {
+				column -= base.getColumnCount();
+				if (row >= extra.getRowCount()) {
 					return "";
 				} else {
 					return extra.get(row, column) == null ? "null" :
@@ -59,9 +59,9 @@ public class BigAugmentedMatrix {
 		}, (row, column) -> {
 			if (column == 0) {
 				return "[";
-			} else if (column == base.getWidth()) {
+			} else if (column == base.getColumnCount()) {
 				return "|";
-			} else if (column == base.getWidth() + extra.getWidth()) {
+			} else if (column == base.getColumnCount() + extra.getColumnCount()) {
 				return "]";
 			} else {
 				return " ";

@@ -34,23 +34,23 @@ public class BigGramSchmidt {
 	}
 
 	public void compute() {
-		this.newBasis = new BigMatrix(this.basis.getHeight(), this.basis.getWidth());
-		this.coefficients = new BigMatrix(this.basis.getHeight(), this.basis.getWidth());
+		this.newBasis = new BigMatrix(this.basis.getRowCount(), this.basis.getColumnCount());
+		this.coefficients = new BigMatrix(this.basis.getRowCount(), this.basis.getColumnCount());
 
-		for(int i = 0; i < this.basis.getHeight(); i++) {
+		for(int i = 0; i < this.basis.getRowCount(); i++) {
 			BigVector v = this.basis.getRow(i).copy();
 			this.newBasis.setRow(i, v);
 
 			for(int j = 0; j < i; j++) {
-				BigDecimal scalar = this.basis.getRow(i).getScalarProjection(this.newBasis.getRow(j));
+				BigDecimal scalar = this.basis.getRow(i).gramSchmidtCoefficient(this.newBasis.getRow(j));
 				v.subtractEquals(this.newBasis.getRow(j).multiply(scalar));
 				this.coefficients.set(i, j, scalar);
 			}
 		}
 
-		for(int i = 0; i < this.basis.getHeight(); i++) {
-			for(int j = i; j < this.basis.getWidth(); j++) {
-				this.coefficients.set(i, j, this.basis.getRow(i).getScalarProjection(this.newBasis.getRow(j)));
+		for(int i = 0; i < this.basis.getRowCount(); i++) {
+			for(int j = i; j < this.basis.getColumnCount(); j++) {
+				this.coefficients.set(i, j, this.basis.getRow(i).gramSchmidtCoefficient(this.newBasis.getRow(j)));
 			}
 		}
 	}

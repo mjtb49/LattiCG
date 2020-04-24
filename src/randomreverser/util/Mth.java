@@ -25,11 +25,6 @@ public class Mth {
         return a;
     }
 
-    @Deprecated // use Long.numberOfTrailingZeros() instead
-    public static int countTrailingZeroes(long v) {
-        return Long.numberOfTrailingZeros(v);
-    }
-
     public static long modInverse(long x, int mod) { //Fast method for modular inverse mod powers of 2
         if ((x & 1) == 0) {
             throw new IllegalArgumentException("x is not coprime with the modulus");
