@@ -1,8 +1,12 @@
 package randomreverser.math.component;
 
+import randomreverser.util.MatrixDataProvider;
 import randomreverser.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.DoubleSupplier;
 
 public final class Matrix {
 
@@ -19,6 +23,16 @@ public final class Matrix {
 		}
 
 		this.rows = new Vector[this.rowCount];
+	}
+
+	public Matrix(int rowCount, int columnCount, MatrixDataProvider gen) {
+		this(rowCount, columnCount);
+
+		for(int row = 0; row < this.rowCount; row++) {
+			for(int col = 0; col < this.columnCount; col++) {
+				this.set(row, col, gen.getValue(row, col));
+			}
+		}
 	}
 
 	public int getRowCount() {
@@ -63,6 +77,10 @@ public final class Matrix {
 		}
 
 		this.rows[i] = value;
+	}
+
+	public boolean isSquare() {
+		return this.getRowCount() == this.getColumnCount();
 	}
 
 	public Matrix add(Matrix m) {
