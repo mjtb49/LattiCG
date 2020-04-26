@@ -2,10 +2,7 @@ package randomreverser.math.component;
 
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
 import static org.junit.Assert.*;
-import static randomreverser.util.MoreAssert.*;
 
 public class BigVectorTest {
 
@@ -21,12 +18,12 @@ public class BigVectorTest {
 
     @Test
     public void testGet() {
-        assertBigDecimalEquals(BigDecimal.valueOf(4), new BigVector(1, 2, 3, 4, 5).get(3));
+        assertEquals(new BigFraction(4), new BigVector(1, 2, 3, 4, 5).get(3));
     }
 
     @Test
     public void testMagnitudeSq() {
-        assertBigDecimalEquals(BigDecimal.valueOf(55), new BigVector(1, 2, 3, 4, 5).magnitudeSq());
+        assertEquals(new BigFraction(55), new BigVector(1, 2, 3, 4, 5).magnitudeSq());
     }
 
     @Test
@@ -73,14 +70,37 @@ public class BigVectorTest {
     @Test
     public void testMultiplyScalar() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
-        assertEquals(new BigVector(2, 4, 6, 8, 10), a.multiply(BigDecimal.valueOf(2)));
+        assertEquals(new BigVector(2, 4, 6, 8, 10), a.multiply(new BigFraction(2)));
         assertEquals(new BigVector(1, 2, 3, 4, 5), a);
+    }
+
+    @Test
+    public void testMultiplyMatrix1() {
+        BigVector a = new BigVector(2, 3);
+        BigMatrix b = BigMatrix.fromString("{{5, 7}, {11, 13}}");
+        assertEquals(new BigVector(43, 53), a.multiply(b));
+        assertEquals(new BigVector(2, 3), a);
+    }
+
+    @Test
+    public void testMultiplyMatrix2() {
+        BigVector a = new BigVector(2, 3, 5);
+        BigMatrix b = BigMatrix.fromString("{{7, 11}, {13, 17}, {19, 23}}");
+        assertEquals(new BigVector(148, 188), a.multiply(b));
+        assertEquals(new BigVector(2, 3, 5), a);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMultiplyMatrixFail() {
+        BigVector a = new BigVector(2, 3, 5);
+        BigMatrix b = BigMatrix.fromString("{{7, 11, 13}, {17, 19, 23}}");
+        a.multiply(b);
     }
 
     @Test
     public void testDivide() {
         BigVector a = new BigVector(2, 4);
-        assertEquals(new BigVector(1, 2), a.divide(BigDecimal.valueOf(2)));
+        assertEquals(new BigVector(1, 2), a.divide(new BigFraction(2)));
         assertEquals(new BigVector(2, 4), a);
     }
 
@@ -115,7 +135,7 @@ public class BigVectorTest {
     @Test
     public void testMultiplyEquals() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
-        BigVector result = a.multiplyEquals(BigDecimal.valueOf(2));
+        BigVector result = a.multiplyEquals(new BigFraction(2));
         assertSame(result, a);
         assertEquals(new BigVector(2, 4, 6, 8, 10), a);
     }
@@ -123,7 +143,7 @@ public class BigVectorTest {
     @Test
     public void divideEquals() {
         BigVector a = new BigVector(2, 4);
-        BigVector result = a.divideEquals(BigDecimal.valueOf(2));
+        BigVector result = a.divideEquals(new BigFraction(2));
         assertSame(result, a);
         assertEquals(new BigVector(1, 2), a);
     }
@@ -132,8 +152,8 @@ public class BigVectorTest {
     public void testDot() {
         BigVector a = new BigVector(2, 3, 5);
         BigVector b = new BigVector(7, 11, 13);
-        assertBigDecimalEquals(BigDecimal.valueOf(112), a.dot(b));
-        assertBigDecimalEquals(BigDecimal.valueOf(112), b.dot(a));
+        assertEquals(new BigFraction(112), a.dot(b));
+        assertEquals(new BigFraction(112), b.dot(a));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -145,7 +165,7 @@ public class BigVectorTest {
     public void testGramSchmidtCoefficient() {
         BigVector a = new BigVector(7, 11, 13);
         BigVector b = new BigVector(2, 3, 5);
-        assertBigDecimalEquals(BigDecimal.valueOf(56.0 / 19), a.gramSchmidtCoefficient(b), BigDecimal.valueOf(0.00000001));
+        assertEquals(new BigFraction(56, 19), a.gramSchmidtCoefficient(b));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -157,7 +177,12 @@ public class BigVectorTest {
     public void testProjectOnto() {
         BigVector a = new BigVector(7, 11, 13);
         BigVector b = new BigVector(2, 3, 5);
-        assertTrue(new BigVector(112.0 / 19, 168.0 / 19, 280.0 / 19).equals(a.projectOnto(b), BigDecimal.valueOf(0.00000001)));
+        BigVector expected = new BigVector(
+                new BigFraction(112, 19),
+                new BigFraction(168, 19),
+                new BigFraction(280, 19)
+        );
+        assertEquals(expected, a.projectOnto(b));
     }
 
     @Test(expected = IllegalArgumentException.class)

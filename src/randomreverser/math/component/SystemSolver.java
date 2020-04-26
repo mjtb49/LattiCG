@@ -1,10 +1,8 @@
 package randomreverser.math.component;
 
-import java.math.BigDecimal;
-
 public class SystemSolver {
 
-	public static SystemSolver.Result solve( Matrix base, Matrix extra, Phase phase) {
+	public static SystemSolver.Result solve(Matrix base, Matrix extra, Phase phase) {
 		AugmentedMatrix am = new AugmentedMatrix(base.copy(), extra.copy());
 
 		for(int x = 0; x < am.getBase().getColumnCount(); x++) {
@@ -42,14 +40,14 @@ public class SystemSolver {
 		for(int x = 0; x < am.getBase().getColumnCount(); x++) {
 			BigVector v = am.getBase().getRow(x);
 
-			if(v.get(x).compareTo(BigDecimal.ZERO) != 0 && v.get(x).compareTo(BigDecimal.ONE) != 0) {
+			if(v.get(x).signum() != 0 && !v.get(x).equals(BigFraction.ONE)) {
 				am.divideRow(x, v.get(x));
-			} else if(v.get(x).compareTo(BigDecimal.ZERO) == 0) {
+			} else if(v.get(x).signum() == 0) {
 				continue;
 			}
 
 			for(int y = x + 1; y < am.getBase().getRowCount(); y++) {
-				if(am.getBase().get(y, x).compareTo(BigDecimal.ZERO) == 0)continue;
+				if(am.getBase().get(y, x).signum() == 0)continue;
 				am.subtractScaledRow(y, am.getBase().get(y, x), x);
 			}
 		}
@@ -60,7 +58,7 @@ public class SystemSolver {
 			for(int i = 0; i < j; i++) {
 				BigVector v = am.getBase().getRow(i);
 				BigVector s = am.getBase().getRow(j);
-				if(v.get(j).compareTo(BigDecimal.ZERO) == 0)continue;
+				if(v.get(j).signum() == 0)continue;
 				am.subtractScaledRow(i, v.get(j), j);
 			}
 		}
@@ -93,7 +91,6 @@ public class SystemSolver {
 					this.result.setRow(i, extraV);
 					this.updateType(Type.ONE_SOLUTION);
 				} else if(isExtraZero) {
-					this.remainder.nullifyRow(i);
 					this.updateType(Type.INFINITE_SOLUTIONS);
 				} else {
 					this.updateType(Type.NO_SOLUTIONS);
@@ -109,11 +106,9 @@ public class SystemSolver {
 
 		@Override
 		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("This system has ").append(this.type).append(".\n\n");
-			sb.append("Result: \n").append(this.result.toPrettyString()).append("\n\n");
-			sb.append("Remainder: \n").append(this.remainder.toString());
-			return sb.toString();
+			return "This system has " + this.type + ".\n\n" +
+					"Result: \n" + this.result.toPrettyString() + "\n\n" +
+					"Remainder: \n" + this.remainder.toString();
 		}
 
 		public enum Type {
@@ -142,7 +137,6 @@ public class SystemSolver {
 					this.result.setRow(i, extraV);
 					this.updateType(Type.ONE_SOLUTION);
 				} else if(isExtraZero) {
-					this.remainder.nullifyRow(i);
 					this.updateType(Type.INFINITE_SOLUTIONS);
 				} else {
 					this.updateType(Type.NO_SOLUTIONS);

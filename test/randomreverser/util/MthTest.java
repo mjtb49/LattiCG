@@ -9,11 +9,6 @@ import static org.junit.Assert.*;
 public class MthTest {
 
     @Test
-    public void testGcdBigDecimal() {
-        assertEquals(BigDecimal.valueOf(1), Mth.gcd(BigDecimal.valueOf(999836362321L), BigDecimal.valueOf(999836358007L)));
-    }
-
-    @Test
     public void testGcdDouble1() {
         assertEquals(1, Mth.gcd(1, 1), 0);
     }

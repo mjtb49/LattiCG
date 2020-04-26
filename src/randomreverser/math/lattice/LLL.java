@@ -1,19 +1,16 @@
 package randomreverser.math.lattice;
 
+import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.Matrix;
 import randomreverser.math.decomposition.BigGramSchmidt;
 import randomreverser.math.decomposition.GramSchmidt;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.security.InvalidParameterException;
-
 public class LLL {
 
 	public static Matrix reduce(Matrix m, Params params) {
 		if(params.delta <= 0.25D && params.delta > 1.0D) {
-			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
+			throw new IllegalArgumentException("Delta must be in the range of (0.25, 1]");
 		}
 
 		GramSchmidt gs = new GramSchmidt(m.copy());
@@ -52,10 +49,8 @@ public class LLL {
 
 	public static BigMatrix reduce(BigMatrix m, Params params, BigMatrix transformations) {
 		if(params.delta <= 0.25D && params.delta > 1.0D) {
-			throw new InvalidParameterException("Delta must be in the range of (0.25, 1]");
+			throw new IllegalArgumentException("Delta must be in the range of (0.25, 1]");
 		}
-
-		BigDecimal BIG_DELTA = BigDecimal.valueOf(params.delta);
 
 		BigGramSchmidt gs = new BigGramSchmidt(m.copy());
 		gs.compute();
@@ -65,8 +60,8 @@ public class LLL {
 		while(k <= n) {
 			//for(int k = 0; k < gs.getBasis().getHeight(); k++) {
 			for(int j = k - 1; j >= 0; j--) {
-				BigDecimal rounded = gs.getCoefficients().get(k, j).setScale(0, RoundingMode.HALF_UP);
-				if (rounded.compareTo(BigDecimal.ZERO) != 0) {
+				BigFraction rounded = new BigFraction(gs.getCoefficients().get(k, j).round());
+				if (rounded.signum() != 0) {
 					gs.getBasis().getRow(k).subtractEquals(gs.getBasis().getRow(j).multiply(rounded));
 					if (transformations != null)
 						transformations.getRow(k).subtractEquals(transformations.getRow(j).multiply(rounded));
@@ -79,9 +74,9 @@ public class LLL {
 
 			//for(int k = 0; k < gs.getBasis().getHeight() - 1; k++) {
 				//BigVector v = gs.getNewBasis().getRow(k).add(gs.getNewBasis().getRow(k-1).scale(gs.getCoefficients().get(k-1, k)));
-				BigDecimal a = gs.getNewBasis().getRow(k).magnitudeSq().add(gs.getNewBasis().getRow(k-1).multiply(gs.getCoefficients().get(k, k-1)).magnitudeSq());
+				BigFraction a = gs.getNewBasis().getRow(k).magnitudeSq().add(gs.getNewBasis().getRow(k-1).multiply(gs.getCoefficients().get(k, k-1)).magnitudeSq());
 
-				if(a.compareTo(gs.getNewBasis().getRow(k-1).magnitudeSq().multiply(BIG_DELTA)) < 0) {
+				if(a.toDouble() < gs.getNewBasis().getRow(k-1).magnitudeSq().toDouble() * params.delta) {
 					gs.getBasis().swapRowsEquals(k-1, k);
 					if (transformations != null)
 						transformations.swapRowsEquals(k-1, k);
