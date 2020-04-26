@@ -1,9 +1,8 @@
 package randomreverser.math.decomposition;
 
+import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
-
-import java.math.BigDecimal;
 
 public class BigGramSchmidt {
 
@@ -42,7 +41,7 @@ public class BigGramSchmidt {
 			this.newBasis.setRow(i, v);
 
 			for(int j = 0; j < i; j++) {
-				BigDecimal scalar = this.basis.getRow(i).gramSchmidtCoefficient(this.newBasis.getRow(j));
+				BigFraction scalar = this.basis.getRow(i).gramSchmidtCoefficient(this.newBasis.getRow(j));
 				v.subtractEquals(this.newBasis.getRow(j).multiply(scalar));
 				this.coefficients.set(i, j, scalar);
 			}

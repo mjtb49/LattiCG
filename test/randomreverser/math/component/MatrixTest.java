@@ -58,6 +58,14 @@ public class MatrixTest {
     }
 
     @Test
+    public void testSetColumn() {
+        Matrix m = new Matrix(2, 2);
+        m.setColumn(0, new Vector(2, 5));
+        m.setColumn(1, new Vector(3, 7));
+        assertEquals(Matrix.fromString("{{2, 3}, {5, 7}}"), m);
+    }
+
+    @Test
     public void testAdd() {
         Matrix m1 = Matrix.fromString("{{2, 3}, {5, 7}}");
         Matrix m2 = Matrix.fromString("{{11, 13}, {17, 19}}");
@@ -228,7 +236,15 @@ public class MatrixTest {
     }
 
     @Test
-    public void testMultiplyEquals() {
+    public void testMultiplyEqualsScalar() {
+        Matrix m = Matrix.fromString("{{2, 3}, {5, 7}}");
+        Matrix result = m.multiplyEquals(2);
+        assertSame(result, m);
+        assertEquals(Matrix.fromString("{{4, 6}, {10, 14}}"), m);
+    }
+
+    @Test
+    public void testMultiplyEqualsMatrix() {
         Matrix m1 = Matrix.fromString("{{2, 3}, {5, 7}}");
         Matrix m2 = Matrix.fromString("{{11, 13}, {17, 19}}");
         Matrix result = m1.multiplyEquals(m2);
@@ -237,13 +253,21 @@ public class MatrixTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMultiplyEqualsFail() {
+    public void testMultiplyEqualsMatrixFail() {
         new Matrix(1, 2).multiplyEquals(new Matrix(1, 2));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMultiplyEqualsNonSquare() {
         new Matrix(2, 2).multiplyEquals(new Matrix(2, 3));
+    }
+
+    @Test
+    public void testDivideEqualsScalar() {
+        Matrix m = Matrix.fromString("{{4, 6}, {10, 14}}");
+        Matrix result = m.divideEquals(2);
+        assertSame(result, m);
+        assertEquals(Matrix.fromString("{{2, 3}, {5, 7}}"), m);
     }
 
     @Test

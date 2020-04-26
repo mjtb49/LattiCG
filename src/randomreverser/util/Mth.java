@@ -1,18 +1,6 @@
 package randomreverser.util;
 
-import java.math.BigDecimal;
-
 public class Mth {
-    public static BigDecimal gcd(BigDecimal a, BigDecimal b) {
-        while (b.signum() != 0) {
-            a = a.remainder(b);
-            BigDecimal temp = a;
-            a = b;
-            b = temp;
-        }
-
-        return a;
-    }
 
     public static double gcd(double a, double b) {
         while(b != 0) {

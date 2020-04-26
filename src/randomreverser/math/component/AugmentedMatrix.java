@@ -30,11 +30,6 @@ public class AugmentedMatrix {
 		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
 	}
 
-	public void nullifyRow(int y) {
-		this.base.setRow(y, null);
-		this.extra.setRow(y, null);
-	}
-
 	@Override
 	public String toString() {
 		return StringUtils.tableToString(Math.max(base.getRowCount(), extra.getRowCount()), base.getColumnCount() + extra.getColumnCount(), (row, column) -> {

@@ -2,8 +2,6 @@ package randomreverser.math.component;
 
 import randomreverser.util.StringUtils;
 
-import java.math.BigDecimal;
-
 public class BigAugmentedMatrix {
 
 	private BigMatrix base;
@@ -22,19 +20,14 @@ public class BigAugmentedMatrix {
 		return this.extra;
 	}
 
-	public void divideRow(int y, BigDecimal scalar) {
+	public void divideRow(int y, BigFraction scalar) {
 		this.base.getRow(y).divideEquals(scalar);
 		this.extra.getRow(y).divideEquals(scalar);
 	}
 
-	public void subtractScaledRow(int y1, BigDecimal scalar, int y2) {
+	public void subtractScaledRow(int y1, BigFraction scalar, int y2) {
 		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).multiply(scalar));
 		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
-	}
-
-	public void nullifyRow(int y) {
-		this.base.setRow(y, null);
-		this.extra.setRow(y, null);
 	}
 
 	@Override
@@ -44,16 +37,14 @@ public class BigAugmentedMatrix {
 				if (row >= base.getRowCount()) {
 					return "";
 				} else {
-					return base.get(row, column) == null ? "null" :
-							base.get(row, column).stripTrailingZeros().toPlainString();
+					return base.get(row, column).toString();
 				}
 			} else {
 				column -= base.getColumnCount();
 				if (row >= extra.getRowCount()) {
 					return "";
 				} else {
-					return extra.get(row, column) == null ? "null" :
-							extra.get(row, column).stripTrailingZeros().toPlainString();
+					return extra.get(row, column).toString();
 				}
 			}
 		}, (row, column) -> {
