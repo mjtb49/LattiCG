@@ -26,21 +26,21 @@ public class BigFractionTest {
     public void testConstructNegativeDenominator1() {
         BigFraction minusHalf = new BigFraction(1, -2);
         assertEquals(BigInteger.valueOf(-1), minusHalf.getNumerator());
-        assertEquals(BigInteger.TWO, minusHalf.getDenominator());
+        assertEquals(BigInteger.valueOf(2), minusHalf.getDenominator());
     }
 
     @Test
     public void testConstructNegativeDenominator2() {
         BigFraction half = new BigFraction(-1, -2);
         assertEquals(BigInteger.ONE, half.getNumerator());
-        assertEquals(BigInteger.TWO, half.getDenominator());
+        assertEquals(BigInteger.valueOf(2), half.getDenominator());
     }
 
     @Test
     public void testConstructSimplify() {
         BigFraction half = new BigFraction(2, 4);
         assertEquals(BigInteger.ONE, half.getNumerator());
-        assertEquals(BigInteger.TWO, half.getDenominator());
+        assertEquals(BigInteger.valueOf(2), half.getDenominator());
     }
 
     @Test
@@ -212,7 +212,7 @@ public class BigFractionTest {
 
     @Test
     public void testRoundingMoreThanHalfPositive() {
-        assertEquals(BigInteger.TWO, new BigFraction(5, 3).round());
+        assertEquals(BigInteger.valueOf(2), new BigFraction(5, 3).round());
     }
 
     @Test
