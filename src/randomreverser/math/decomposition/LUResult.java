@@ -66,6 +66,7 @@ public class LUResult {
 
 	@Override
 	public String toString() {
-		return this.L + " | " + this.U;
+		return this.P + " | " + this.L + " | " + this.U;
 	}
+
 }
