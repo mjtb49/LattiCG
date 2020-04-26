@@ -44,6 +44,7 @@ public final class Matrix {
 			}
 		}
 	}
+
     /**
      * Gets the number of rows in the matrix
      *
@@ -60,6 +61,10 @@ public final class Matrix {
      */
     public int getColumnCount() {
         return this.columnCount;
+    }
+
+    public boolean isSquare() {
+        return this.rowCount == this.columnCount;
     }
 
     /**
@@ -169,9 +174,8 @@ public final class Matrix {
     }
 
 	public Matrix add(Matrix m) {
-		if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
-			throw new IllegalArgumentException("Adding two matrices with different dimensions");
-		}
+        return copy().addEquals(m);
+    }
 
     /**
      * Adds the given matrix from this matrix, stores the result in a new matrix and returns that matrix
