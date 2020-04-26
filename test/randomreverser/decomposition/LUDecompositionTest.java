@@ -78,25 +78,22 @@ public class LUDecompositionTest {
 	@Test
 	public void testInverse2() {
 		Matrix m = Matrix.fromString("{{1, 5}, {2, -3}}");
-		Matrix inverse = null;
 		LUResult result = LUDecomposition.decompose(m);
-		assertTrue(result.inverse().equals(inverse, 0.0001D));
+		assertTrue(result.inverse().multiply(m).equals(Matrix.identityMatrix(m.getRowCount()), 0.0001D));
 	}
 
 	@Test
 	public void testInverse3() {
 		Matrix m = Matrix.fromString("{{0, 5, 3}, {2, -3, 1}, {-9, 3, 4}}");
-		Matrix inverse = null;
 		LUResult result = LUDecomposition.decompose(m);
-		assertTrue(result.inverse().equals(inverse, 0.0001D));
+		assertTrue(result.inverse().multiply(m).equals(Matrix.identityMatrix(m.getRowCount()), 0.0001D));
 	}
 
 	@Test
 	public void testInverse4() {
 		Matrix m = Matrix.fromString("{{4, 3, 2, 1}, {1, 10, 3, 4}, {5, 3, 2, -4}, {4, 8, 7, 9}}");
-		Matrix inverse = null;
 		LUResult result = LUDecomposition.decompose(m);
-		assertTrue(result.inverse().equals(inverse, 0.0001D));
+		assertTrue(result.inverse().multiply(m).equals(Matrix.identityMatrix(m.getRowCount()), 0.0001D));
 	}
 
 }

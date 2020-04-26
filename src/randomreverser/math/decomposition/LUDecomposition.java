@@ -13,8 +13,10 @@ public class LUDecomposition {
 		Matrix m = matrix.copy();
 		int size = m.getRowCount();
 		Vector p = new Vector(size);
+		Matrix inv = Matrix.identityMatrix(size);
 		int swaps = 0;
 
+		//Decomposition
 		for(int i = 0; i < size; i++) {
 			int pivot = -1;
 			double beegestNumbor = 0.0D;
@@ -33,6 +35,7 @@ public class LUDecomposition {
 			}
 
 			p.set(i, pivot);
+			inv.swapRowsEquals(i, pivot);
 
 			if(pivot != i) {
 				m.swapRowsEquals(i, pivot);
@@ -60,13 +63,6 @@ public class LUDecomposition {
 		det *= (swaps & 1) == 0 ? 1 : -1;
 
 		//Inverse
-		Matrix inv = m.copy();
-
-		for(int row = 0; row < size; row++) {
-			if(row == (int)p.get(row))continue;
-			inv.swapRowsEquals(row, (int)p.get(row));
-		}
-
 		for(int dcol = 0; dcol < size; dcol++) {
 			for(int row = 0; row < size; row++) {
 				for(int col = 0; col < row; col++) {
