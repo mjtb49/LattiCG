@@ -16,11 +16,14 @@ public class LUDecomposition {
 
 		for(int i = 0; i < size; i++) {
 			int pivot = -1;
+			double beegestNumbor = 0.0D;
 
 			for(int row = i; row < size; row++) {
-				if(m.get(row, i) != 0) {
+				double d = Math.abs(m.get(row, i));
+
+				if(d > beegestNumbor) {
+					beegestNumbor = d;
 					pivot = row;
-					break;
 				}
 			}
 
@@ -55,6 +58,10 @@ public class LUDecomposition {
 
 		det *= (swaps & 1) == 0 ? 1 : -1;
 		return new LUResult(m, p, det);
+	}
+
+	public static Matrix flippy(LUResult result) {
+		return null;
 	}
 
 }
