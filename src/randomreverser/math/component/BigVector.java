@@ -1,244 +1,391 @@
 package randomreverser.math.component;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
+/**
+ * A vector with {@link BigFraction} elements
+ */
 public final class BigVector {
 
-	private BigDecimal[] numbers;
-	private int dimension;
+    BigFraction[] numbers;
+    private int dimension;
 
-	public BigVector(int dimension) {
-		this.dimension = dimension;
-		this.numbers = new BigDecimal[this.dimension];
-	}
+    // to support views over a backing array, for internal use by BigMatrix
+    int startPos = 0;
+    int step = 1;
 
-	public BigVector(double... numbers) {
-		this(toBigDecimals(numbers));
-	}
+    /**
+     * Constructs the zero vector of the given dimension
+     *
+     * @param dimension The dimension of the vector to create
+     */
+    public BigVector(int dimension) {
+        this.dimension = dimension;
+        this.numbers = new BigFraction[this.dimension];
+        Arrays.fill(numbers, BigFraction.ZERO);
+    }
 
-	private static BigDecimal[] toBigDecimals(double[] numbers) {
-		BigDecimal[] decimals = new BigDecimal[numbers.length];
-		for (int i = 0; i < numbers.length; i++) {
-			decimals[i] = BigDecimal.valueOf(numbers[i]);
-		}
-		return decimals;
-	}
+    /**
+     * Constructs a vector with the given integer elements
+     *
+     * @param numbers The elements of the vector
+     */
+    public BigVector(long... numbers) {
+        this(toBigFractions(numbers));
+    }
 
-	public BigVector(BigDecimal... numbers) {
-		this.dimension = numbers.length;
-		this.numbers = new BigDecimal[this.dimension];
+    private static BigFraction[] toBigFractions(long[] numbers) {
+        BigFraction[] fractions = new BigFraction[numbers.length];
+        for (int i = 0; i < numbers.length; i++) {
+            fractions[i] = new BigFraction(numbers[i]);
+        }
+        return fractions;
+    }
 
-		for(int i = 0; i < this.dimension; i++) {
-			this.set(i, numbers[i]);
-		}
-	}
+    /**
+     * Constructs a vector with the given elements
+     *
+     * @param numbers The elements of the vector
+     */
+    public BigVector(BigFraction... numbers) {
+        this.dimension = numbers.length;
+        this.numbers = numbers;
+    }
 
-	public int getDimension() {
-		return this.dimension;
-	}
+    // for internal use by BigMatrix
+    static BigVector createView(BigFraction[] array, int dimension, int startPos, int step) {
+        BigVector vec = new BigVector(array);
+        vec.dimension = dimension;
+        vec.startPos = startPos;
+        vec.step = step;
+        return vec;
+    }
 
-	public BigDecimal get(int i) {
-		return this.numbers[i];
-	}
+    /**
+     * Gets the dimension of the vector
+     *
+     * @return The dimension of the vector
+     */
+    public int getDimension() {
+        return this.dimension;
+    }
 
-	public void set(int i, BigDecimal value) {
-		this.numbers[i] = value.setScale(20, RoundingMode.HALF_UP);
-	}
+    /**
+     * Gets the element at the given index in the vector
+     *
+     * @param i The index
+     * @return The element at the given index
+     * @throws IndexOutOfBoundsException If {@code i} is out of bounds
+     */
+    public BigFraction get(int i) {
+        if (i < 0 || i >= dimension) {
+            throw new IndexOutOfBoundsException("Index " + i + ", dimension " + dimension);
+        }
+        return this.numbers[step * i + startPos];
+    }
 
-	public BigDecimal magnitudeSq() {
-		BigDecimal magnitude = BigDecimal.ZERO;
+    /**
+     * Sets the element at the given index in the vector
+     *
+     * @param i The index
+     * @param value The value to put in that index
+     * @throws IndexOutOfBoundsException If {@code i} is out of bounds
+     */
+    public void set(int i, BigFraction value) {
+        if (i < 0 || i >= dimension) {
+            throw new IndexOutOfBoundsException("Index " + i + ", dimension " + dimension);
+        }
+        this.numbers[step * i + startPos] = value;
+    }
 
-		for(int i = 0; i < this.getDimension(); i++) {
-			magnitude = magnitude.add(this.get(i).multiply(this.get(i)));
-		}
+    /**
+     * Returns the square of the magnitude (norm) of this vector.
+     * Note: there is no {@code magnitude()} method in {@code BigVector}, as that can result in an irrational number.
+     * If the un-squared magnitude is desired, the caller should convert the result to a decimal and square root it
+     * themselves.
+     *
+     * @return The square of the magnitude of this vector
+     */
+    public BigFraction magnitudeSq() {
+        BigFraction magnitude = BigFraction.ZERO;
 
-		return magnitude;
-	}
+        for(int i = 0; i < this.getDimension(); i++) {
+            magnitude = magnitude.add(this.get(i).multiply(this.get(i)));
+        }
 
-	public boolean isZero() {
-		for(int i = 0; i < this.getDimension(); i++) {
-			if(this.get(i).compareTo(BigDecimal.ZERO) != 0) return false;
-		}
+        return magnitude;
+    }
 
-		return true;
-	}
+    /**
+     * Returns whether this vector is the zero vector
+     *
+     * @return Whether this vector is the zero vector
+     */
+    public boolean isZero() {
+        for(int i = 0; i < this.getDimension(); i++) {
+            if(this.get(i).signum() != 0) return false;
+        }
 
-	public BigVector add(BigVector a) {
-		assertSameDimension(a);
+        return true;
+    }
 
-		BigVector v = new BigVector(this.getDimension());
+    /**
+     * Adds the given vector to this vector, stores the result in a new vector and returns that vector
+     *
+     * @param a The vector to add
+     * @return A new vector containing the result
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigVector add(BigVector a) {
+        return copy().addEquals(a);
+    }
 
-		for(int i = 0; i < v.getDimension(); i++) {
-			v.set(i, this.get(i).add(a.get(i)));
-		}
+    /**
+     * Subtracts the given vector from this vector, stores the result in a new vector and returns that vector
+     *
+     * @param a The vector to subtract
+     * @return A new vector containing the result
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigVector subtract(BigVector a) {
+        return copy().subtractEquals(a);
+    }
 
-		return v;
-	}
+    /**
+     * Multiplies this vector by the given scalar, stores the result in a new vector and returns that vector
+     *
+     * @param scalar The scalar to multiply by
+     * @return A new vector containing the result
+     */
+    public BigVector multiply(BigFraction scalar) {
+        return copy().multiplyEquals(scalar);
+    }
 
-	public BigVector subtract(BigVector a) {
-		assertSameDimension(a);
+    /**
+     * Computes {@code this * m}, interpreting this vector as a row vector, stores the result in a new vector and
+     * returns that vector
+     *
+     * @param m The matrix to right-multiply by
+     * @return A new vector containing the result
+     * @throws IllegalArgumentException If the dimension of this vector is not equal to the number of rows in the given
+     *                                  matrix
+     */
+    public BigVector multiply(BigMatrix m) {
+        if (this.getDimension() != m.getRowCount()) {
+            throw new IllegalArgumentException("Vector dimension should equal the number of matrix rows");
+        }
 
-		BigVector v = new BigVector(this.getDimension());
+        BigVector v = new BigVector(m.getColumnCount());
 
-		for(int i = 0; i < v.getDimension(); i++) {
-			v.set(i, this.get(i).subtract(a.get(i)));
-		}
+        for (int i = 0; i < v.getDimension(); i++) {
+            v.set(i, this.dot(m.getColumn(i)));
+        }
 
-		return v;
-	}
+        return v;
+    }
 
-	public BigVector multiply(BigDecimal scalar) {
-		BigVector v = this.copy();
+    /**
+     * Divides this vector by the given scalar, stores the result in a new vector and returns that vector
+     *
+     * @param scalar The scalar to divide by
+     * @return A new vector containing the result
+     */
+    public BigVector divide(BigFraction scalar) {
+        return copy().divideEquals(scalar);
+    }
 
-		for(int i = 0; i < v.getDimension(); i++) {
-			v.set(i, this.get(i).multiply(scalar));
-		}
+    /**
+     * Adds the given vector to this vector, modifying this vector
+     *
+     * @param a The vector to add to this vector
+     * @return This vector
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigVector addEquals(BigVector a) {
+        assertSameDimension(a);
 
-		return v;
-	}
+        for(int i = 0; i < this.getDimension(); i++) {
+            this.set(i, this.get(i).add(a.get(i)));
+        }
 
-	public BigVector divide(BigDecimal scalar) {
-		BigVector v = this.copy();
+        return this;
+    }
 
-		for(int i = 0; i < v.getDimension(); i++) {
-			v.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
-		}
+    /**
+     * Subtracts the given vector from this vector, modifying this vector
+     *
+     * @param a The vector to subtract from this vector
+     * @return This vector
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigVector subtractEquals(BigVector a) {
+        assertSameDimension(a);
 
-		return v;
-	}
+        for(int i = 0; i < this.getDimension(); i++) {
+            this.set(i, this.get(i).subtract(a.get(i)));
+        }
 
-	public BigVector addEquals(BigVector a) {
-		assertSameDimension(a);
+        return this;
+    }
 
-		for(int i = 0; i < this.getDimension(); i++) {
-			this.set(i, this.get(i).add(a.get(i)));
-		}
+    /**
+     * Multiplies this vector by the given scalar, modifying this vector
+     *
+     * @param scalar The scalar to multiply this vector by
+     * @return This vector
+     */
+    public BigVector multiplyEquals(BigFraction scalar) {
+        for(int i = 0; i < this.getDimension(); i++) {
+            this.set(i, this.get(i).multiply(scalar));
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	public BigVector subtractEquals(BigVector a) {
-		assertSameDimension(a);
+    /**
+     * Divides this vector by the given scalar, modifying this vector
+     *
+     * @param scalar The scalar to divide this vector by
+     * @return This vector
+     */
+    public BigVector divideEquals(BigFraction scalar) {
+        for(int i = 0; i < this.getDimension(); i++) {
+            this.set(i, this.get(i).divide(scalar));
+        }
 
-		for(int i = 0; i < this.getDimension(); i++) {
-			this.set(i, this.get(i).subtract(a.get(i)));
-		}
+        return this;
+    }
 
-		return this;
-	}
+    /**
+     * Calculates the dot product of this vector and the given vector
+     *
+     * @param v The vector to find the dot product with
+     * @return The dot product of this vector and the given vector
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigFraction dot(BigVector v) {
+        assertSameDimension(v);
 
-	public BigVector multiplyEquals(BigDecimal scalar) {
-		for(int i = 0; i < this.getDimension(); i++) {
-			this.set(i, this.get(i).multiply(scalar));
-		}
+        BigFraction dot = BigFraction.ZERO;
 
-		return this;
-	}
+        for(int i = 0; i < this.getDimension(); i++) {
+            dot = dot.add(this.get(i).multiply(v.get(i)));
+        }
 
-	public BigVector divideEquals(BigDecimal scalar) {
-		for(int i = 0; i < this.getDimension(); i++) {
-			this.set(i, this.get(i).divide(scalar, RoundingMode.HALF_UP));
-		}
+        return dot;
+    }
 
-		return this;
-	}
+    /**
+     * Returns the Gram-Schmidt coefficient when this vector is projected onto the given vector, that is, the ratio of
+     * the length of the projection of this vector onto the given vector, to the given vector's length. In other words,
+     * multiplying the given vector by the Gram-Schmidt coefficient gives the projection of this vector onto the given
+     * vector
+     *
+     * @param v The vector to project onto
+     * @return The Gram-Schmidt coefficient when this vector is projected onto the given vector
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigFraction gramSchmidtCoefficient(BigVector v) {
+        return this.dot(v).divide(v.magnitudeSq());
+    }
 
-	public BigDecimal dot(BigVector v) {
-		assertSameDimension(v);
+    /**
+     * Calculates the projection of this vector onto the given vector, stores the result in a new vector and returns
+     * that vector
+     *
+     * @param v The vector to project onto
+     * @return A new vector containing the result
+     * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
+     *                                  vector
+     */
+    public BigVector projectOnto(BigVector v) {
+        return v.multiply(this.gramSchmidtCoefficient(v));
+    }
 
-		BigDecimal dot = BigDecimal.ZERO;
+    /**
+     * Creates a copy of this vector
+     *
+     * @return A copy of this vector
+     */
+    public BigVector copy() {
+        if (step == 1) {
+            return new BigVector(Arrays.copyOfRange(numbers, startPos, startPos + dimension));
+        }
 
-		for(int i = 0; i < this.getDimension(); i++) {
-			dot = dot.add(this.get(i).multiply(v.get(i)));
-		}
+        BigVector v = new BigVector(this.getDimension());
+        for (int i = 0; i < v.getDimension(); i++) {
+            v.set(i, this.get(i));
+        }
+        return v;
+    }
 
-		return dot;
-	}
+    private void assertSameDimension(BigVector other) {
+        if (other.dimension != this.dimension) {
+            throw new IllegalArgumentException("The other vector is not the same dimension");
+        }
+    }
 
-	public BigDecimal gramSchmidtCoefficient(BigVector v) {
-		return this.dot(v).divide(v.magnitudeSq(), RoundingMode.HALF_UP);
-	}
+    @Override
+    public int hashCode() {
+        int h = 0;
+        for (int i = 0; i < dimension; i++) {
+            h = 31 * h + get(i).hashCode();
+        }
+        return h;
+    }
 
-	public BigVector projectOnto(BigVector v) {
-		return v.multiply(this.gramSchmidtCoefficient(v));
-	}
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) return true;
+        if (other == null || other.getClass() != BigVector.class) return false;
+        BigVector that = (BigVector) other;
+        if (this.dimension != that.dimension) {
+            return false;
+        }
+        for (int i = 0; i < dimension; i++) {
+            if (!this.get(i).equals(that.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	public BigVector copy() {
-		BigVector v = new BigVector(this.getDimension());
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
 
-		for(int i = 0; i < v.getDimension(); i++) {
-			v.set(i, this.get(i) == null ? BigDecimal.ZERO : this.get(i));
-		}
+        for(int i = 0; i < this.getDimension(); i++) {
+            sb.append(this.get(i))
+                    .append(i == this.getDimension() - 1 ? "" : ", ");
+        }
 
-		return v;
-	}
+        return sb.append("}").toString();
+    }
 
-	private void assertSameDimension(BigVector other) {
-		if (other.dimension != this.dimension) {
-			throw new IllegalArgumentException("The other vector is not the same dimension");
-		}
-	}
+    /**
+     * Parses a string in wolfram-style vector notation
+     *
+     * @param raw The string in wolfram-style vector notation
+     * @return The parsed vector
+     * @throws IllegalArgumentException If the input is malformed
+     * @throws NumberFormatException If the input is malformed
+     */
+    public static BigVector fromString(String raw) {
+        raw = raw.replaceAll("\\s+","");
 
-	public boolean equals(BigVector other, BigDecimal tolerance) {
-		if (this.dimension != other.dimension) {
-			return false;
-		}
-		for (int i = 0; i < dimension; i++) {
-			if (this.get(i).subtract(other.get(i)).abs().compareTo(tolerance) > 0) {
-				return false;
-			}
-		}
-		return true;
-	}
+        String[] data = raw.split(",");
+        BigVector v = new BigVector(data.length);
 
-	@Override
-	public int hashCode() {
-		return Arrays.hashCode(numbers);
-	}
+        for(int i = 0; i < data.length; i++) {
+            v.set(i, BigFraction.parse(data[i]));
+        }
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == this) return true;
-		if (other == null || other.getClass() != BigVector.class) return false;
-		BigVector that = (BigVector) other;
-		return this.equals(that, BigDecimal.ZERO);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder("{");
-
-		for(int i = 0; i < this.getDimension(); i++) {
-			sb.append(this.get(i) == null ? null : this.get(i).stripTrailingZeros().toPlainString())
-					.append(i == this.getDimension() - 1 ? "" : ", ");
-		}
-
-		return sb.append("}").toString();
-	}
-
-	public static BigVector fromString(String raw) {
-		raw = raw.replaceAll("\\s+","");
-
-		String[] data = raw.split(Pattern.quote(","));
-		BigVector v = new BigVector(data.length);
-
-		for(int i = 0; i < data.length; i++) {
-			v.set(i, new BigDecimal(data[i]));
-		}
-
-		return v;
-	}
-
-	public static BigVector fromVector(Vector v) {
-		BigVector p = new BigVector(v.getDimension());
-
-		for(int i = 0; i < p.getDimension(); i++) {
-			p.set(i, BigDecimal.valueOf(v.get(i)));
-		}
-
-		return p;
-	}
+        return v;
+    }
 }

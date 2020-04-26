@@ -2,10 +2,7 @@ package randomreverser.math.component;
 
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
 import static org.junit.Assert.*;
-import static randomreverser.util.MoreAssert.*;
 
 public class BigMatrixTest {
 
@@ -22,19 +19,19 @@ public class BigMatrixTest {
     @Test
     public void testGet() {
         BigMatrix m = BigMatrix.fromString("{{2, 3}, {5, 7}}");
-        assertBigDecimalEquals(BigDecimal.valueOf(2), m.get(0, 0));
-        assertBigDecimalEquals(BigDecimal.valueOf(3), m.get(0, 1));
-        assertBigDecimalEquals(BigDecimal.valueOf(5), m.get(1, 0));
-        assertBigDecimalEquals(BigDecimal.valueOf(7), m.get(1, 1));
+        assertEquals(new BigFraction(2), m.get(0, 0));
+        assertEquals(new BigFraction(3), m.get(0, 1));
+        assertEquals(new BigFraction(5), m.get(1, 0));
+        assertEquals(new BigFraction(7), m.get(1, 1));
     }
 
     @Test
     public void testSet() {
         BigMatrix m = new BigMatrix(2, 2);
-        m.set(0, 0, BigDecimal.valueOf(2));
-        m.set(0, 1, BigDecimal.valueOf(3));
-        m.set(1, 0, BigDecimal.valueOf(5));
-        m.set(1, 1, BigDecimal.valueOf(7));
+        m.set(0, 0, new BigFraction(2));
+        m.set(0, 1, new BigFraction(3));
+        m.set(1, 0, new BigFraction(5));
+        m.set(1, 1, new BigFraction(7));
         assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
     }
 
@@ -46,10 +43,25 @@ public class BigMatrixTest {
     }
 
     @Test
+    public void testGetColumn() {
+        BigMatrix m = BigMatrix.fromString("{{2, 3}, {5, 7}}");
+        assertEquals(new BigVector(2, 5), m.getColumn(0));
+        assertEquals(new BigVector(3, 7), m.getColumn(1));
+    }
+
+    @Test
     public void testSetRow() {
         BigMatrix m = new BigMatrix(2, 2);
         m.setRow(0, new BigVector(2, 3));
         m.setRow(1, new BigVector(5, 7));
+        assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
+    }
+
+    @Test
+    public void testSetColumn() {
+        BigMatrix m = new BigMatrix(2, 2);
+        m.setColumn(0, new BigVector(2, 5));
+        m.setColumn(1, new BigVector(3, 7));
         assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
     }
 
@@ -83,7 +95,7 @@ public class BigMatrixTest {
     @Test
     public void testMultiplyScalar() {
         BigMatrix m = BigMatrix.fromString("{{2, 3}, {5, 7}}");
-        assertEquals(BigMatrix.fromString("{{4, 6}, {10, 14}}"), m.multiply(BigDecimal.valueOf(2)));
+        assertEquals(BigMatrix.fromString("{{4, 6}, {10, 14}}"), m.multiply(new BigFraction(2)));
         assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
     }
 
@@ -109,9 +121,22 @@ public class BigMatrixTest {
     }
 
     @Test
+    public void testMultiplyVector() {
+        BigMatrix m = BigMatrix.fromString("{{2, 3}, {5, 7}}");
+        BigVector v = new BigVector(11, 13);
+        assertEquals(new BigVector(61, 146), m.multiply(v));
+        assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMultiplyVectorFail() {
+        new BigMatrix(2, 2).multiply(new BigVector(3));
+    }
+
+    @Test
     public void testDivide() {
         BigMatrix m = BigMatrix.fromString("{{4, 6}, {10, 14}}");
-        assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m.divide(BigDecimal.valueOf(2)));
+        assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m.divide(new BigFraction(2)));
         assertEquals(BigMatrix.fromString("{{4, 6}, {10, 14}}"), m);
     }
 
@@ -129,7 +154,7 @@ public class BigMatrixTest {
 
     @Test
     public void testInverseEight() {
-        assertEquals(BigMatrix.fromString("{{0.125}}"), BigMatrix.fromString("{{8}}").inverse());
+        assertEquals(BigMatrix.fromString("{{1/8}}"), BigMatrix.fromString("{{8}}").inverse());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -159,8 +184,8 @@ public class BigMatrixTest {
                 "{16955, -18494, -20727, 15324, 12297}," +
                 "{9837, -20547, -31365, 31833, 16965}," +
                 "{-8706, 28434, 25335, -27342, -15984}}"
-        ).divide(BigDecimal.valueOf(227079));
-        assertTrue(m.inverse().equals(expected, BigDecimal.valueOf(0.00000001)));
+        ).divide(new BigFraction(227079));
+        assertEquals(expected, m.inverse());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -227,6 +252,14 @@ public class BigMatrixTest {
     @Test(expected = IllegalArgumentException.class)
     public void testMultiplyEqualsNonSquare() {
         new BigMatrix(2, 2).multiplyEquals(new BigMatrix(2, 3));
+    }
+
+    @Test
+    public void testDivideEqualsScalar() {
+        BigMatrix m = BigMatrix.fromString("{{4, 6}, {10, 14}}");
+        BigMatrix result = m.divideEquals(new BigFraction(2));
+        assertSame(result, m);
+        assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
     }
 
     @Test
