@@ -1,5 +1,6 @@
 package randomreverser.math.component;
 
+import randomreverser.math.decomposition.LUDecomposition;
 import randomreverser.util.MatrixDataProvider;
 import randomreverser.util.StringUtils;
 
@@ -173,6 +174,13 @@ public final class Matrix {
         }
     }
 
+    /**
+     * Adds the given matrix to this matrix, stores the result in a new matrix and returns that matrix
+     *
+     * @param m The matrix to add
+     * @return A new matrix containing the result
+     * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
+     */
 	public Matrix add(Matrix m) {
         return copy().addEquals(m);
     }
@@ -264,17 +272,7 @@ public final class Matrix {
      * @throws IllegalStateException If this matrix is singular
      */
     public Matrix inverse() {
-        if(this.rowCount != this.columnCount) {
-            throw new UnsupportedOperationException("Can only find the inverse of square matrices");
-        }
-
-        SystemSolver.Result result = SystemSolver.solve(this, identityMatrix(this.rowCount), SystemSolver.Phase.BASIS);
-
-        if(result.type != SystemSolver.Result.Type.ONE_SOLUTION) {
-            throw new IllegalStateException("This matrix is not invertible");
-        }
-
-        return result.result;
+        return LUDecomposition.decompose(this).inverse();
     }
 
     /**
