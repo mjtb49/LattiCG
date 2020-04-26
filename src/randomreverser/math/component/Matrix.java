@@ -1,8 +1,13 @@
 package randomreverser.math.component;
 
+import randomreverser.math.decomposition.LUDecomposition;
+import randomreverser.util.MatrixDataProvider;
 import randomreverser.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.DoubleSupplier;
 
 /**
  * A matrix of double values
@@ -31,6 +36,16 @@ public final class Matrix {
         this.numbers = new double[rowCount * columnCount];
     }
 
+	public Matrix(int rowCount, int columnCount, MatrixDataProvider gen) {
+		this(rowCount, columnCount);
+
+		for(int row = 0; row < this.rowCount; row++) {
+			for(int col = 0; col < this.columnCount; col++) {
+				this.set(row, col, gen.getValue(row, col));
+			}
+		}
+	}
+
     /**
      * Gets the number of rows in the matrix
      *
@@ -47,6 +62,10 @@ public final class Matrix {
      */
     public int getColumnCount() {
         return this.columnCount;
+    }
+
+    public boolean isSquare() {
+        return this.rowCount == this.columnCount;
     }
 
     /**
@@ -162,7 +181,7 @@ public final class Matrix {
      * @return A new matrix containing the result
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-    public Matrix add(Matrix m) {
+	public Matrix add(Matrix m) {
         return copy().addEquals(m);
     }
 
@@ -253,17 +272,7 @@ public final class Matrix {
      * @throws IllegalStateException If this matrix is singular
      */
     public Matrix inverse() {
-        if(this.rowCount != this.columnCount) {
-            throw new UnsupportedOperationException("Can only find the inverse of square matrices");
-        }
-
-        SystemSolver.Result result = SystemSolver.solve(this, identityMatrix(this.rowCount), SystemSolver.Phase.BASIS);
-
-        if(result.type != SystemSolver.Result.Type.ONE_SOLUTION) {
-            throw new IllegalStateException("This matrix is not invertible");
-        }
-
-        return result.result;
+        return LUDecomposition.decompose(this).inverse();
     }
 
     /**
