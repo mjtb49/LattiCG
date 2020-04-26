@@ -1,6 +1,7 @@
 package randomreverser.math.decomposition;
 
 import randomreverser.math.component.Matrix;
+import randomreverser.math.component.Vector;
 
 import java.util.regex.Pattern;
 
@@ -11,8 +12,9 @@ public class LUResult {
 	protected final Matrix L;
 	protected final Matrix U;
 	private final double det;
+	private final Matrix inv;
 
-	public LUResult(Matrix lu, Matrix p, double det) {
+	public LUResult(Matrix lu, Vector p, double det, Matrix inv) {
 		this.size = lu.getRowCount();
 
 		this.L = new Matrix(this.size, this.size, (row, col) -> {
@@ -26,8 +28,14 @@ public class LUResult {
 			else return 0.0D;
 		});
 
-		this.P = p;
+		this.P = Matrix.identityMatrix(this.size);
+
+		for(int i = 0; i < this.size; i++) {
+			this.P.swapRowsEquals(i, (int)p.get(i));
+		}
+
 		this.det = det;
+		this.inv = inv;
 	}
 
 	public int getMatrixSize() {
@@ -48,6 +56,10 @@ public class LUResult {
 
 	public double getDet() {
 		return this.det;
+	}
+
+	public Matrix inverse() {
+		return this.inv;
 	}
 
 	public String toPrettyString() {

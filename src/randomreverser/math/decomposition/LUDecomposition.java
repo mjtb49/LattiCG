@@ -1,6 +1,7 @@
 package randomreverser.math.decomposition;
 
 import randomreverser.math.component.Matrix;
+import randomreverser.math.component.Vector;
 
 public class LUDecomposition {
 
@@ -11,7 +12,7 @@ public class LUDecomposition {
 
 		Matrix m = matrix.copy();
 		int size = m.getRowCount();
-		Matrix p = Matrix.identityMatrix(size);
+		Vector p = new Vector(size);
 		int swaps = 0;
 
 		for(int i = 0; i < size; i++) {
@@ -31,7 +32,7 @@ public class LUDecomposition {
 				throw new IllegalStateException("Matrix is singular");
 			}
 
-			p.swapRowsEquals(i, pivot);
+			p.set(i, pivot);
 
 			if(pivot != i) {
 				m.swapRowsEquals(i, pivot);
@@ -57,11 +58,34 @@ public class LUDecomposition {
 		}
 
 		det *= (swaps & 1) == 0 ? 1 : -1;
-		return new LUResult(m, p, det);
-	}
 
-	public static Matrix flippy(LUResult result) {
-		return null;
+		//Inverse
+		Matrix inv = m.copy();
+
+		for(int row = 0; row < size; row++) {
+			if(row == (int)p.get(row))continue;
+			inv.swapRowsEquals(row, (int)p.get(row));
+		}
+
+		for(int dcol = 0; dcol < size; dcol++) {
+			for(int row = 0; row < size; row++) {
+				for(int col = 0; col < row; col++) {
+					inv.set(row, dcol, inv.get(row, dcol) - m.get(row, col) * inv.get(col, dcol));
+				}
+			}
+		}
+
+		for(int dcol = 0; dcol < size; dcol++) {
+			for(int row = size - 1; row >= 0; row--) {
+				for(int col = size - 1; col > row; col--) {
+					inv.set(row, dcol, inv.get(row, dcol) - m.get(row, col) * inv.get(col, dcol));
+				}
+
+				inv.set(row, dcol, inv.get(row, dcol) / m.get(row, row));
+			}
+		}
+
+		return new LUResult(m, p, det, inv);
 	}
 
 }
