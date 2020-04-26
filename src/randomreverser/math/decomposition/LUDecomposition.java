@@ -4,15 +4,6 @@ import randomreverser.math.component.Matrix;
 
 public class LUDecomposition {
 
-	public static void main(String[] args) {
-		Matrix m = Matrix.fromString("{{1, 5}, {2, -3}}");
-		LUResult result = LUDecomposition.decompose(m);
-		System.out.println(m.toPrettyString() + "\n");
-		System.out.println(result.toPrettyString() + "\n");
-		System.out.println(result.getL().multiply(result.getU()).toPrettyString() + "\n");
-		System.out.println(result.getDet());
-	}
-
 	public static LUResult decompose(Matrix matrix) {
 		if(!matrix.isSquare()) {
 			throw new IllegalArgumentException("Matrix is not square");
@@ -20,6 +11,8 @@ public class LUDecomposition {
 
 		Matrix m = matrix.copy();
 		int size = m.getRowCount();
+		Matrix p = Matrix.identityMatrix(size);
+		int swaps = 0;
 
 		for(int i = 0; i < size; i++) {
 			int pivot = -1;
@@ -35,8 +28,11 @@ public class LUDecomposition {
 				throw new IllegalStateException("Matrix is singular");
 			}
 
+			p.swapRowsEquals(i, pivot);
+
 			if(pivot != i) {
 				m.swapRowsEquals(i, pivot);
+				swaps++;
 			}
 
 			for(int row = i + 1; row < size; row++) {
@@ -57,7 +53,8 @@ public class LUDecomposition {
 			det *= m.get(i, i);
 		}
 
-		return new LUResult(m, det);
+		det *= (swaps & 1) == 0 ? 1 : -1;
+		return new LUResult(m, p, det);
 	}
 
 }
