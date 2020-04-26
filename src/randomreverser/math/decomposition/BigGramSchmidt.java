@@ -38,13 +38,13 @@ public class BigGramSchmidt {
 
 		for(int i = 0; i < this.basis.getRowCount(); i++) {
 			BigVector v = this.basis.getRow(i).copy();
-			this.newBasis.setRow(i, v);
 
 			for(int j = 0; j < i; j++) {
 				BigFraction scalar = this.basis.getRow(i).gramSchmidtCoefficient(this.newBasis.getRow(j));
 				v.subtractEquals(this.newBasis.getRow(j).multiply(scalar));
 				this.coefficients.set(i, j, scalar);
 			}
+			this.newBasis.setRow(i, v);
 		}
 
 		for(int i = 0; i < this.basis.getRowCount(); i++) {
