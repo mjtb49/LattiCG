@@ -1,26 +1,25 @@
 package randomreverser.math.decomposition;
 
 import randomreverser.math.component.Matrix;
-import randomreverser.math.component.Vector;
 
-public class SolverThingsINeedABetterName {
+public class LUDecomposition {
 
 	public static void main(String[] args) {
-		Matrix m = Matrix.fromString("{{4,3,2,1},{1,10,3,4},{5,3,2,-4},{4,8,7,9}}");
-		LUResult result = SolverThingsINeedABetterName.luDecompose(m);
-		System.out.println(m.toPrettyString());
-		System.out.println(result.toPrettyString());
-		System.out.println(result.getL().multiply(result.getU()).toPrettyString());
+		Matrix m = Matrix.fromString("{{1, 5}, {2, -3}}");
+		LUResult result = LUDecomposition.decompose(m);
+		System.out.println(m.toPrettyString() + "\n");
+		System.out.println(result.toPrettyString() + "\n");
+		System.out.println(result.getL().multiply(result.getU()).toPrettyString() + "\n");
+		System.out.println(result.getDet());
 	}
 
-	public static LUResult luDecompose(Matrix matrix) {
+	public static LUResult decompose(Matrix matrix) {
 		if(!matrix.isSquare()) {
 			throw new IllegalArgumentException("Matrix is not square");
 		}
 
 		Matrix m = matrix.copy();
 		int size = m.getRowCount();
-		Vector p = new Vector(size);
 
 		for(int i = 0; i < size; i++) {
 			int pivot = -1;
@@ -35,8 +34,6 @@ public class SolverThingsINeedABetterName {
 			if(pivot == -1) {
 				throw new IllegalStateException("Matrix is singular");
 			}
-
-			p.set(i, pivot);
 
 			if(pivot != i) {
 				m.swapRowsEquals(i, pivot);
@@ -53,11 +50,14 @@ public class SolverThingsINeedABetterName {
 			}
 		}
 
-		return new LUResult(m, p);
-	}
+		//Determinant
+		double det = 1.0D;
 
-	public static double getDeterminant(LUResult result) {
-		return 0.0D;
+		for(int i = 0; i < size; i++) {
+			det *= m.get(i, i);
+		}
+
+		return new LUResult(m, det);
 	}
 
 }
