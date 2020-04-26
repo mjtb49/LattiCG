@@ -1,32 +1,26 @@
 package randomreverser;
 
+import randomreverser.math.component.*;
 import randomreverser.util.LCG;
 import randomreverser.util.Mth;
-import randomreverser.math.component.BigMatrix;
-import randomreverser.math.component.BigVector;
-import randomreverser.math.component.Matrix;
-import randomreverser.math.component.Vector;
 import randomreverser.math.lattice.LLL;
 import randomreverser.math.lattice.Enumerate;
 import randomreverser.util.Rand;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class RandomReverser {
 
-    private static final BigDecimal MOD = new BigDecimal(281474976710656L);
-    private static final BigDecimal MULT = new BigDecimal(25214903917L);
-    private static final BigDecimal ONE = new BigDecimal(1);
-    private static final BigDecimal ZERO = new BigDecimal(0);
+    private static final BigInteger MOD = BigInteger.valueOf(281474976710656L);
+    private static final BigInteger MULT = BigInteger.valueOf(25214903917L);
 
     private Matrix lattice;
 
     private ArrayList<Long> mins;
     private ArrayList<Long> maxes;
-    private ArrayList<Integer> gaps;
+    private ArrayList<Integer> callIndices;
+    private int currentCallIndex;
     private int dimensions;
     private boolean verbose;
 
@@ -35,8 +29,8 @@ public class RandomReverser {
         dimensions = 0;
         mins = new ArrayList<>();
         maxes = new ArrayList<>();
-        gaps = new ArrayList<>();
-        gaps.add(0);
+        callIndices = new ArrayList<>();
+        currentCallIndex = 0;
     }
 
     //TODO Make this pick and choose which dimensions to use instead of using all of them
@@ -51,14 +45,14 @@ public class RandomReverser {
             vecMaxes.set(i, (double) maxes.get(i));
             offsets.set(i,rand.getSeed());
             if (i != dimensions-1)
-                rand.advance(gaps.get(i+1));
+                rand.advance(callIndices.get(i+1));
         }
         if (verbose) {
             System.out.println("Mins: "+vecMins);
             System.out.println("Maxes: "+vecMaxes);
             System.out.println("Offsets: "+offsets);
         }
-        LCG r = LCG.JAVA.combine(-gaps.get(0));
+        LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
         ArrayList<Long> results = new ArrayList<>();
         for (Vector n : Enumerate.enumerate(dimensions, vecMins, vecMaxes, lattice, offsets)) {
@@ -70,78 +64,74 @@ public class RandomReverser {
     }
 
     private void createLattice() {
-//        if (verbose)
-//            System.out.println("Gaps: " + gaps);
-//        if (mins.size() != dimensions || maxes.size() != dimensions || gaps.size() -1 != dimensions){
-//            //TODO Bad Input What Do
-//            return;
-//        }
-//
-//        BigVector sideLengths =  new BigVector(dimensions);
-//        for (int i = 0; i < dimensions; i++) {
-//            sideLengths.set(i,new BigDecimal(maxes.get(i)-mins.get(i)+1));
-//        }
-//        BigDecimal lcm = ONE;
-//        for (int i = 0; i < dimensions; i++) {
-//            lcm = sideLengths.get(i).multiply(lcm).divide(Mth.gcd(lcm, sideLengths.get(i)), RoundingMode.UNNECESSARY);
-//        }
-//
-//        BigMatrix scales = new BigMatrix(dimensions,dimensions);
-//        for (int i = 0; i < dimensions; i++) {
-//            for (int j = 0; j < dimensions; j++)
-//                scales.set(i,j,ZERO);
-//            scales.set(i,i,lcm.divide(sideLengths.get(i), RoundingMode.UNNECESSARY));
-//            // Hacky solution: scales.set(i,i,ONE);
-//        }
-//
-//        BigMatrix unscaledLattice = new BigMatrix(dimensions,dimensions);
-//
-//        for(int i = 0; i < dimensions; i++) {
-//            for (int j = 0; j < dimensions; j++)
-//                unscaledLattice.set(i,j, ZERO);
-//
-//            if (i == 0) {
-//                unscaledLattice.set(0, i, ONE);
-//            } else {
-//                unscaledLattice.set(0, i, unscaledLattice.get(0, i-1));
-//                //for (int j = 0; j < gaps.get(i); j ++) {
-//                BigInteger tempMult = MULT.toBigInteger().modPow(BigInteger.valueOf(gaps.get(i)), MOD.toBigInteger());
-//                unscaledLattice.set(0, i, unscaledLattice.get(0,i).multiply(new BigDecimal(tempMult)).remainder(MOD));
-//                //}
-//                unscaledLattice.set(i, i, MOD);
-//            }
-//
-//        }
-//
-//        BigMatrix scaledLattice = unscaledLattice.multiply(scales);
-//
-//        LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
-//        if(verbose)
-//            System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
-//
-//        BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
-//        BigMatrix result = LLL.reduce(scaledLattice, params, transformations);
-//        //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
-//
-//        if(verbose) {
-//            System.out.println("Found Reduced Scaled Basis:\n" + result.toPrettyString());
-//            System.out.println("Found Reduced Basis:\n" + transformations.multiply(unscaledLattice).toPrettyString());
-//            //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
-//        }
-//        //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-//        lattice = Matrix.fromBigMatrix(transformations.multiply(unscaledLattice));
+       if (verbose)
+           System.out.println("Call Indices: " + callIndices);
+       if (mins.size() != dimensions || maxes.size() != dimensions || callIndices.size() != dimensions){
+           //TODO Bad Input What Do
+           return;
+       }
+
+       BigInteger[] sideLengths =  new BigInteger[dimensions]; //The lengths of the sides of the cuboid in which our seeds must fall
+
+       for (int i = 0; i < dimensions; i++) {
+           sideLengths[i] = BigInteger.valueOf(maxes.get(i)-mins.get(i)+1);
+       }
+
+       BigInteger lcm = BigInteger.ONE;
+       for (int i = 0; i < dimensions; i++) {
+           lcm = Mth.lcm(lcm, sideLengths[i]);
+       }
+
+       BigMatrix scales = new BigMatrix(dimensions,dimensions);
+       for (int i = 0; i < dimensions; i++) {
+           for (int j = 0; j < dimensions; j++)
+               scales.set(i,j,BigFraction.ZERO);
+           scales.set(i,i,new BigFraction(lcm.divide(sideLengths[i])));
+       }
+
+       BigMatrix unscaledLattice = new BigMatrix(dimensions,dimensions);
+       for(int i = 0; i < dimensions; i++) {
+           for (int j = 0; j < dimensions; j++)
+               unscaledLattice.set(i,j, BigFraction.ZERO);
+           if (i == 0) {
+               unscaledLattice.set(0, i, BigFraction.ONE);
+           } else {
+               unscaledLattice.set(0, i, unscaledLattice.get(0, i-1));
+               //for (int j = 0; j < callIndices.get(i); j ++) {
+               BigInteger tempMult = MULT.modPow(BigInteger.valueOf(callIndices.get(i) - callIndices.get(0)), MOD);
+               unscaledLattice.set(0, i, new BigFraction(tempMult));
+               //}
+               unscaledLattice.set(i, i, new BigFraction(MOD));
+           }
+       }
+       BigMatrix scaledLattice = unscaledLattice.multiply(scales);
+       LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
+       if(verbose)
+           System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
+       BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
+       BigMatrix result = LLL.reduce(scaledLattice, params, transformations);
+       //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
+       if(verbose) {
+           System.out.println("Found Reduced Scaled Basis:\n" + result.toPrettyString());
+           System.out.println("Found Reduced Basis:\n" + transformations.multiply(unscaledLattice).toPrettyString());
+           //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
+       }
+       //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
+       lattice = Matrix.fromBigMatrix(transformations.multiply(unscaledLattice));
     }
 
     private void addMeasuredSeed(long min, long max) {
-        gaps.set(dimensions, gaps.get(dimensions)+1);
+        //callIndices.set(dimensions, callIndices.get(dimensions)+1);
         mins.add(min);
         maxes.add(max);
         dimensions += 1;
-        gaps.add(0);
+        currentCallIndex += 1;
+        callIndices.add(currentCallIndex);
     }
 
     private void addUnmeasuredSeeds(int numSeeds) {
-        gaps.set(dimensions, gaps.get(dimensions) + numSeeds);
+        currentCallIndex += numSeeds;
+        //callIndices.set(dimensions, callIndices.get(dimensions) + numSeeds);
     }
 
     public void addNextIntCall(int n, int min, int max) {

@@ -1,5 +1,9 @@
 package randomreverser.util;
 
+import randomreverser.math.component.BigFraction;
+
+import java.math.BigInteger;
+
 public class Mth {
 
     public static double gcd(double a, double b) {
@@ -11,6 +15,10 @@ public class Mth {
         }
 
         return a;
+    }
+
+    public static BigInteger lcm(BigInteger a, BigInteger b) {
+        return a.multiply(b.divide(a.gcd(b)));
     }
 
     public static long modInverse(long x, int mod) { //Fast method for modular inverse mod powers of 2
