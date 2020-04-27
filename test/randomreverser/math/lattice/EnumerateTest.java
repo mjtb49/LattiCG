@@ -1,8 +1,11 @@
 package randomreverser.math.lattice;
 
+import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,8 +56,10 @@ public class EnumerateTest {
         );
 
         List<Long> results = Enumerate.enumerate(basis, lower, upper, new BigVector(17))
-                .boxed()
-                .collect(Collectors.toList());
+                .map(vec -> vec.get(0))
+                .map(BigFraction::getNumerator)
+                .map(BigInteger::longValue)
+                .collect(Collectors.toCollection(ArrayList::new));
 
         assertEquals(correct.size(), results.size());
         assertTrue(results.containsAll(correct));
