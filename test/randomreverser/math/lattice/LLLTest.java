@@ -51,4 +51,25 @@ public class LLLTest {
         BigMatrix expected = BigMatrix.fromString("{{-2, 0}, {0, 3}}");
         assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
     }
+
+    @Test
+    public void testBigLinearDependant() {
+        BigMatrix basis = BigMatrix.fromString("{{2, 3,128,16}, {4, 9,354,17}, {6, 0,1921,15}, {0, 9,12637,15},{-4,0,-60,-62}}");
+        BigMatrix expected = BigMatrix.fromString("{{-2, 0, -30, -31}, {-12, -51, -15, -9}, {-28, 27, -12, 37}, {-42, -21, 41, -18}}");
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
+    }
+
+    @Test
+    public void testVectorsSpanningSubspace() {
+        BigMatrix basis = BigMatrix.fromString("{{2, 3,128,16}, {4, 9,354,17}, {6, 0,1921,15}}");
+        BigMatrix expected = BigMatrix.fromString("{{-2, 0, -30, -31}, {-12, -51, -15, -9}, {-2, 3, 68, -46}}");
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
+    }
+
+    @Test
+    public void testDependantVectorsSpanningSubspace() {
+        BigMatrix basis = BigMatrix.fromString("{{2, 3,128,16}, {4, 9,354,17}, {6, 0,1921,15}, {2, 3,128,16}, {4, 9,354,17}, {6, 0,1921,15}}");
+        BigMatrix expected = BigMatrix.fromString("{{-2, 0, -30, -31}, {-12, -51, -15, -9}, {-2, 3, 68, -46}}");
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
+    }
 }
