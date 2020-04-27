@@ -1,5 +1,8 @@
 package randomreverser.math.lattice;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,7 +17,8 @@ class EnumeratePool {
     private final Condition finished;
     private final Condition waiting;
 
-    private volatile Enumerate.SearchInfo queue;
+    private volatile Queue<Enumerate.SearchInfo> queue;
+    private volatile Throwable thrown;
     private volatile int active;
     private volatile boolean shutdown;
 
@@ -23,7 +27,8 @@ class EnumeratePool {
         this.lock = new ReentrantLock();
         this.finished = this.lock.newCondition();
         this.waiting = this.lock.newCondition();
-        this.queue = null;
+        this.queue = new LinkedList<>();
+        this.thrown = null;
         this.active = 0;
         this.shutdown = false;
 
@@ -34,28 +39,33 @@ class EnumeratePool {
     }
 
     private void run() {
-        while (true) {
-            this.lock.lock();
+        try {
+            while (true) {
+                this.lock.lock();
 
-            while (this.queue == null) {
-                this.waiting.awaitUninterruptibly();
+                while (this.queue.isEmpty()) {
+                    this.waiting.awaitUninterruptibly();
 
-                if (this.shutdown) {
-                    return;
+                    if (this.shutdown) {
+                        return;
+                    }
                 }
+
+                Enumerate.SearchInfo info = this.queue.poll();
+
+                this.lock.unlock();
+
+                Enumerate.search(info);
+
+                this.lock.lock();
+                this.active -= 1;
+                this.finished.signalAll();
+                this.lock.unlock();
             }
-
-            Enumerate.SearchInfo info = this.queue;
-
-            this.queue = null;
-            this.active += 1;
-            this.lock.unlock();
-
-            Enumerate.search(info);
-
+        } catch (Throwable thrown) {
             this.lock.lock();
-            this.active -= 1;
-            this.finished.signalAll();
+            this.thrown = thrown;
+            this.finished.signal();
             this.lock.unlock();
         }
     }
@@ -64,7 +74,8 @@ class EnumeratePool {
         this.lock.lock();
 
         if (this.active < this.threads.length) {
-            this.queue = info.copy();
+            this.queue.offer(info.copy());
+            this.active += 1;
             this.waiting.signal();
             this.lock.unlock();
         } else {
@@ -77,12 +88,16 @@ class EnumeratePool {
         this.search(root);
         this.lock.lock();
 
-        while (this.active > 0) {
+        while (this.active > 0 && this.thrown == null) {
             this.finished.awaitUninterruptibly();
         }
 
         this.shutdown = true;
         this.waiting.signalAll();
         this.lock.unlock();
+
+        if (this.thrown != null) {
+            throw new RuntimeException(this.thrown);
+        }
     }
 }
