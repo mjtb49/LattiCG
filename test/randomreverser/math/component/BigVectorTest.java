@@ -104,6 +104,14 @@ public class BigVectorTest {
         assertEquals(new BigVector(2, 4), a);
     }
 
+
+    @Test
+    public void testSwapNums() {
+        BigVector a = new BigVector(1, 2, 3);
+        assertEquals(new BigVector(1, 3, 2), a.swapNums(1, 2));
+        assertEquals(new BigVector(1, 2, 3), a);
+    }
+
     @Test
     public void testAddEquals() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
@@ -146,6 +154,14 @@ public class BigVectorTest {
         BigVector result = a.divideEquals(new BigFraction(2));
         assertSame(result, a);
         assertEquals(new BigVector(1, 2), a);
+    }
+
+    @Test
+    public void testSwapNumsEquals() {
+        BigVector a = new BigVector(1, 2, 3);
+        BigVector result = a.swapNumsEquals(1, 2);
+        assertSame(result, a);
+        assertEquals(new BigVector(1, 3, 2), a);
     }
 
     @Test

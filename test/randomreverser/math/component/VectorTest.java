@@ -110,6 +110,13 @@ public class VectorTest {
     }
 
     @Test
+    public void testSwapNums() {
+        Vector a = new Vector(1, 2, 3);
+        assertEquals(new Vector(1, 3, 2), a.swapNums(1, 2));
+        assertEquals(new Vector(1, 2, 3), a);
+    }
+
+    @Test
     public void testAddEquals() {
         Vector a = new Vector(1, 2, 3, 4, 5);
         Vector b = new Vector(5, 3, 6, -4, -1);
@@ -151,6 +158,14 @@ public class VectorTest {
         Vector result = a.divideEquals(2);
         assertSame(result, a);
         assertEquals(new Vector(1, 2), a);
+    }
+
+    @Test
+    public void testSwapNumsEquals() {
+        Vector a = new Vector(1, 2, 3);
+        Vector result = a.swapNumsEquals(1, 2);
+        assertSame(result, a);
+        assertEquals(new Vector(1, 3, 2), a);
     }
 
     @Test
