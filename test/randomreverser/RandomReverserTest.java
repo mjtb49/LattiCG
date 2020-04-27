@@ -1,6 +1,5 @@
 package randomreverser;
 
-import randomreverser.RandomReverser;
 import java.util.ArrayList;
 
 public class RandomReverserTest {

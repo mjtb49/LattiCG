@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class EnumerateTest {
     public static void main(String[] args) {
-
+        testBKZ17Reverse();
     }
 
     private static void testBKZ17Reverse() {
