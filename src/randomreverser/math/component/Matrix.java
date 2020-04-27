@@ -1,13 +1,9 @@
 package randomreverser.math.component;
 
 import randomreverser.math.decomposition.LUDecomposition;
-import randomreverser.util.MatrixDataProvider;
 import randomreverser.util.StringUtils;
 
 import java.util.Arrays;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.DoubleSupplier;
 
 /**
  * A matrix of double values
@@ -36,15 +32,22 @@ public final class Matrix {
         this.numbers = new double[rowCount * columnCount];
     }
 
-	public Matrix(int rowCount, int columnCount, MatrixDataProvider gen) {
-		this(rowCount, columnCount);
+    /**
+     * Constructs a matrix of the given size, using the given function to fill in each element.
+     *
+     * @param rowCount The number of rows
+     * @param columnCount The number of columns
+     * @param gen The function to call for each element of the matrix
+     */
+    public Matrix(int rowCount, int columnCount, DataProvider gen) {
+        this(rowCount, columnCount);
 
-		for(int row = 0; row < this.rowCount; row++) {
-			for(int col = 0; col < this.columnCount; col++) {
-				this.set(row, col, gen.getValue(row, col));
-			}
-		}
-	}
+        for(int row = 0; row < this.rowCount; row++) {
+            for(int col = 0; col < this.columnCount; col++) {
+                this.set(row, col, gen.getValue(row, col));
+            }
+        }
+    }
 
     /**
      * Gets the number of rows in the matrix
@@ -64,6 +67,11 @@ public final class Matrix {
         return this.columnCount;
     }
 
+    /**
+     * Returns whether this is a square matrix
+     *
+     * @return Whether this is a square matrix
+     */
     public boolean isSquare() {
         return this.rowCount == this.columnCount;
     }
@@ -181,7 +189,7 @@ public final class Matrix {
      * @return A new matrix containing the result
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-	public Matrix add(Matrix m) {
+    public Matrix add(Matrix m) {
         return copy().addEquals(m);
     }
 
@@ -539,4 +547,13 @@ public final class Matrix {
         return m;
     }
 
+    /**
+     * A function that returns the value that should go in a cell in a matrix based on the row and column
+     */
+    @FunctionalInterface
+    public interface DataProvider {
+
+        double getValue(int row, int col);
+
+    }
 }

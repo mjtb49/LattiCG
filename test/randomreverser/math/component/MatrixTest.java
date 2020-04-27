@@ -148,7 +148,7 @@ public class MatrixTest {
     @Test
     public void testInverseOrthogonal() {
         Matrix m = Matrix.fromString("{{0, 1}, {-1, 0}}");
-        assertEquals(Matrix.fromString("{{0, -1}, {1, 0}}"), m.inverse());
+        assertTrue(Matrix.fromString("{{0, -1}, {1, 0}}").equals(m.inverse(), 0.00000001));
         assertEquals(Matrix.fromString("{{0, 1}, {-1, 0}}"), m);
     }
 

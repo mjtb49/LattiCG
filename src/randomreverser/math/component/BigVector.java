@@ -197,6 +197,18 @@ public final class BigVector {
     }
 
     /**
+     * Swaps the two numbers at the given indices, stores the result in a new vector and returns that matrix
+     *
+     * @param i The row to swap with {@code j}
+     * @param j The row to swap with {@code i}
+     * @return A new vector containing the result
+     * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
+     */
+    public BigVector swapNums(int i, int j) {
+        return copy().swapNumsEquals(i, j);
+    }
+
+    /**
      * Adds the given vector to this vector, modifying this vector
      *
      * @param a The vector to add to this vector
@@ -257,6 +269,21 @@ public final class BigVector {
             this.set(i, this.get(i).divide(scalar));
         }
 
+        return this;
+    }
+
+    /**
+     * Swaps the two numbers at the given indices, modifying the vector
+     *
+     * @param i The row to swap with {@code j}
+     * @param j The row to swap with {@code i}
+     * @return This vector
+     * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
+     */
+    public BigVector swapNumsEquals(int i, int j) {
+        BigFraction temp = this.get(i);
+        this.set(i, this.get(j));
+        this.set(j, temp);
         return this;
     }
 

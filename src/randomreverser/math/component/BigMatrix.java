@@ -1,5 +1,6 @@
 package randomreverser.math.component;
 
+import randomreverser.math.decomposition.LUDecomposition;
 import randomreverser.util.StringUtils;
 
 import java.util.Arrays;
@@ -24,12 +25,35 @@ public final class BigMatrix {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
 
-        if(rowCount <= 0 || columnCount <= 0) {
+        if (rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
         }
 
         this.numbers = new BigFraction[rowCount * columnCount];
         Arrays.fill(numbers, BigFraction.ZERO);
+    }
+
+    /**
+     * Constructs a matrix of the given size, using the given function to fill in each element.
+     *
+     * @param rowCount The number of rows
+     * @param columnCount The number of columns
+     * @param gen The function to call for each element of the matrix
+     */
+    public BigMatrix(int rowCount, int columnCount, DataProvider gen) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+
+        if(rowCount <= 0 || columnCount <= 0) {
+            throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
+        }
+
+        this.numbers = new BigFraction[rowCount * columnCount];
+        for (int row = 0; row < rowCount; row++) {
+            for (int column = 0; column < columnCount; column++) {
+                numbers[column + columnCount * row] = gen.getValue(row, column);
+            }
+        }
     }
 
     /**
@@ -48,6 +72,15 @@ public final class BigMatrix {
      */
     public int getColumnCount() {
         return this.columnCount;
+    }
+
+    /**
+     * Returns whether this is a square matrix
+     *
+     * @return Whether this is a square matrix
+     */
+    public boolean isSquare() {
+        return this.rowCount == this.columnCount;
     }
 
     /**
@@ -255,21 +288,7 @@ public final class BigMatrix {
      * @throws IllegalStateException If this matrix is singular
      */
     public BigMatrix inverse() {
-        if(this.getRowCount() != this.getColumnCount()) {
-            throw new UnsupportedOperationException("Can only find the inverse of square matrices");
-        }
-        if (this.getRowCount() == 1) {
-            BigMatrix r = new BigMatrix(1,1);
-            r.set(0,0, this.get(0, 0).reciprocal());
-            return r;
-        }
-        SystemSolver.BigResult result = SystemSolver.solve(this, BigMatrix.identityMatrix(this.getRowCount()), SystemSolver.Phase.BASIS);
-
-        if(result.type != SystemSolver.BigResult.Type.ONE_SOLUTION) {
-            throw new IllegalStateException("This matrix is not invertible");
-        }
-
-        return result.result;
+        return LUDecomposition.decompose(this).inverse();
     }
 
     /**
@@ -499,5 +518,15 @@ public final class BigMatrix {
         }
 
         return m;
+    }
+
+    /**
+     * A function that returns the value that should go in a cell in a matrix based on the row and column
+     */
+    @FunctionalInterface
+    public interface DataProvider {
+
+        BigFraction getValue(int row, int col);
+
     }
 }
