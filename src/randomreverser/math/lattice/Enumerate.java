@@ -5,9 +5,10 @@ import randomreverser.math.component.*;
 import java.math.BigInteger;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class Enumerate {
-    public static LongStream enumerate(BigMatrix basis, BigVector lower, BigVector upper, BigVector offset, int threads) {
+    public static Stream<BigVector> enumerate(BigMatrix basis, BigVector lower, BigVector upper, BigVector offset, int threads) {
         SearchInfo root = new SearchInfo();
         root.size = basis.getRowCount();
         root.depth = 0;
@@ -15,8 +16,8 @@ public class Enumerate {
         root.offset = root.transform.multiply(lower.subtract(offset));
         root.fixed = new BigVector(root.size);
         root.table = new BigMatrix(2 * root.size + 1, root.size + 1);
-        root.reverseTransform = basis.getColumn(0).copy();
-        root.reverseOffset = root.reverseTransform.dot(offset);
+        root.reverseTransform = basis.copy();
+        root.reverseOffset = offset;
         root.results = new ConcurrentLinkedQueue<>();
         root.pool = new EnumeratePool(threads);
 
@@ -25,20 +26,18 @@ public class Enumerate {
             root.table.set(i + 1, root.size, upper.get(i).subtract(lower.get(i)));
         }
 
-        System.out.println("starting");
         root.pool.start(root);
-        System.out.println("done");
 
-        return root.results.stream().mapToLong(Long::longValue);
+        return root.results.stream();
     }
 
-    public static LongStream enumerate(BigMatrix basis, BigVector lower, BigVector upper, BigVector offset) {
+    public static Stream<BigVector> enumerate(BigMatrix basis, BigVector lower, BigVector upper, BigVector offset) {
         return enumerate(basis, lower, upper, offset, Runtime.getRuntime().availableProcessors());
     }
 
     static void search(SearchInfo info) {
         if (info.depth == info.size) {
-            info.results.offer(info.reverseOffset.add(info.reverseTransform.dot(info.fixed)).getNumerator().longValue());
+            info.results.offer(info.reverseOffset.add(info.reverseTransform.multiply(info.fixed)));
         } else {
             BigInteger min, max;
             BigFraction offset = info.offset.get(info.depth);
@@ -93,10 +92,10 @@ public class Enumerate {
         BigVector fixed;
         BigMatrix table;
 
-        BigVector reverseTransform;
-        BigFraction reverseOffset;
+        BigMatrix reverseTransform;
+        BigVector reverseOffset;
 
-        ConcurrentLinkedQueue<Long> results;
+        ConcurrentLinkedQueue<BigVector> results;
         EnumeratePool pool;
 
         public SearchInfo copy() {

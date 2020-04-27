@@ -48,7 +48,7 @@ public class RandomReverser {
             offset.set(i, new BigFraction(rand.getSeed()));
 
             if (i != dimensions - 1) {
-                rand.advance(callIndices.get(i + 1));
+                rand.advance(callIndices.get(i + 1) - callIndices.get(i));
             }
         }
 
@@ -60,13 +60,15 @@ public class RandomReverser {
 
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
-        ArrayList<Long> results = Enumerate.enumerate(lattice, lower, upper, offset)
-                .boxed()
+        ArrayList<Long> results = Enumerate.enumerate(lattice.transpose(), lower, upper, offset)
+                .map(vec -> vec.get(0))
+                .map(BigFraction::getNumerator)
+                .map(BigInteger::longValue)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         if (verbose) {
             for (long seed : results) {
-                System.out.println("found: " + seed);
+                System.out.println("found: " + r.nextSeed(seed));
             }
         }
 

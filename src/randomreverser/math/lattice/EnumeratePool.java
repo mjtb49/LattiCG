@@ -34,6 +34,7 @@ class EnumeratePool {
 
         for (int i = 0; i < threadCount; ++i) {
             this.threads[i] = new Thread(this::run);
+            this.threads[i].setDaemon(true);
             this.threads[i].start();
         }
     }

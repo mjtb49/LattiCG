@@ -13,6 +13,6 @@ public class RandomReverserTest {
         double time = System.currentTimeMillis();
         ArrayList<Long> results = device.findAllValidSeeds();
         System.out.println(results);
-        System.out.println("Took "+ ((System.currentTimeMillis() - time) /1000) + " seconds");
+        System.out.println("Took "+ ((System.currentTimeMillis() - time) /1000) + " seconds to find "+results.size()+" seeds.");
     }
 }
