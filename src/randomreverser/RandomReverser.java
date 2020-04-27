@@ -48,7 +48,7 @@ public class RandomReverser {
             offset.set(i, new BigFraction(rand.getSeed()));
 
             if (i != dimensions - 1) {
-                rand.advance(callIndices.get(i + 1));
+                rand.advance(callIndices.get(i + 1) - callIndices.get(i));
             }
         }
 
@@ -66,7 +66,7 @@ public class RandomReverser {
 
         if (verbose) {
             for (long seed : results) {
-                System.out.println("found: " + seed);
+                System.out.println("found: " + r.nextSeed(seed));
             }
         }
 
