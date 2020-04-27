@@ -9,6 +9,7 @@ import randomreverser.util.Rand;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class RandomReverser {
 
@@ -54,12 +55,15 @@ public class RandomReverser {
         }
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
-        ArrayList<Long> results = new ArrayList<>();
-        for (Vector n : Enumerate.enumerate(dimensions, vecMins, vecMaxes, lattice, offsets)) {
-            if(verbose)
-                System.out.println("Found: " + r.nextSeed((long) lattice.getColumn(0).dot(n))+" at "+n);
-            results.add(r.nextSeed((long) lattice.getColumn(0).dot(n)));
+        // TODO: use BigFraction API instead
+        ArrayList<Long> results = Enumerate.enumerate(dimensions, vecMins, vecMaxes, lattice, offsets)
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (verbose) {
+            results.forEach(seed -> System.out.println("found: " + seed));
         }
+
         return results;
     }
 

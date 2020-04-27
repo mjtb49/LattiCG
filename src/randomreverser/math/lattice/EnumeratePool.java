@@ -44,11 +44,12 @@ class EnumeratePool {
                 this.lock.lock();
 
                 while (this.queue.isEmpty()) {
-                    this.waiting.awaitUninterruptibly();
-
                     if (this.shutdown) {
+                        this.lock.unlock();
                         return;
                     }
+
+                    this.waiting.awaitUninterruptibly();
                 }
 
                 Enumerate.SearchInfo info = this.queue.poll();
@@ -87,6 +88,8 @@ class EnumeratePool {
     public void start(Enumerate.SearchInfo root) {
         this.search(root);
         this.lock.lock();
+
+        System.out.println("ACTIVE AT START: " + this.active);
 
         while (this.active > 0 && this.thrown == null) {
             this.finished.awaitUninterruptibly();
