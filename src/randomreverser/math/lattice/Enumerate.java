@@ -15,8 +15,8 @@ public class Enumerate {
         root.offset = root.transform.multiply(lower.subtract(offset));
         root.fixed = new BigVector(root.size);
         root.table = new BigMatrix(2 * root.size + 1, root.size + 1);
-        root.reverseTransform = basis.getColumn(0).copy();
-        root.reverseOffset = root.reverseTransform.dot(offset);
+        root.reverseTransform = basis.getRow(0).copy();
+        root.reverseOffset = BigFraction.ZERO; //offset.get(0);
         root.results = new ConcurrentLinkedQueue<>();
         root.pool = new EnumeratePool(threads);
 
@@ -25,9 +25,7 @@ public class Enumerate {
             root.table.set(i + 1, root.size, upper.get(i).subtract(lower.get(i)));
         }
 
-        System.out.println("starting");
         root.pool.start(root);
-        System.out.println("done");
 
         return root.results.stream().mapToLong(Long::longValue);
     }

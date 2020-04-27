@@ -60,7 +60,7 @@ public class RandomReverser {
 
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
-        ArrayList<Long> results = Enumerate.enumerate(lattice, lower, upper, offset)
+        ArrayList<Long> results = Enumerate.enumerate(lattice.transpose(), lower, upper, offset)
                 .boxed()
                 .collect(Collectors.toCollection(ArrayList::new));
 
