@@ -6,14 +6,17 @@ import randomreverser.math.component.BigVector;
 
 public class LLL {
 
-	private static BigMatrix gramSchmidtBasis;
-	private static BigMatrix mu;
-	private static BigMatrix lattice;
-	private static BigMatrix H;
-	private static BigFraction[] sizes;
-	private static Params params;
-	private static int kmax;
-	private static int k;
+	private LLL() {
+	}
+
+	private BigMatrix gramSchmidtBasis;
+	private BigMatrix mu;
+	private BigMatrix lattice;
+	private BigMatrix H;
+	private BigFraction[] sizes;
+	private Params params;
+	private int kmax;
+	private int k;
 	private static final BigFraction eta = BigFraction.HALF;
 
 
@@ -26,7 +29,11 @@ public class LLL {
      * @return the reduced lattice
      */
 	public static BigMatrix reduce(BigMatrix lattice, Params params, BigMatrix transformations) {
-		LLL.params = params;
+		return new LLL().reduce0(lattice, params, transformations);
+	}
+
+	private BigMatrix reduce0(BigMatrix lattice, Params params, BigMatrix transformations) {
+		this.params = params;
 		int n = lattice.getRowCount();
 		int m = lattice.getColumnCount();
 		gramSchmidtBasis = new BigMatrix(n,m);
@@ -36,9 +43,9 @@ public class LLL {
 		gramSchmidtBasis.setRow(0, lattice.getRow(0).copy());
 		//transformations = BigMatrix.identityMatrix(n);
 		H = transformations;
-		LLL.lattice = lattice.copy();
+		this.lattice = lattice.copy();
 		sizes = new BigFraction[n];
-		sizes[0] = LLL.lattice.getRow(0).magnitudeSq();
+		sizes[0] = this.lattice.getRow(0).magnitudeSq();
 
 		while (k < n) {
 			if (k > kmax) {
@@ -47,10 +54,11 @@ public class LLL {
 			}
 			testCondition();
 		}
-		return LLL.lattice;
+
+		return this.lattice;
 	}
 
-	private static void incGramSchmidt() {
+	private void incGramSchmidt() {
 		for (int j = 0; j <= k - 1; j++) {
 			//System.out.println(k+" "+j);
 			if (sizes[j].compareTo(BigFraction.ZERO) != 0) {
@@ -68,7 +76,7 @@ public class LLL {
 		sizes[k] = newRow.magnitudeSq();
 	}
 
-	private static void testCondition() {
+	private void testCondition() {
 		red(k,k-1);
 		/*System.out.println("BEGIN INFO");
 		System.out.println(mu + "\n");
@@ -87,7 +95,7 @@ public class LLL {
 		}
 	}
 
-	private static void swapg(int n) {
+	private void swapg(int n) {
 		/*System.out.println(lattice.toPrettyString());
 		System.out.println(mu.toPrettyString());
 		System.out.println(gramSchmidtBasis.toPrettyString()); */
@@ -146,7 +154,7 @@ public class LLL {
 		}
 	}
 
-	private static void red(int n, int l) {
+	private void red(int n, int l) {
 		if (mu.get(n,l).abs().compareTo(eta) <= 0) {
 			return;
 		}
@@ -164,7 +172,7 @@ public class LLL {
 	}
 
 	public static final class Params {
-		protected double delta;
+		protected double delta = 0.75;
 		protected boolean debug;
 
 		public Params setDelta(double delta) {

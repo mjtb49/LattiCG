@@ -177,7 +177,7 @@ public class LUDecomposition {
 		private final double det;
 		private final Matrix inv;
 
-		public Result(Matrix lu, Vector p, double det, Matrix inv) {
+		private Result(Matrix lu, Vector p, double det, Matrix inv) {
 			this.size = lu.getRowCount();
 
 			this.L = new Matrix(this.size, this.size, (row, col) -> {
@@ -255,7 +255,7 @@ public class LUDecomposition {
 		private final BigFraction det;
 		private final BigMatrix inv;
 
-		public BigResult(BigMatrix lu, BigVector p, BigFraction det, BigMatrix inv) {
+		private BigResult(BigMatrix lu, BigVector p, BigFraction det, BigMatrix inv) {
 			this.size = lu.getRowCount();
 
 			this.L = new BigMatrix(this.size, this.size, (row, col) -> {
