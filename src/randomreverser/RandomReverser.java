@@ -16,7 +16,7 @@ public class RandomReverser {
     private static final BigInteger MOD = BigInteger.valueOf(281474976710656L);
     private static final BigInteger MULT = BigInteger.valueOf(25214903917L);
 
-    private Matrix lattice;
+    private BigMatrix lattice;
 
     private ArrayList<Long> mins;
     private ArrayList<Long> maxes;
@@ -37,31 +37,37 @@ public class RandomReverser {
     //TODO Make this pick and choose which dimensions to use instead of using all of them
     public ArrayList<Long> findAllValidSeeds() {
         createLattice();
-        Vector vecMins = new Vector(dimensions);
-        Vector vecMaxes = new Vector(dimensions);
-        Vector offsets = new Vector(dimensions);
+        BigVector lower = new BigVector(dimensions);
+        BigVector upper = new BigVector(dimensions);
+        BigVector offset = new BigVector(dimensions);
         Rand rand = Rand.ofInternalSeed(0L);
+
         for (int i = 0; i < dimensions; i++) {
-            vecMins.set(i, (double) mins.get(i));
-            vecMaxes.set(i, (double) maxes.get(i));
-            offsets.set(i,rand.getSeed());
-            if (i != dimensions-1)
-                rand.advance(callIndices.get(i+1));
+            lower.set(i, new BigFraction(mins.get(i)));
+            upper.set(i, new BigFraction(maxes.get(i)));
+            offset.set(i, new BigFraction(rand.getSeed()));
+
+            if (i != dimensions - 1) {
+                rand.advance(callIndices.get(i + 1));
+            }
         }
+
         if (verbose) {
-            System.out.println("Mins: "+vecMins);
-            System.out.println("Maxes: "+vecMaxes);
-            System.out.println("Offsets: "+offsets);
+            System.out.println("Mins: " + lower);
+            System.out.println("Maxes: " + upper);
+            System.out.println("Offsets: " + offset);
         }
+
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
-        // TODO: use BigFraction API instead
-        ArrayList<Long> results = Enumerate.enumerate(dimensions, vecMins, vecMaxes, lattice, offsets)
+        ArrayList<Long> results = Enumerate.enumerate(lattice, lower, upper, offset)
                 .boxed()
                 .collect(Collectors.toCollection(ArrayList::new));
 
         if (verbose) {
-            results.forEach(seed -> System.out.println("found: " + seed));
+            for (long seed : results) {
+                System.out.println("found: " + seed);
+            }
         }
 
         return results;
@@ -121,7 +127,7 @@ public class RandomReverser {
            //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
        }
        //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-       lattice = Matrix.fromBigMatrix(transformations.multiply(unscaledLattice));
+       lattice = transformations.multiply(unscaledLattice);
     }
 
     private void addMeasuredSeed(long min, long max) {

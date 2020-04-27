@@ -89,8 +89,6 @@ class EnumeratePool {
         this.search(root);
         this.lock.lock();
 
-        System.out.println("ACTIVE AT START: " + this.active);
-
         while (this.active > 0 && this.thrown == null) {
             this.finished.awaitUninterruptibly();
         }

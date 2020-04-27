@@ -7,7 +7,7 @@ public class RandomReverserTest {
     public static void main(String[] args) {
 
         RandomReverser device = new RandomReverser();
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 12; i++) {
             device.addNextFloatCall(0.9f,1.0f);
         }
         device.setVerbose(true);

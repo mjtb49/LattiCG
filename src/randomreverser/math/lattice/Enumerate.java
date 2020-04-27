@@ -36,25 +36,6 @@ public class Enumerate {
         return enumerate(basis, lower, upper, offset, Runtime.getRuntime().availableProcessors());
     }
 
-    public static LongStream enumerate(int dimensions, Vector lower, Vector upper, Matrix basis, Vector offset) {
-        BigMatrix bigBasis = new BigMatrix(dimensions, dimensions);
-        BigVector bigLower = new BigVector(dimensions);
-        BigVector bigUpper = new BigVector(dimensions);
-        BigVector bigOffset = new BigVector(dimensions);
-
-        for (int row = 0; row < dimensions; ++row) {
-            bigLower.set(row, new BigFraction(Math.round(lower.get(row))));
-            bigUpper.set(row, new BigFraction(Math.round(upper.get(row))));
-            bigOffset.set(row, new BigFraction(Math.round(offset.get(row))));
-
-            for (int col = 0; col < dimensions; ++col) {
-                bigBasis.set(row, col, new BigFraction(Math.round(basis.get(row, col))));
-            }
-        }
-
-        return enumerate(bigBasis, bigLower, bigOffset, bigUpper);
-    }
-
     static void search(SearchInfo info) {
         if (info.depth == info.size) {
             info.results.offer(info.reverseOffset.add(info.reverseTransform.dot(info.fixed)).getNumerator().longValue());
@@ -77,8 +58,6 @@ public class Enumerate {
 
             x = Optimize.optimize(info.table, info.size, info.depth);
             max = x.dot(transformRow).add(offset).floor();
-
-            System.out.println(info.depth + ": " + min + " -> " + max);
 
             for (BigInteger i = min; i.compareTo(max) <= 0; i = i.add(BigInteger.ONE)) {
                 BigFraction y = offset.subtract(i);
