@@ -11,7 +11,7 @@ public class LLLTest {
     public void testReduce2ConsecutiveJavaCalls() {
         BigMatrix basis = BigMatrix.fromString("{{1, 25214903917}, {0, 281474976710656}}");
         BigMatrix expected = BigMatrix.fromString("{{7847617, 4824621}, {-18218081, 24667315}}");
-        assertEquals(expected, LLL.reduce(basis, new LLL.Params(), BigMatrix.identityMatrix(2)));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
     }
 
     @Test
@@ -42,13 +42,13 @@ public class LLLTest {
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858}," +
                 "{8462157635811,1251368972967,-1652918150373,1387004841087,1717588765715,-2363517938153,10131123425739,-11456623266449,5477436914243,-4759160995705,5496978719611,-6245443060385}," +
                 "{14276340518069,11302502565649,-760697010115,6141148139513,-8322341108987,-2402663381215,6840633257741,3747223598729,-6011287794091,3767907907633,-10053902617891,6917101368857}}");
-        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99), BigMatrix.identityMatrix(12)));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
     }
 
     @Test
     public void testLinearDependent() {
         BigMatrix basis = BigMatrix.fromString("{{2, 3}, {4, 9}, {6, 0}, {0, 9}, {30, 30}}");
-        BigMatrix expected = BigMatrix.fromString("{{0, 0}, {0, 0}, {0, 0}, {-2, 0}, {0, 3}}");
-        assertEquals(expected, LLL.reduce(basis, new LLL.Params(), BigMatrix.identityMatrix(5)));
+        BigMatrix expected = BigMatrix.fromString("{{-2, 0}, {0, 3}}");
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params()).getReducedBasis());
     }
 }

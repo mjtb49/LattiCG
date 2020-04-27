@@ -120,16 +120,16 @@ public class RandomReverser {
        LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
        if(verbose)
            System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
-       BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
-       BigMatrix result = LLL.reduce(scaledLattice, params, transformations);
+      // BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
+       LLL.Result result = LLL.reduce(scaledLattice, params);
        //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
        if(verbose) {
-           System.out.println("Found Reduced Scaled Basis:\n" + result.toPrettyString());
-           System.out.println("Found Reduced Basis:\n" + transformations.multiply(unscaledLattice).toPrettyString());
+           System.out.println("Found Reduced Scaled Basis:\n" + result.getReducedBasis().toPrettyString());
+           System.out.println("Found Reduced Basis:\n" + result.getTransformations().multiply(unscaledLattice).toPrettyString());
            //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
        }
        //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-       lattice = transformations.multiply(unscaledLattice);
+       lattice = result.getTransformations().multiply(unscaledLattice);
     }
 
     private void addMeasuredSeed(long min, long max) {
