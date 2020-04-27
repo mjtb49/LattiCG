@@ -7,7 +7,8 @@ import randomreverser.math.component.BigVector;
 import java.util.Arrays;
 
 /**
- * A table-based Simplex solver made specifically for the type of linear optimization needed by Enumerate.
+ * A table-based Simplex solver made specifically for the type of linear optimization needed by Enumerate. It's package
+ * private since it should only be used by Enumerate, but it's too much code to put in a static inner class.
  */
 class Optimize {
     /*
@@ -127,7 +128,7 @@ class Optimize {
         return true;
     }
 
-    static BigVector optimize(BigMatrix initialTable, int size, int depth) {
+    public static BigVector optimize(BigMatrix initialTable, int size, int depth) {
         BigMatrix table = new BigMatrix(2 + size + depth, size + 1);
 
         // copy over initial table
