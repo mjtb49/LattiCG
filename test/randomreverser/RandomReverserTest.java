@@ -6,8 +6,11 @@ public class RandomReverserTest {
     public static void main(String[] args) {
 
         RandomReverser device = new RandomReverser();
-        for (int i = 0; i < 12; i++) {
-            device.addNextFloatCall(0.9f,1.0f);
+        device.addNextIntCall(16,11,11);
+        device.addNextIntCall(256, 20, 20);
+        device.addNextIntCall(16,11,11);
+        for (int i = 0; i < 18; i++) {
+            device.addNextIntCall(4,8,8);
         }
         device.setVerbose(true);
         double time = System.currentTimeMillis();
