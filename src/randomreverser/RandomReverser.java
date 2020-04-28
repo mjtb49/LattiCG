@@ -64,11 +64,12 @@ public class RandomReverser {
                 .map(vec -> vec.get(0))
                 .map(BigFraction::getNumerator)
                 .map(BigInteger::longValue)
+                .map(r::nextSeed)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         if (verbose) {
             for (long seed : results) {
-                System.out.println("found: " + r.nextSeed(seed));
+                System.out.println("found: " + seed);
             }
         }
 
