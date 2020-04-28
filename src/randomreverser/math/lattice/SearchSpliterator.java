@@ -2,51 +2,41 @@ package randomreverser.math.lattice;
 
 import randomreverser.math.component.BigVector;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
-class RecursiveSearchSpliterator implements ISearchSpliterator {
+class SearchSpliterator implements Spliterator<BigVector> {
     private final LinkedList<SearchNode> children;
 
-    public RecursiveSearchSpliterator(List<SearchNode> children) {
+    public SearchSpliterator(List<SearchNode> children) {
         this.children = new LinkedList<>(children);
     }
 
-    public BigVector next() {
-        BigVector result = null;
-
-        while (result == null && !this.children.isEmpty()) {
-            result = this.children.getFirst().spliterator().next();
-
-            if (result == null) {
+    public boolean tryAdvance(Consumer<? super BigVector> action) {
+        while (!this.children.isEmpty()) {
+            if (this.children.getFirst().spliterator().tryAdvance(action)) {
+                return true;
+            } else {
                 this.children.removeFirst();
             }
         }
 
-        return result;
+        return false;
     }
 
     @Override
     public void forEachRemaining(Consumer<? super BigVector> action) {
         while (!this.children.isEmpty()) {
-            BigVector result = this.children.getFirst().spliterator().next();
-
-            if (result == null) {
-                this.children.removeFirst();
-            } else {
-                action.accept(result);
-            }
+            this.children.removeFirst().spliterator().forEachRemaining(action);
         }
     }
 
     @Override
-    public ISearchSpliterator trySplit() {
+    public Spliterator<BigVector> trySplit() {
         if (this.children.isEmpty()) {
             return null;
         } else if (this.children.size() == 1) {
-            ISearchSpliterator child = this.children.get(0).spliterator();
+            Spliterator<BigVector> child = this.children.get(0).spliterator();
 
             if (child != null) {
                 return child.trySplit();
@@ -62,7 +52,7 @@ class RecursiveSearchSpliterator implements ISearchSpliterator {
             split.add(this.children.removeFirst());
         }
 
-        return new RecursiveSearchSpliterator(split);
+        return new SearchSpliterator(split);
     }
 
     @Override
@@ -72,6 +62,6 @@ class RecursiveSearchSpliterator implements ISearchSpliterator {
 
     @Override
     public int characteristics() {
-        return NONNULL | DISTINCT;
+        return NONNULL | DISTINCT | IMMUTABLE | ORDERED;
     }
 }
