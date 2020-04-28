@@ -49,7 +49,7 @@ class SearchSpliterator implements Spliterator<BigVector> {
         Deque<SearchNode> split = new LinkedList<>();
 
         for (int i = 0; i < count; ++i) {
-            split.addFirst(this.children.removeLast());
+            split.addLast(this.children.removeFirst());
         }
 
         return new SearchSpliterator(split);
