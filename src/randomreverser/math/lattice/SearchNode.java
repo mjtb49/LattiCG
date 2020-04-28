@@ -7,7 +7,7 @@ import randomreverser.math.component.BigVector;
 import java.math.BigInteger;
 import java.util.*;
 
-public class SearchNode {
+class SearchNode {
     private final int size;
     private final int depth;
 

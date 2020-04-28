@@ -180,10 +180,49 @@ public class RandomReverser {
         addUnmeasuredSeeds(numCalls);
     }
 
-    public void addNextFloatCall(float min, float max) {
-        long minSeed = ((long) (min  * (1 << 24))) << 24;
-        long maxSeed = ((long) ((max * (1 << 24))) << 24) | 0xffffff;
+    /**
+     * Add a constraint that min < / <= nextFloat() < / <= max, with strict inequalities when minInclusive or
+     * maxInclusive are false, respectively.
+     *
+     * @param min low end of the valid range
+     * @param max high end of the valid range
+     * @param minInclusive true if the low end of the valid range should be inclusive
+     * @param maxInclusive true if the high end of the valid range should be inclusive
+     */
+    public void addNextFloatCall(float min, float max, boolean minInclusive, boolean maxInclusive) {
+        float minInc = min;
+        float maxInc = max;
+
+        if (!minInclusive) {
+            minInc = Math.nextUp(min);
+        }
+
+        if (maxInclusive) {
+            maxInc = Math.nextUp(max);
+        }
+
+        // inclusive
+        long minLong = (long) StrictMath.ceil(minInc * 0x1.0p24f);
+        long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p24f) - 1;
+
+        if (minLong < maxLong) {
+            throw new IllegalArgumentException("call has no valid range");
+        }
+
+        long minSeed = minLong << 24;
+        long maxSeed = (maxLong << 24) | 0xffffff;
+
         addMeasuredSeed(minSeed, maxSeed);
+    }
+
+    /**
+     * Add a constraint that min <= nextFloat() < max.
+     *
+     * @param min low end of the valid range
+     * @param max high end of the valid range
+     */
+    public void addNextFloatCall(float min, float max) {
+        addNextFloatCall(min, max, true, false);
     }
 
     public void consumeNextFloatCalls(int numCalls) {
@@ -220,16 +259,58 @@ public class RandomReverser {
         addUnmeasuredSeeds(2 * numCalls);
     }
 
-    public void addNextDoubleCall(double min, double max) {
-        long minAsLong = (long) (min * (double) (1L << 53));
-        long maxAsLong = (long) (max * (double) (1L << 53));
-        addMeasuredSeed((minAsLong >>> 27) << 22, (((maxAsLong >>> 27) +1 )<<22) - 1);
+    /**
+     * Add a constraint that min < / <= nextDouble() < / <= max, with strict inequalities when minInclusive or
+     * maxInclusive are false, respectively.
+     *
+     * @param min low end of the valid range
+     * @param max high end of the valid range
+     * @param minInclusive true if the low end of the valid range should be inclusive
+     * @param maxInclusive true if the high end of the valid range should be inclusive
+     */
+    public void addNextDoubleCall(double min, double max, boolean minInclusive, boolean maxInclusive) {
+        double minInc = min;
+        double maxInc = max;
 
-        if (minAsLong >>> 27 == maxAsLong >>> 27) { //Can we even say anything about the second half
-            addMeasuredSeed((minAsLong & 0x7ff_ffff) << 21, (((maxAsLong & 0x7ff_ffff)+1) << 21) - 1);
+        if (!minInclusive) {
+            minInc = Math.nextUp(min);
+        }
+
+        if (maxInclusive) {
+            maxInc = Math.nextUp(max);
+        }
+
+        // inclusive
+        long minLong = (long) StrictMath.ceil(minInc * 0x1.0p53);
+        long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p53) - 1;
+
+        if (minLong < maxLong) {
+            throw new IllegalArgumentException("call has no valid range");
+        }
+
+        long minSeed1 = (minLong >> 27) << 22;
+        long maxSeed1 = ((minLong >> 27) << 22) | 0x3fffff;
+
+        addMeasuredSeed(minSeed1, maxSeed1);
+
+        if (minLong >>> 27 == maxLong >>> 27) { //Can we even say anything about the second half
+            long minSeed2 = (minLong & 0x7ffffff) << 21;
+            long maxSeed2 = ((minLong & 0x7ffffff) << 21) | 0x1fffff;
+
+            addMeasuredSeed(minSeed2, maxSeed2);
         } else {
             addUnmeasuredSeeds(1);
         }
+    }
+
+    /**
+     * Add a constraint that min <= nextDouble() < max.
+     *
+     * @param min low end of the valid range
+     * @param max high end of the valid range
+     */
+    public void addNextDouble(double min, double max) {
+        addNextDoubleCall(min, max, true, false);
     }
 
     public void consumeNextDoubleCalls(int numCalls) {
