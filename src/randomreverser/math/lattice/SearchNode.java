@@ -33,7 +33,7 @@ class SearchNode {
             return;
         }
 
-        List<SearchNode> children = new ArrayList<>();
+        Deque<SearchNode> children = new LinkedList<>();
 
         BigVector x;
         BigInteger min, max;
@@ -73,7 +73,7 @@ class SearchNode {
             }
 
             this.fixed.set(this.depth, new BigFraction(min));
-            children.add(new SearchNode(this.size, this.depth + 1, this.transform, this.offset, this.table.copy(), this.fixed.copy()));
+            children.addLast(new SearchNode(this.size, this.depth + 1, this.transform, this.offset, this.table.copy(), this.fixed.copy()));
         }
 
         this.spliterator = new SearchSpliterator(children);

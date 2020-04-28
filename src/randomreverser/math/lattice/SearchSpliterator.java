@@ -6,10 +6,10 @@ import java.util.*;
 import java.util.function.Consumer;
 
 class SearchSpliterator implements Spliterator<BigVector> {
-    private final LinkedList<SearchNode> children;
+    private final Deque<SearchNode> children;
 
-    public SearchSpliterator(List<SearchNode> children) {
-        this.children = new LinkedList<>(children);
+    public SearchSpliterator(Deque<SearchNode> children) {
+        this.children = children;
     }
 
     public boolean tryAdvance(Consumer<? super BigVector> action) {
@@ -36,7 +36,7 @@ class SearchSpliterator implements Spliterator<BigVector> {
         if (this.children.isEmpty()) {
             return null;
         } else if (this.children.size() == 1) {
-            Spliterator<BigVector> child = this.children.get(0).spliterator();
+            Spliterator<BigVector> child = this.children.getFirst().spliterator();
 
             if (child != null) {
                 return child.trySplit();
@@ -46,10 +46,10 @@ class SearchSpliterator implements Spliterator<BigVector> {
         }
 
         int count = this.children.size() / 2;
-        List<SearchNode> split = new ArrayList<>();
+        Deque<SearchNode> split = new LinkedList<>();
 
         for (int i = 0; i < count; ++i) {
-            split.add(this.children.removeFirst());
+            split.addFirst(this.children.removeLast());
         }
 
         return new SearchSpliterator(split);
@@ -57,11 +57,14 @@ class SearchSpliterator implements Spliterator<BigVector> {
 
     @Override
     public long estimateSize() {
-        return Long.MAX_VALUE; // TODO: attempt to give an actual estimate? don't know if it's worth it, it works fine
+        // TODO: attempt to give an actual estimate?
+        // as it is, it's works well with streams, and is well-defined by the
+        // spliterator API
+        return Long.MAX_VALUE;
     }
 
     @Override
     public int characteristics() {
-        return NONNULL | DISTINCT | IMMUTABLE | ORDERED;
+        return DISTINCT | ORDERED | NONNULL | IMMUTABLE;
     }
 }
