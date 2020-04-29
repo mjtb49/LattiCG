@@ -16,7 +16,7 @@ class SearchNode {
     private final BigMatrix table;
     private final BigVector fixed;
 
-    private ISearchSpliterator spliterator;
+    private Spliterator<BigVector> spliterator;
 
     public SearchNode(int size, int depth, BigMatrix transform, BigVector offset, BigMatrix table, BigVector fixed) {
         this.size = size;
@@ -29,11 +29,11 @@ class SearchNode {
 
     private void initialize() {
         if (this.depth == this.size) {
-            this.spliterator = new LeafSearchSpliterator(this.fixed);
+            this.spliterator = Collections.singleton(this.fixed).spliterator();
             return;
         }
 
-        List<SearchNode> children = new ArrayList<>();
+        Deque<SearchNode> children = new LinkedList<>();
 
         BigVector x;
         BigInteger min, max;
@@ -73,13 +73,13 @@ class SearchNode {
             }
 
             this.fixed.set(this.depth, new BigFraction(min));
-            children.add(new SearchNode(this.size, this.depth + 1, this.transform, this.offset, this.table.copy(), this.fixed.copy()));
+            children.addLast(new SearchNode(this.size, this.depth + 1, this.transform, this.offset, this.table.copy(), this.fixed.copy()));
         }
 
-        this.spliterator = new RecursiveSearchSpliterator(children);
+        this.spliterator = new SearchSpliterator(children);
     }
 
-    public ISearchSpliterator spliterator() {
+    public Spliterator<BigVector> spliterator() {
         if (this.spliterator == null) {
             this.initialize();
         }
