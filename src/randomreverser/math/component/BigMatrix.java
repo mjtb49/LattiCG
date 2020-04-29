@@ -14,6 +14,9 @@ public final class BigMatrix {
     private int rowCount;
     private int columnCount;
 
+    private int startIndex = 0;
+    private int underlyingColumnCount;
+
     /**
      * Constructs the zero matrix of the given size
      *
@@ -24,6 +27,7 @@ public final class BigMatrix {
     public BigMatrix(int rowCount, int columnCount) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
+        this.underlyingColumnCount = columnCount;
 
         if (rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
@@ -43,6 +47,7 @@ public final class BigMatrix {
     public BigMatrix(int rowCount, int columnCount, DataProvider gen) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
+        this.underlyingColumnCount = columnCount;
 
         if(rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
@@ -54,6 +59,14 @@ public final class BigMatrix {
                 numbers[column + columnCount * row] = gen.getValue(row, column);
             }
         }
+    }
+
+    private BigMatrix(int rowCount, int columnCount, BigFraction[] numbers, int startIndex, int underlyingColumnCount) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+        this.numbers = numbers;
+        this.startIndex = startIndex;
+        this.underlyingColumnCount = underlyingColumnCount;
     }
 
     /**
@@ -95,7 +108,7 @@ public final class BigMatrix {
         if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) {
             throw new IndexOutOfBoundsException("Index (" + row + ", " + col + "), size (" + rowCount + ", " + columnCount + ")");
         }
-        return numbers[col + columnCount * row];
+        return numbers[startIndex + col + underlyingColumnCount * row];
     }
 
     /**
@@ -110,7 +123,7 @@ public final class BigMatrix {
         if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) {
             throw new IndexOutOfBoundsException("Index (" + row + ", " + col + "), size (" + rowCount + ", " + columnCount + ")");
         }
-        numbers[col + columnCount * row] = value;
+        numbers[startIndex + col + underlyingColumnCount * row] = value;
     }
 
     /**
@@ -124,7 +137,7 @@ public final class BigMatrix {
         if (rowIndex < 0 || rowIndex >= rowCount) {
             throw new IndexOutOfBoundsException("Index " + rowIndex + ", size " + rowCount);
         }
-        return BigVector.createView(numbers, columnCount, rowIndex * columnCount, 1);
+        return BigVector.createView(numbers, columnCount, startIndex + rowIndex * underlyingColumnCount, 1);
     }
 
     /**
@@ -138,7 +151,7 @@ public final class BigMatrix {
         if (columnIndex < 0 || columnIndex >= columnCount) {
             throw new IndexOutOfBoundsException("Index " + columnIndex + ", size " + columnCount);
         }
-        return BigVector.createView(numbers, rowCount, columnIndex, columnCount);
+        return BigVector.createView(numbers, rowCount, startIndex + columnIndex, underlyingColumnCount);
     }
 
     /**
@@ -158,8 +171,8 @@ public final class BigMatrix {
             throw new IndexOutOfBoundsException("Index " + rowIndex + ", size " + rowCount);
         }
 
-        if (newRow.step == 1) {
-            System.arraycopy(newRow.numbers, newRow.startPos, numbers, rowIndex * columnCount, columnCount);
+        if (newRow.step == 1 && columnCount == underlyingColumnCount) {
+            System.arraycopy(newRow.numbers, newRow.startPos, numbers, startIndex + rowIndex * columnCount, columnCount);
         } else {
             for (int i = 0; i < columnCount; i++) {
                 set(rowIndex, i, newRow.get(i));
@@ -187,6 +200,25 @@ public final class BigMatrix {
         for (int i = 0; i < rowCount; i++) {
             set(i, columnIndex, newColumn.get(i));
         }
+    }
+
+    /**
+     * Gets a submatrix <i>view</i> starting at the given position and of the given size. Modifying this matrix will
+     * modify the original matrix
+     *
+     * @param startRow The row of the top of the submatrix
+     * @param startColumn The column on the left of the submatrix
+     * @param rowCount The number of rows in the submatrix
+     * @param columnCount The number of columns in the submatrix
+     * @return A view of the submatrix
+     * @throws IndexOutOfBoundsException If {@code startRow}, {@code startColumn}, {@code rowCount} or
+     *                                   {@code columnCount} is out of bounds
+     */
+    public BigMatrix submatrix(int startRow, int startColumn, int rowCount, int columnCount) {
+        if (startRow < 0 || startColumn < 0 || rowCount <= 0 || columnCount <= 0 || startRow + rowCount >= this.rowCount || startColumn + columnCount >= this.columnCount) {
+            throw new IllegalArgumentException(String.format("Illegal submatrix start (%d, %d) with size (%d, %d), size of original matrix (%d, %d)", startRow, startColumn, rowCount, columnCount, this.rowCount, this.columnCount));
+        }
+        return new BigMatrix(rowCount, columnCount, numbers, startIndex + startColumn + underlyingColumnCount * startRow, underlyingColumnCount);
     }
 
     /**
@@ -330,8 +362,17 @@ public final class BigMatrix {
             throw new IllegalArgumentException("Adding two matrices with different dimensions");
         }
 
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = numbers[i].add(m.numbers[i]);
+        if (this.columnCount == this.underlyingColumnCount && m.columnCount == m.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] = numbers[startIndex + i].add(m.numbers[m.startIndex + i]);
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col).add(m.get(row, col)));
+                }
+            }
         }
 
         return this;
@@ -349,8 +390,17 @@ public final class BigMatrix {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
 
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = numbers[i].subtract(m.numbers[i]);
+        if (this.columnCount == this.underlyingColumnCount && m.columnCount == m.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] = numbers[startIndex + i].subtract(m.numbers[m.startIndex + i]);
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col).subtract(m.get(row, col)));
+                }
+            }
         }
 
         return this;
@@ -363,8 +413,17 @@ public final class BigMatrix {
      * @return This matrix
      */
     public BigMatrix multiplyEquals(BigFraction scalar) {
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = numbers[i].multiply(scalar);
+        if (this.columnCount == this.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] = numbers[startIndex + i].multiply(scalar);
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col).multiply(scalar));
+                }
+            }
         }
         return this;
     }
@@ -425,8 +484,13 @@ public final class BigMatrix {
      * @return A copy of this matrix
      */
     public BigMatrix copy() {
-        BigMatrix dest = new BigMatrix(this.rowCount, this.columnCount);
-        System.arraycopy(numbers, 0, dest.numbers, 0, numbers.length);
+        BigMatrix dest;
+        if (columnCount == underlyingColumnCount) {
+            dest = new BigMatrix(this.rowCount, this.columnCount);
+            System.arraycopy(numbers, startIndex, dest.numbers, 0, dest.numbers.length);
+        } else {
+            dest = new BigMatrix(rowCount, columnCount, this::get);
+        }
         return dest;
     }
 
@@ -441,7 +505,12 @@ public final class BigMatrix {
 
     @Override
     public int hashCode() {
-        int h = Arrays.hashCode(numbers);
+        int h = 0;
+        for (int row = 0; row < rowCount; row++) {
+            for (int col = 0; col < columnCount; col++) {
+                h = 31 * h + get(row, col).hashCode();
+            }
+        }
         h = 31 * h + columnCount;
         h = 31 * h + rowCount;
         return h;
@@ -452,7 +521,26 @@ public final class BigMatrix {
         if (other == this) return true;
         if (other == null || other.getClass() != BigMatrix.class) return false;
         BigMatrix that = (BigMatrix) other;
-        return this.columnCount == that.columnCount && this.rowCount == that.rowCount && Arrays.equals(this.numbers, that.numbers);
+        if (this.rowCount != that.rowCount || this.columnCount != that.columnCount) {
+            return false;
+        }
+        if (columnCount == underlyingColumnCount && that.columnCount == that.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                if (!that.numbers[that.startIndex + i].equals(this.numbers[this.startIndex + i])) {
+                    return false;
+                }
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    if (!that.get(row, col).equals(this.get(row, col))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
