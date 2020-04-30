@@ -43,14 +43,14 @@ class SearchNode {
             this.table.set(0, col, transformRow.get(col).negate());
         }
 
-        x = Optimize.optimize(this.table, this.size, this.depth);
+        x = OldOptimize.optimize(this.table, this.size, this.depth);
         min = transformRow.dot(x).add(this.offset.get(this.depth)).ceil();
 
         for (int col = 0; col < this.size; ++col) {
             this.table.set(0, col, transformRow.get(col));
         }
 
-        x = Optimize.optimize(this.table, this.size, this.depth);
+        x = OldOptimize.optimize(this.table, this.size, this.depth);
         max = transformRow.dot(x).add(this.offset.get(this.depth)).floor();
 
         max = max.add(BigInteger.ONE);

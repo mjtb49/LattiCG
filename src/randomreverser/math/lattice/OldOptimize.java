@@ -10,7 +10,7 @@ import java.util.Arrays;
  * A table-based Simplex solver made specifically for the type of linear optimization needed by Enumerate. It's package
  * private since it should only be used by Enumerate, but it's too much code to put in a static inner class.
  */
-class Optimize {
+class OldOptimize {
     /*
      * Perform a single pivot operation on the table.
      */
@@ -140,9 +140,7 @@ class Optimize {
 
         // initialize the objective function for the pre-optimization
         for (int row = 2 + size; row < 2 + size + depth; ++row) {
-            for (int col = 0; col < size + 1; ++col) {
-                table.set(0, col, table.get(0, col).add(table.get(row, col)));
-            }
+            table.getRow(0).addEquals(table.getRow(row));
         }
 
         int[] B = new int[size + depth];
@@ -184,9 +182,7 @@ class Optimize {
                 assert c1 < size;
 
                 if (N[c1] < 2 * size) {
-                    table.set(0, c0, initialTable.get(1, c1));
-
-                    for (int row = 1; row < 1 + size + depth; ++row) {
+                    for (int row = 0; row < 1 + size + depth; ++row) {
                         table.set(row, c0, initialTable.get(1 + row, c1));
                     }
 
@@ -199,11 +195,10 @@ class Optimize {
 
         N = Arrays.copyOf(N, size - depth);
 
-        table.set(0, size - depth, initialTable.get(1, size));
-
-        for (int row = 1; row < 1 + size + depth; ++row) {
+        for (int row = 0; row < 1 + size + depth; ++row) {
             table.set(row, size - depth, initialTable.get(1 + row, size));
         }
+
 
         while (step(table, B, N, 2 * size, size + depth)) {
             // step does the hard work

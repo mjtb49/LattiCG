@@ -415,4 +415,30 @@ public final class BigVector {
 
         return v;
     }
+
+    /**
+     * Create a basis vector of length 1.
+     *
+     * @param size dimension of the vector
+     * @param i index of the 1
+     * @return a basis vector
+     */
+    public static BigVector basis(int size, int i) {
+        return basis(size, i, BigFraction.ONE);
+    }
+
+    /**
+     * Create a basis vector of the specified length.
+     *
+     * @param size dimension of the vector
+     * @param i index of the provided component
+     * @param scale the length of the vector
+     * @return a basis vector
+     */
+    public static BigVector basis(int size, int i, BigFraction scale) {
+        BigVector vector = new BigVector(size);
+        vector.set(i, scale);
+
+        return vector;
+    }
 }
