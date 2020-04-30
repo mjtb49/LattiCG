@@ -88,7 +88,7 @@ public class EnumerateTest {
 
         long end = System.nanoTime();
 
-        System.out.printf("elapsed: %.3f%n", (end - start) / 1.0e9);
+        System.out.printf("elapsed: %.2f%n", (end - start) / 1.0e9);
 
         assertEquals(correct.size(), results.size());
         assertTrue(results.containsAll(correct));

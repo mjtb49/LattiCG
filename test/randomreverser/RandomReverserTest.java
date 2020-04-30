@@ -1,26 +1,23 @@
 package randomreverser;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RandomReverserTest {
     public static void main(String[] args) {
-
         RandomReverser device = new RandomReverser();
-        device.addNextLongCall(0,0);
-        device.setVerbose(true);
-        device.findAllValidSeeds();
 
-        device = new RandomReverser();
-        device.addNextIntCall(16,11,11);
-        device.addNextIntCall(256, 20, 20);
-        device.addNextIntCall(16,11,11);
-        for (int i = 0; i < 14; i++) {
-            device.addNextIntCall(4,8,8);
+        for (int i = 0; i < 12; ++i) {
+            device.addNextFloatCall(0.9f, 1.0f);
         }
+
         device.setVerbose(true);
-        double time = System.currentTimeMillis();
-        ArrayList<Long> results = device.findAllValidSeeds();
-        System.out.println(results);
-        System.out.println("Took "+ ((System.currentTimeMillis() - time) /1000) + " seconds to find "+results.size()+" seeds.");
+
+        long start = System.nanoTime();
+        List<Long> results = device.findAllValidSeeds().boxed().collect(Collectors.toList());
+        long end = System.nanoTime();
+
+        System.out.printf("results: %s%n", results);
+        System.out.printf("elapsed: %.2f%n", (end - start) * 1e-9);
     }
 }

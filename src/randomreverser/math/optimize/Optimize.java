@@ -184,7 +184,11 @@ public class Optimize {
         this.basics[exiting] = temp;
     }
 
-    public Optimize withEqual(BigVector lhs, BigFraction rhs) {
+    public Optimize copy() {
+        return new Optimize(this.table.copy(), Arrays.copyOf(this.basics, this.rows - 1), Arrays.copyOf(this.nonbasics, this.cols - 1), this.transform);
+    }
+
+    public Optimize withStrictBound(BigVector lhs, BigFraction rhs) {
         BigMatrix newTable = new BigMatrix(this.rows + 1, this.cols);
 
         for (int row = 0; row < this.rows - 1; ++row) {
@@ -192,6 +196,10 @@ public class Optimize {
         }
 
         newTable.setRow(this.rows - 1, this.transformForTable(lhs, rhs));
+
+        if (newTable.get(this.rows - 1, this.cols - 1).signum() < 0) {
+            newTable.getRow(this.rows - 1).multiplyEquals(BigFraction.MINUS_ONE);
+        }
 
         int[] newBasics = Arrays.copyOf(this.basics, this.rows);
         int[] newNonbasics = Arrays.copyOf(this.nonbasics, this.cols - 1);
@@ -473,42 +481,42 @@ public class Optimize {
             this.rights.add(rhs);
         }
 
-        public Builder withLess(BigVector lhs, BigFraction rhs) {
-            this.checkLHS(lhs);
-            this.add(1, lhs.copy(), rhs);
-
-            return this;
-        }
-
-        public Builder withGreater(BigVector lhs, BigFraction rhs) {
+        public Builder withLowerBound(BigVector lhs, BigFraction rhs) {
             this.checkLHS(lhs);
             this.add(-1, lhs.copy(), rhs);
 
             return this;
         }
 
-        public Builder withEqual(BigVector lhs, BigFraction rhs) {
+        public Builder withUpperBound(BigVector lhs, BigFraction rhs) {
+            this.checkLHS(lhs);
+            this.add(1, lhs.copy(), rhs);
+
+            return this;
+        }
+
+        public Builder withStrictBound(BigVector lhs, BigFraction rhs) {
             this.checkLHS(lhs);
             this.add(0, lhs.copy(), rhs);
 
             return this;
         }
 
-        public Builder withLess(int lhs, BigFraction rhs) {
-            this.checkLHS(lhs);
-            this.add(1, BigVector.basis(this.size, lhs), rhs);
-
-            return this;
-        }
-
-        public Builder withGreater(int lhs, BigFraction rhs) {
+        public Builder withLowerBound(int lhs, BigFraction rhs) {
             this.checkLHS(lhs);
             this.add(-1, BigVector.basis(this.size, lhs), rhs);
 
             return this;
         }
 
-        public Builder withEqual(int lhs, BigFraction rhs) {
+        public Builder withUpperBound(int lhs, BigFraction rhs) {
+            this.checkLHS(lhs);
+            this.add(1, BigVector.basis(this.size, lhs), rhs);
+
+            return this;
+        }
+
+        public Builder withStrictBound(int lhs, BigFraction rhs) {
             this.checkLHS(lhs);
             this.add(0, BigVector.basis(this.size, lhs), rhs);
 

@@ -10,6 +10,7 @@ import randomreverser.util.Rand;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class RandomReverser {
 
@@ -35,7 +36,7 @@ public class RandomReverser {
     }
 
     //TODO Make this pick and choose which dimensions to use instead of using all of them
-    public ArrayList<Long> findAllValidSeeds() {
+    public LongStream findAllValidSeeds() {
         createLattice();
         BigVector lower = new BigVector(dimensions);
         BigVector upper = new BigVector(dimensions);
@@ -60,20 +61,11 @@ public class RandomReverser {
 
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
 
-        ArrayList<Long> results = Enumerate.enumerate(lattice.transpose(), lower, upper, offset)
+        return Enumerate.enumerate(lattice.transpose(), lower, upper, offset)
                 .map(vec -> vec.get(0))
                 .map(BigFraction::getNumerator)
-                .map(BigInteger::longValue)
-                .map(r::nextSeed)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (verbose) {
-            for (long seed : results) {
-                System.out.println("found: " + seed);
-            }
-        }
-
-        return results;
+                .mapToLong(BigInteger::longValue)
+                .map(r::nextSeed);
     }
 
     private void createLattice() {
@@ -205,7 +197,7 @@ public class RandomReverser {
         long minLong = (long) StrictMath.ceil(minInc * 0x1.0p24f);
         long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p24f) - 1;
 
-        if (minLong < maxLong) {
+        if (maxLong < minLong) {
             throw new IllegalArgumentException("call has no valid range");
         }
 
