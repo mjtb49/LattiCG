@@ -3,8 +3,6 @@ package randomreverser.math.component;
 import randomreverser.math.decomposition.LUDecomposition;
 import randomreverser.util.StringUtils;
 
-import java.util.Arrays;
-
 /**
  * A matrix of double values
  */
@@ -13,6 +11,9 @@ public final class Matrix {
     private double[] numbers;
     private int rowCount;
     private int columnCount;
+
+    private int startIndex = 0;
+    private int underlyingColumnCount;
 
     /**
      * Constructs the zero matrix of the given size
@@ -24,6 +25,7 @@ public final class Matrix {
     public Matrix(int rowCount, int columnCount) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
+        this.underlyingColumnCount = columnCount;
 
         if(rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
@@ -47,6 +49,14 @@ public final class Matrix {
                 this.set(row, col, gen.getValue(row, col));
             }
         }
+    }
+
+    private Matrix(int rowCount, int columnCount, double[] numbers, int startIndex, int underlyingColumnCount) {
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+        this.numbers = numbers;
+        this.startIndex = startIndex;
+        this.underlyingColumnCount = underlyingColumnCount;
     }
 
     /**
@@ -88,7 +98,7 @@ public final class Matrix {
         if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) {
             throw new IndexOutOfBoundsException("Index (" + row + ", " + col + "), size (" + rowCount + ", " + columnCount + ")");
         }
-        return numbers[col + columnCount * row];
+        return numbers[startIndex + col + underlyingColumnCount * row];
     }
 
     /**
@@ -103,7 +113,7 @@ public final class Matrix {
         if (row < 0 || row >= rowCount || col < 0 || col >= columnCount) {
             throw new IndexOutOfBoundsException("Index (" + row + ", " + col + "), size (" + rowCount + ", " + columnCount + ")");
         }
-        numbers[col + columnCount * row] = value;
+        numbers[startIndex + col + underlyingColumnCount * row] = value;
     }
 
     /**
@@ -117,7 +127,7 @@ public final class Matrix {
         if (rowIndex < 0 || rowIndex >= rowCount) {
             throw new IndexOutOfBoundsException("Index " + rowIndex + ", size " + rowCount);
         }
-        return Vector.createView(numbers, columnCount, rowIndex * columnCount, 1);
+        return Vector.createView(numbers, columnCount, startIndex + rowIndex * underlyingColumnCount, 1);
     }
 
     /**
@@ -131,7 +141,7 @@ public final class Matrix {
         if (columnIndex < 0 || columnIndex >= columnCount) {
             throw new IndexOutOfBoundsException("Index " + columnIndex + ", size " + columnCount);
         }
-        return Vector.createView(numbers, rowCount, columnIndex, columnCount);
+        return Vector.createView(numbers, rowCount, startIndex + columnIndex, underlyingColumnCount);
     }
 
     /**
@@ -151,8 +161,8 @@ public final class Matrix {
             throw new IndexOutOfBoundsException("Index " + rowIndex + ", size " + rowCount);
         }
 
-        if (newRow.step == 1) {
-            System.arraycopy(newRow.numbers, newRow.startPos, numbers, rowIndex * columnCount, columnCount);
+        if (newRow.step == 1 && columnCount == underlyingColumnCount) {
+            System.arraycopy(newRow.numbers, newRow.startPos, numbers, startIndex + rowIndex * columnCount, columnCount);
         } else {
             for (int i = 0; i < columnCount; i++) {
                 set(rowIndex, i, newRow.get(i));
@@ -180,6 +190,25 @@ public final class Matrix {
         for (int i = 0; i < rowCount; i++) {
             set(i, columnIndex, newColumn.get(i));
         }
+    }
+
+    /**
+     * Gets a submatrix <i>view</i> starting at the given position and of the given size. Modifying this matrix will
+     * modify the original matrix
+     *
+     * @param startRow The row of the top of the submatrix
+     * @param startColumn The column on the left of the submatrix
+     * @param rowCount The number of rows in the submatrix
+     * @param columnCount The number of columns in the submatrix
+     * @return A view of the submatrix
+     * @throws IndexOutOfBoundsException If {@code startRow}, {@code startColumn}, {@code rowCount} or
+     *                                   {@code columnCount} is out of bounds
+     */
+    public Matrix submatrix(int startRow, int startColumn, int rowCount, int columnCount) {
+        if (startRow < 0 || startColumn < 0 || rowCount <= 0 || columnCount <= 0 || startRow + rowCount >= this.rowCount || startColumn + columnCount >= this.columnCount) {
+            throw new IllegalArgumentException(String.format("Illegal submatrix start (%d, %d) with size (%d, %d), size of original matrix (%d, %d)", startRow, startColumn, rowCount, columnCount, this.rowCount, this.columnCount));
+        }
+        return new Matrix(rowCount, columnCount, numbers, startIndex + startColumn + underlyingColumnCount * startRow, underlyingColumnCount);
     }
 
     /**
@@ -322,8 +351,17 @@ public final class Matrix {
             throw new IllegalArgumentException("Adding two matrices with different dimensions");
         }
 
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] += m.numbers[i];
+        if (this.columnCount == this.underlyingColumnCount && m.columnCount == m.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] += m.numbers[m.startIndex + i];
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col) + m.get(row, col));
+                }
+            }
         }
 
         return this;
@@ -341,8 +379,17 @@ public final class Matrix {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
 
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] -= m.numbers[i];
+        if (this.columnCount == this.underlyingColumnCount && m.columnCount == m.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] -= m.numbers[m.startIndex + i];
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col) - m.get(row, col));
+                }
+            }
         }
 
         return this;
@@ -355,8 +402,17 @@ public final class Matrix {
      * @return This matrix
      */
     public Matrix multiplyEquals(double scalar) {
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] *= scalar;
+        if (this.columnCount == this.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                numbers[startIndex + i] *= scalar;
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    set(row, col, get(row, col) * scalar);
+                }
+            }
         }
         return this;
     }
@@ -416,8 +472,13 @@ public final class Matrix {
      * @return A copy of this matrix
      */
     public Matrix copy() {
-        Matrix dest = new Matrix(this.rowCount, this.columnCount);
-        System.arraycopy(numbers, 0, dest.numbers, 0, numbers.length);
+        Matrix dest;
+        if (columnCount == underlyingColumnCount) {
+            dest = new Matrix(rowCount, columnCount);
+            System.arraycopy(numbers, startIndex, dest.numbers, 0, dest.numbers.length);
+        } else {
+            dest = new Matrix(rowCount, columnCount, this::get);
+        }
         return dest;
     }
 
@@ -442,9 +503,20 @@ public final class Matrix {
         if (this.rowCount != other.rowCount || this.columnCount != other.columnCount) {
             return false;
         }
-        for (int i = 0; i < numbers.length; i++) {
-            if (Math.abs(other.numbers[i] - this.numbers[i]) > tolerance) {
-                return false;
+        if (columnCount == underlyingColumnCount && other.columnCount == other.underlyingColumnCount) {
+            int size = rowCount * columnCount;
+            for (int i = 0; i < size; i++) {
+                if (Math.abs(other.numbers[other.startIndex + i] - this.numbers[this.startIndex + i]) > tolerance) {
+                    return false;
+                }
+            }
+        } else {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    if (Math.abs(other.get(row, col) - this.get(row, col)) > tolerance) {
+                        return false;
+                    }
+                }
             }
         }
         return true;
@@ -452,7 +524,12 @@ public final class Matrix {
 
     @Override
     public int hashCode() {
-        int h = Arrays.hashCode(numbers);
+        int h = 0;
+        for (int row = 0; row < rowCount; row++) {
+            for (int col = 0; col < columnCount; col++) {
+                h = 31 * h + Double.hashCode(get(row, col));
+            }
+        }
         h = 31 * h + columnCount;
         h = 31 * h + rowCount;
         return h;
@@ -463,7 +540,7 @@ public final class Matrix {
         if (other == this) return true;
         if (other == null || other.getClass() != Matrix.class) return false;
         Matrix that = (Matrix) other;
-        return this.columnCount == that.columnCount && this.rowCount == that.rowCount && Arrays.equals(this.numbers, that.numbers);
+        return this.equals(that, 0);
     }
 
     @Override
