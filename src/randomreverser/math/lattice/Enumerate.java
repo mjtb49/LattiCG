@@ -4,24 +4,33 @@ import randomreverser.math.component.*;
 import randomreverser.math.optimize.Optimize;
 
 import java.math.BigInteger;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Enumerate {
     public static Stream<BigVector> enumerate(BigMatrix basis, BigVector origin, Optimize constraints) {
         int rootSize = basis.getRowCount();
-        BigMatrix rootTransform = basis.inverse();
-        BigVector rootOrigin = rootTransform.multiply(origin);
+        BigMatrix rootInverse = basis.inverse();
+        BigVector rootOrigin = rootInverse.multiply(origin);
         BigVector rootFixed = new BigVector(rootSize);
         Optimize rootConstraints = constraints.copy();
 
-        // we want points of the form offset + basis * x that satisfy constraints
+        List<BigFraction> widths = new ArrayList<>();
+        List<Integer> order = new ArrayList<>();
 
-        // TODO: check lattice aligned widths of bounding box to get a rough idea of what order to traverse in
+        for (int i = 0; i < rootSize; ++i) {
+            BigFraction min = constraints.copy().minimize(rootInverse.getRow(i)).getSecond();
+            BigFraction max = constraints.copy().maximize(rootInverse.getRow(i)).getSecond();
+            widths.add(max.subtract(min));
+            order.add(i);
+        }
 
-        SearchNode root = new SearchNode(rootSize, 0, rootTransform, rootOrigin, rootFixed, rootConstraints);
+        order.sort(Comparator.comparing(i -> widths.get(i)));
+
+        SearchNode root = new SearchNode(rootSize, 0, rootInverse, rootOrigin, rootFixed, rootConstraints, order);
 
         return StreamSupport.stream(root.spliterator(), true)
                 .map(basis::multiply)

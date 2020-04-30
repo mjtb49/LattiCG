@@ -16,16 +16,18 @@ class SearchNode {
     private final BigVector origin;
     private final BigVector fixed;
     private final Optimize constraints;
+    private final List<Integer> order;
 
     private Spliterator<BigVector> spliterator;
 
-    public SearchNode(int size, int depth, BigMatrix inverse, BigVector origin, BigVector fixed, Optimize constraints) {
+    public SearchNode(int size, int depth, BigMatrix inverse, BigVector origin, BigVector fixed, Optimize constraints, List<Integer> order) {
         this.size = size;
         this.depth = depth;
         this.inverse = inverse;
         this.origin = origin;
         this.fixed = fixed;
         this.constraints = constraints;
+        this.order = order;
     }
 
     private void initialize() {
@@ -34,10 +36,12 @@ class SearchNode {
             return;
         }
 
+        int index = this.order.get(this.depth);
+
         Deque<SearchNode> children = new LinkedList<>();
 
-        BigVector gradient = this.inverse.getRow(this.depth);
-        BigFraction offset = this.origin.get(this.depth);
+        BigVector gradient = this.inverse.getRow(index);
+        BigFraction offset = this.origin.get(index);
 
         // make copies since if we try to do max after min, we force the
         // optimizer to retrace its steps
@@ -46,8 +50,8 @@ class SearchNode {
 
         for (; min.compareTo(max) <= 0; min = min.add(BigInteger.ONE)) {
             Optimize next = this.constraints.withStrictBound(gradient, new BigFraction(min).add(offset));
-            this.fixed.set(this.depth, new BigFraction(min));
-            children.addLast(new SearchNode(this.size, this.depth + 1, this.inverse, this.origin, this.fixed.copy(), next));
+            this.fixed.set(index, new BigFraction(min));
+            children.addLast(new SearchNode(this.size, this.depth + 1, this.inverse, this.origin, this.fixed.copy(), next, this.order));
         }
 
         this.spliterator = new SearchSpliterator(children);
