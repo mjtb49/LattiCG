@@ -30,11 +30,15 @@ public class Enumerate {
 
         order.sort(Comparator.comparing(i -> widths.get(i)));
 
-        SearchNode root = new SearchNode(rootSize, 0, rootInverse, rootOrigin, rootFixed, rootConstraints, order);
+        try {
+            SearchNode root = new SearchNode(rootSize, 0, rootInverse, rootOrigin, rootFixed, rootConstraints, order);
 
-        return StreamSupport.stream(root.spliterator(), true)
-                .map(basis::multiply)
-                .map(origin::add);
+            return StreamSupport.stream(root.spliterator(), true)
+                    .map(basis::multiply)
+                    .map(origin::add);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("constraints are not feasible", e);
+        }
     }
 
     // TODO: remove
