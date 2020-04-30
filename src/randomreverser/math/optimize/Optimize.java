@@ -231,9 +231,6 @@ public class Optimize {
 
         for (int row = 0; row < rows - 1; ++row) {
             if (basics[row] >= realVariables) {
-                // shouldn't be able to happen thanks to exception above
-                assert table.get(row, cols - 1).signum() == 0;
-
                 for (int col = 0; col < cols - 1; ++col) {
                     if (nonbasics[col] >= realVariables || table.get(row, col).signum() == 0) {
                         continue;
@@ -250,11 +247,6 @@ public class Optimize {
 
         for (int c0 = 0, c1 = 0; c0 < finalCols - 1; ++c0, ++c1) {
             for (;; ++c1) {
-                // TODO: test and remove
-                // technically this should be covered by the exception above,
-                // but it's gonna stay here until this is well tested
-                assert c1 < cols - 1;
-
                 if (nonbasics[c1] >= realVariables) {
                     continue;
                 }
