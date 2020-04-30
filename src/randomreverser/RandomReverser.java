@@ -276,18 +276,18 @@ public class RandomReverser {
         long minLong = (long) StrictMath.ceil(minInc * 0x1.0p53);
         long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p53) - 1;
 
-        if (minLong < maxLong) {
+        if (maxLong < minLong) {
             throw new IllegalArgumentException("call has no valid range");
         }
 
         long minSeed1 = (minLong >> 27) << 22;
-        long maxSeed1 = ((minLong >> 27) << 22) | 0x3fffff;
+        long maxSeed1 = ((maxLong >> 27) << 22) | 0x3fffff;
 
         addMeasuredSeed(minSeed1, maxSeed1);
 
         if (minLong >>> 27 == maxLong >>> 27) { //Can we even say anything about the second half
             long minSeed2 = (minLong & 0x7ffffff) << 21;
-            long maxSeed2 = ((minLong & 0x7ffffff) << 21) | 0x1fffff;
+            long maxSeed2 = ((maxLong & 0x7ffffff) << 21) | 0x1fffff;
 
             addMeasuredSeed(minSeed2, maxSeed2);
         } else {
@@ -301,7 +301,7 @@ public class RandomReverser {
      * @param min low end of the valid range
      * @param max high end of the valid range
      */
-    public void addNextDouble(double min, double max) {
+    public void addNextDoubleCall(double min, double max) {
         addNextDoubleCall(min, max, true, false);
     }
 

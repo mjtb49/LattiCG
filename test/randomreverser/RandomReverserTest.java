@@ -8,7 +8,7 @@ public class RandomReverserTest {
         RandomReverser device = new RandomReverser();
 
         for (int i = 0; i < 12; ++i) {
-            device.addNextFloatCall(0.9f, 1.0f);
+            device.addNextDoubleCall(0.9, 1.0);
         }
 
         device.setVerbose(true);
@@ -18,6 +18,7 @@ public class RandomReverserTest {
         long end = System.nanoTime();
 
         System.out.printf("results: %s%n", results);
-        System.out.printf("elapsed: %.2f%n", (end - start) * 1e-9);
+        System.out.printf("count:   %s%n", results.size());
+        System.out.printf("elapsed: %.2fs%n", (end - start) * 1e-9);
     }
 }
