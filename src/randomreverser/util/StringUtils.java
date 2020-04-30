@@ -36,7 +36,7 @@ public class StringUtils {
                     cell.insert(0, " ");
                 }
                 for (int i = 0, e = (whitespace + 1) / 2; i < e; i++) {
-                    cell.append(" ");
+                    cell.insert(0, " ");
                 }
             }
         }
