@@ -115,7 +115,7 @@ public class Rand {
     }
 
     public double nextDouble() {
-        return (((long)this.next(27) << 27) + this.next(27)) / (double)(1L << 54);
+        return (((long)this.next(26) << 27) + this.next(27)) / (double)(1L << 53);
     }
 
     public Random asRandomView() {

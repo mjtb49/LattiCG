@@ -60,13 +60,13 @@ public class OptimizeTest {
 //        Pair<BigVector, BigFraction> min = optimize.minimize(BigVector.fromString("1/281474976710656, -1/140737488355328, -1/281474976710656, 0, -3/281474976710656, 0, 1/281474976710656, 1/140737488355328, 1/140737488355328, 1/281474976710656, 0, 1/70368744177664, 1/140737488355328, 1/281474976710656, -19/140737488355328, 1/140737488355328, -1/70368744177664"));
 //        Pair<BigVector, BigFraction> max = optimize.maximize(BigVector.fromString("1/281474976710656, -1/140737488355328, -1/281474976710656, 0, -3/281474976710656, 0, 1/281474976710656, 1/140737488355328, 1/140737488355328, 1/281474976710656, 0, 1/70368744177664, 1/140737488355328, 1/281474976710656, -19/140737488355328, 1/140737488355328, -1/70368744177664"));
 
-        System.out.println(min.getFirst());
+       /* System.out.println(min.getFirst());
         System.out.println(min.getSecond());
         System.out.println(min.getSecond().toDouble());
 
         System.out.println(max.getFirst());
         System.out.println(max.getSecond());
-        System.out.println(max.getSecond().toDouble());
+        System.out.println(max.getSecond().toDouble());*/
 
         assertEquals(BigFraction.parse("-10547790643587294007/322288848333701120"), min.getSecond());
         assertEquals(BigFraction.parse("-4727348601358048099/151996487423754240"), max.getSecond());
