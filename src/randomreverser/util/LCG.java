@@ -24,6 +24,14 @@ public class LCG {
         return mod(seed * multiplier + addend);
     }
 
+    public LCG combine(LCG other) {
+        if (this.modulus != other.modulus) {
+            throw new IllegalArgumentException("Combining with LCG of different modulus");
+        }
+        // f(x) = ax + b, g(x) = cx + d => fg(x) = a(cx + d) + b = acx + ad + b
+        return new LCG(mod(this.multiplier * other.multiplier), mod(this.multiplier * other.addend + this.addend), this.modulus);
+    }
+
     public LCG combine(long steps) {
         long multiplier = 1;
         long addend = 0;
@@ -55,7 +63,7 @@ public class LCG {
         if (canMask) {
             return n & (modulus - 1);
         } else {
-            return n % modulus; // TODO: does not work for modulus > 2^32
+            return Long.remainderUnsigned(n, modulus); // TODO: multiplication does not work for modulus > 2^32 and non-power-of-2
         }
     }
 

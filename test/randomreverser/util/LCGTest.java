@@ -8,6 +8,11 @@ public class LCGTest {
     private static final long JAVA_MODULUS = LCG.JAVA.modulus;
 
     @Test
+    public void testJavaCombineLCG() {
+        assertEquals(new LCG(0xBB20B4600A69L, 0x40942DE6BAL, JAVA_MODULUS), LCG.JAVA.combine(LCG.JAVA));
+    }
+
+    @Test
     public void testJavaCombine0() {
         assertEquals(new LCG(1, 0, JAVA_MODULUS), LCG.JAVA.combine(0));
     }

@@ -37,7 +37,7 @@ public class Enumerate {
                 .map(origin::add);
     }
 
-    // TODO: remove
+    @Deprecated // TODO: remove
     public static Stream<BigVector> enumerate(BigMatrix basis, BigVector lower, BigVector upper, BigVector origin) {
         Optimize.Builder builder = Optimize.Builder.ofSize(basis.getRowCount());
 
