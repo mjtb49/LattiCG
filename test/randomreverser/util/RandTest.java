@@ -30,7 +30,7 @@ public class RandTest {
 
     @Test
     public void testNextDouble() {
-        assertEquals(new Random(107038380838084L).nextDouble(), Rand.ofSeedScrambled(107038380838084L).nextDouble(), 0);
+        assertEquals(new Random(98765L).nextDouble(), Rand.ofSeedScrambled(98765L).nextDouble(), 0);
     }
 
     @Test
