@@ -100,7 +100,7 @@ public class ReversalProgramBuilder {
     private void latticeReversal(List<ReversalProgram.Instruction> instructions, List<Constraint<?>> constraints,
                                  int latticeSize, BigInteger lcmSideLengths) {
         List<RangeConstraint> rangeConstraints = new ArrayList<>();
-        BigMatrix untransformed = new BigMatrix(latticeSize, latticeSize);
+        BigMatrix untransformed = new BigMatrix(latticeSize+1, latticeSize);
         BigMatrix transform = new BigMatrix(latticeSize, latticeSize);
         BigVector translation = new BigVector(latticeSize);
         LCG vecToSeed = null;
@@ -115,7 +115,7 @@ public class ReversalProgramBuilder {
                 if (vecToSeed == null) {
                     vecToSeed = tmpLcg.invert();
                 }
-                untransformed.set(latticeIndex, latticeIndex, new BigFraction(lcg.modulus));
+                untransformed.set(latticeIndex+1, latticeIndex, new BigFraction(lcg.modulus));
                 untransformed.set(0, latticeIndex, new BigFraction(tmpLcg.multiplier));
                 BigInteger length = BigInteger.valueOf(rangeConstraint.getLength());
                 transform.set(latticeIndex, latticeIndex, new BigFraction(lcmSideLengths.divide(length)));
@@ -125,7 +125,8 @@ public class ReversalProgramBuilder {
         }
         BigMatrix unreduced = untransformed.multiply(transform);
         LLL.Result lllResult = LLL.reduce(unreduced, new LLL.Params().setDelta(0.99));
-        BigMatrix reduced = lllResult.getTransformations().multiply(untransformed);
+        //TODO: transform is diagonal so this is a little expensive
+        BigMatrix reduced = lllResult.getReducedBasis().multiply(transform.inverse());
         // TODO: build this transpose into the entire matrix construction
         // *cough* matthew learnt the wrong standard *cough* excuse me I have a cough today
         BigMatrix lattice = reduced.transpose();

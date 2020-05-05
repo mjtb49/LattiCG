@@ -9,7 +9,6 @@ import randomreverser.util.Rand;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 public class RandomReverser {
@@ -285,6 +284,7 @@ public class RandomReverser {
 
         addMeasuredSeed(minSeed1, maxSeed1);
 
+        //TODO this is not the only time we can speak about the second half. What if maxLong >>> 27 - minLong >>> 27 == 1
         if (minLong >>> 27 == maxLong >>> 27) { //Can we even say anything about the second half
             long minSeed2 = (minLong & 0x7ffffff) << 21;
             long maxSeed2 = ((maxLong & 0x7ffffff) << 21) | 0x1fffff;
