@@ -215,7 +215,7 @@ public final class BigMatrix {
      *                                   {@code columnCount} is out of bounds
      */
     public BigMatrix submatrix(int startRow, int startColumn, int rowCount, int columnCount) {
-        if (startRow < 0 || startColumn < 0 || rowCount <= 0 || columnCount <= 0 || startRow + rowCount >= this.rowCount || startColumn + columnCount >= this.columnCount) {
+        if (startRow < 0 || startColumn < 0 || rowCount <= 0 || columnCount <= 0 || startRow + rowCount > this.rowCount || startColumn + columnCount > this.columnCount) {
             throw new IllegalArgumentException(String.format("Illegal submatrix start (%d, %d) with size (%d, %d), size of original matrix (%d, %d)", startRow, startColumn, rowCount, columnCount, this.rowCount, this.columnCount));
         }
         return new BigMatrix(rowCount, columnCount, numbers, startIndex + startColumn + underlyingColumnCount * startRow, underlyingColumnCount);
