@@ -79,19 +79,12 @@ public class LLL {
         reduceLLL(lattice, params);
         int dim = lattice.getRowCount();
         int colCount = lattice.getColumnCount();
+        Result result=null;
         while (z < dim - 1) {
             j = (j % (dim - 1)) + 1;
             k = Math.min(j + beta - 1, dim);
             h = Math.min(k + 1, dim);
-
-            // blockSizes is unchecked and tbh could be off
-            BigFraction[] blockSizes = new BigFraction[k-j+1];
-            for (int i = j; i <= k; i++) {
-                blockSizes[i-j] = sizes[j];
-            }
-
-            BigVector v = enumerateBKZ(j - 1, k - 1, dim,sizes,mu.submatrix(j,0,k-j+1,colCount));
-            System.out.println(v.toString());
+            BigVector v = enumerateBKZ(j - 1, k - 1, dim,sizes,mu);
             if (!passvec(v, j - 1, dim)) {
                 z = 0;
                 BigVector newVec = v.multiply(lattice.submatrix(j, 0, k - j + 1, colCount));
@@ -104,8 +97,8 @@ public class LLL {
                 for (int row = j; row < h; row++) {
                     newBlock.setRow(row + 1, lattice.getRow(row));
                 }
-                Result result = new LLL().reduceLLL(newBlock, params);
-                for (int row = 0; row <= h; row++) {
+                result = new LLL().reduceLLL(newBlock, params);
+                for (int row = 0; row < h+1; row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -113,7 +106,7 @@ public class LLL {
                 }
             } else {
                 z = z + 1;
-                Result result = new LLL().reduceLLL(lattice.submatrix(0, 0, h+1 , colCount), params);
+                result = new LLL().reduceLLL(lattice, params);
                 for (int row = 0; row < h; row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
@@ -122,14 +115,10 @@ public class LLL {
                 }
             }
         }
-        return null;
+        return result;
     }
 
     private BigVector enumerateBKZ(int ini, int fim, int dim, BigFraction[] B,BigMatrix blockMu) {
-
-
-
-        System.out.println(String.format("%d %d %d",ini,fim,dim));
         BigFraction[] cT = new BigFraction[dim + 1];
         BigFraction[] y = new BigFraction[dim + 1];
         BigFraction[] auxY = new BigFraction[dim + 1];
@@ -141,7 +130,7 @@ public class LLL {
         BigInteger[] uT = new BigInteger[dim + 1];
         BigInteger[] auxUT = new BigInteger[dim + 1];
 
-        BigFraction cL, aux;
+        BigFraction cL;
         int s = ini, t = ini, i;
         int window = fim - ini + 1;
 
@@ -158,8 +147,6 @@ public class LLL {
             cT[i] = y[i] = auxY[i] = BigFraction.ZERO;
             d[i] = BigInteger.ONE;
         }
-
-
         while(t <= fim){
             // cT[t] = cT[t + 1] + (auxY[t] - 2*uT[t]*y[t] + auxUT[t]) * B[t];
             // cT(t) := cT(t+1) + (y(t) + u(t))^2 * c(t)  but (y(t)+u(t))^2= y(t)^2 + u(t)^2 + 2*u(t)*y(t)
@@ -174,9 +161,7 @@ public class LLL {
                         y[t] =y[t].add(blockMu.get(i,t).multiply(uT[i]));
                     }
                     uT[t] = v[t] = y[t].round().negate();
-
                     delta[t] = BigInteger.ZERO;
-
                     // if (uT[t] > -y[t])
                     if (y[t].negate().compareTo(uT[t]) <0){
                         d[t] = BigInteger.ONE.negate();
@@ -184,9 +169,6 @@ public class LLL {
                     else{
                         d[t] = BigInteger.ONE;
                     }
-
-                    //Prepare cT[t] to next iteration
-
                 }
                 else{
                     cL = cT[ini];
@@ -198,7 +180,6 @@ public class LLL {
             else{
                 t++;
                 s = Math.max(s, t); //Get max value
-
                 if(t < s){
                     delta[t] = delta[t].negate();
                 }
