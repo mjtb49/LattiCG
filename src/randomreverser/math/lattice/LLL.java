@@ -121,38 +121,37 @@ public class LLL {
     private BigVector enumerateBKZ(int ini, int fim, int dim, BigFraction[] B,BigMatrix blockMu) {
         BigFraction[] cT = new BigFraction[dim + 1];
         BigFraction[] y = new BigFraction[dim + 1];
-        BigFraction[] auxY = new BigFraction[dim + 1];
 
         BigInteger[] v = new BigInteger[dim + 1];
         BigInteger[] delta = new BigInteger[dim + 1];
         BigInteger[] d = new BigInteger[dim + 1];
         BigVector u = new BigVector(dim + 1);
         BigInteger[] uT = new BigInteger[dim + 1];
-        BigInteger[] auxUT = new BigInteger[dim + 1];
-
-        BigFraction cL;
+        BigInteger auxUT;
+        BigFraction cL,auxY;
         int s = ini, t = ini, i;
         int window = fim - ini + 1;
 
         // Initialize vectors
         cL = B[ini];
-        d[ini] = uT[ini] = auxUT[ini] = BigInteger.ONE;
+        d[ini] = uT[ini]  = BigInteger.ONE;
         u.set(ini,BigFraction.ONE);
         delta[ini] = v[ini] = BigInteger.ZERO;
-        y[ini] = auxY[ini] = BigFraction.ZERO;
+        y[ini] = BigFraction.ZERO;
 
         for (i = ini + 1; i <= fim + 1; i++) {
-            uT[i] = delta[i] = v[i] = auxUT[i] = BigInteger.ZERO;
+            uT[i] = delta[i] = v[i]  = BigInteger.ZERO;
             u.set(i,BigFraction.ZERO);
-            cT[i] = y[i] = auxY[i] = BigFraction.ZERO;
+            cT[i] = y[i] = BigFraction.ZERO;
             d[i] = BigInteger.ONE;
         }
         while(t <= fim){
+
             // cT[t] = cT[t + 1] + (auxY[t] - 2*uT[t]*y[t] + auxUT[t]) * B[t];
             // cT(t) := cT(t+1) + (y(t) + u(t))^2 * c(t)  but (y(t)+u(t))^2= y(t)^2 + u(t)^2 + 2*u(t)*y(t)
-            auxY[t] = y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
-            auxUT[t] = uT[t].multiply(uT[t]);
-            cT[t] = cT[t + 1].add((auxY[t].add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT[t])).multiply(B[t]));
+            auxY= y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
+            auxUT = uT[t].multiply(uT[t]);
+            cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT)).multiply(B[t]));
             if (cT[t].compareTo(cL)<0){
                 if (t > ini){
                     t--;
