@@ -1,10 +1,15 @@
 package randomreverser.reversal.constraint;
 
-import randomreverser.reversal.ReversalProgramInstance;
+import randomreverser.reversal.ProgramInstance;
+import randomreverser.reversal.asm.StringParser;
 import randomreverser.reversal.observation.RangeObservation;
 
 public class RangeConstraint extends Constraint<RangeObservation> {
-    private final long length;
+    private long length;
+
+    RangeConstraint() {
+        super(ConstraintType.RANGE);
+    }
 
     public RangeConstraint(long length) {
         super(ConstraintType.RANGE);
@@ -16,11 +21,24 @@ public class RangeConstraint extends Constraint<RangeObservation> {
     }
 
     @Override
-    public boolean check(ReversalProgramInstance program, long seed, RangeObservation observation) {
+    public boolean check(ProgramInstance program, long seed, RangeObservation observation) {
         if (observation.getMin() > observation.getMax()) {
             return seed > observation.getMin() || seed < observation.getMax();
         } else {
             return seed >= observation.getMin() && seed <= observation.getMax();
         }
+    }
+
+    @Override
+    public void readOperands(StringParser parser) {
+        length = parser.consumeInteger().getFirst().longValue();
+    }
+
+    @Override
+    public void writeOperands(StringBuilder output, boolean verbose) {
+        if (verbose) {
+            output.append("/* length = */ ");
+        }
+        output.append(length);
     }
 }

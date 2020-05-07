@@ -1,6 +1,12 @@
 package randomreverser.math.component;
 
+import randomreverser.reversal.asm.ParseException;
+import randomreverser.reversal.asm.StringParser;
+import randomreverser.reversal.asm.Token;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.IntToDoubleFunction;
 
 /**
@@ -415,20 +421,36 @@ public final class Vector {
      *
      * @param raw The string in wolfram-style vector notation
      * @return The parsed vector
-     * @throws IllegalArgumentException If the input is malformed
-     * @throws NumberFormatException If the input is malformed
+     * @throws ParseException If the input is malformed
      */
     public static Vector fromString(String raw) {
-        raw = raw.replaceAll("\\s+","");
+        StringParser parser = StringParser.of(raw);
+        Vector vec = parse(parser);
+        parser.expectEof();
+        return vec;
+    }
 
-        String[] data = raw.split(",");
-        Vector v = new Vector(data.length);
-
-        for(int i = 0; i < data.length; i++) {
-            v.set(i, Double.parseDouble(data[i]));
+    /**
+     * Parses a vector from a string parser
+     *
+     * @param parser The parser to parse the vector from
+     * @return The parsed vector
+     * @throws ParseException If the input is malformed
+     */
+    public static Vector parse(StringParser parser) {
+        Token firstToken = parser.expect("{");
+        List<Double> numbers = new ArrayList<>();
+        while (!parser.peekNotEof().getText().equals("}")) {
+            if (!numbers.isEmpty()) {
+                parser.expect(",");
+            }
+            numbers.add(parser.consumeDecimal().getFirst().doubleValue());
         }
-
-        return v;
+        parser.expect("}");
+        if (numbers.isEmpty()) {
+            throw new ParseException("Empty vector", firstToken);
+        }
+        return new Vector(numbers.size(), numbers::get);
     }
 
     /**

@@ -1,7 +1,13 @@
 package randomreverser.math.component;
 
 import randomreverser.math.decomposition.LUDecomposition;
+import randomreverser.reversal.asm.ParseException;
+import randomreverser.reversal.asm.StringParser;
+import randomreverser.reversal.asm.Token;
 import randomreverser.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A matrix of double values
@@ -559,36 +565,44 @@ public final class Matrix {
      *
      * @param raw The string in wolfram-style matrix notation
      * @return The parsed matrix
-     * @throws IllegalArgumentException If the input is malformed
-     * @throws NumberFormatException If the input is malformed
+     * @throws ParseException If the input is malformed
      */
     public static Matrix fromString(String raw) {
-        Matrix m = null;
-        int height;
-        int width;
+       StringParser parser = StringParser.of(raw);
+       Matrix mat = parse(parser);
+       parser.expectEof();
+       return mat;
+    }
 
-        raw = raw.replaceAll("\\s+","");
-
-        if (!raw.startsWith("{") || !raw.endsWith("}")) {
-            throw new IllegalArgumentException("Malformed matrix");
-        }
-
-        raw = raw.substring(2, raw.length() - 2);
-        String[] data = raw.split("},\\{");
-        height = data.length;
-
-        for(int i = 0; i < height; i++) {
-            Vector v = Vector.fromString(data[i]);
-
-            if(i == 0) {
-                width = v.getDimension();
-                m = new Matrix(height,width);
+    /**
+     * Parses a matrix from a string parser
+     *
+     * @param parser The parser to parse the matrix from
+     * @return The parsed matrix
+     * @throws ParseException If the input is malformed
+     */
+    public static Matrix parse(StringParser parser) {
+        Token firstToken = parser.expect("{");
+        List<Vector> rows = new ArrayList<>();
+        while (!parser.peekNotEof().getText().equals("}")) {
+            if (!rows.isEmpty()) {
+                parser.expect(",");
             }
-
-            m.setRow(i, v);
+            Vector row = Vector.parse(parser);
+            rows.add(row);
+            if (row.getDimension() != rows.get(0).getDimension()) {
+                throw new ParseException("Rows of matrix do not have equal dimension", firstToken);
+            }
         }
-
-        return m;
+        parser.expect("}");
+        if (rows.isEmpty()) {
+            throw new ParseException("Empty matrix", firstToken);
+        }
+        Matrix mat = new Matrix(rows.size(), rows.get(0).getDimension());
+        for (int i = 0; i < rows.size(); i++) {
+            mat.setRow(i, rows.get(i));
+        }
+        return mat;
     }
 
     /**

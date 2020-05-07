@@ -7,32 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
-public final class DynamicReversalProgram {
+public final class DynamicProgram {
 
-    private final ReversalProgramBuilder programBuilder;
+    private final ProgramBuilder programBuilder;
     private final List<Object> values = new ArrayList<>();
     private boolean valid = true;
 
-    private DynamicReversalProgram(LCG lcg) {
-        programBuilder = ReversalProgram.builder(lcg);
+    private DynamicProgram(LCG lcg) {
+        programBuilder = Program.builder(lcg);
     }
 
-    public static DynamicReversalProgram create(LCG lcg) {
-        return new DynamicReversalProgram(lcg);
+    public static DynamicProgram create(LCG lcg) {
+        return new DynamicProgram(lcg);
     }
 
-    public <T> DynamicReversalProgram add(CallType<T> callType, T value) {
+    public <T> DynamicProgram add(CallType<T> callType, T value) {
         checkValid();
         programBuilder.add(callType);
         values.add(value);
         return this;
     }
 
-    public DynamicReversalProgram add(CallType<Boolean> callType) {
+    public DynamicProgram add(CallType<Boolean> callType) {
         return add(callType, true);
     }
 
-    public DynamicReversalProgram skip(long steps) {
+    public DynamicProgram skip(long steps) {
         checkValid();
         programBuilder.skip(steps);
         return this;
@@ -40,8 +40,8 @@ public final class DynamicReversalProgram {
 
     public LongStream reverse() {
         checkValid();
-        ReversalProgram program = programBuilder.build();
-        ReversalProgramInstance instance = program.start();
+        Program program = programBuilder.build();
+        ProgramInstance instance = program.start();
         for (Object value : values) {
             instance.add(value);
         }
