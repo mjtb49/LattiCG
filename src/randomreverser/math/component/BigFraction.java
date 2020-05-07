@@ -353,6 +353,11 @@ public final class BigFraction implements Comparable<BigFraction> {
         return ntor.multiply(other.dtor).compareTo(other.ntor.multiply(dtor));
     }
 
+    public int compareTo(BigInteger other) {
+        BigFraction other_frac=new BigFraction(other);
+        return ntor.multiply(other_frac.dtor).compareTo(other_frac.ntor.multiply(dtor));
+    }
+
     @Override
     public int hashCode() {
         return ntor.hashCode() + 31 * dtor.hashCode();
