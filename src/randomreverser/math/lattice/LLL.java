@@ -77,12 +77,12 @@ public class LLL {
         reduceLLL(lattice, params);
         int dim = lattice.getRowCount();
         int colCount = lattice.getColumnCount();
-        Result result=null;
+        Result result = null;
         while (z < dim - 1) {
             j = (j % (dim - 1)) + 1;
             k = Math.min(j + beta - 1, dim);
             h = Math.min(k + 1, dim);
-            BigVector v = enumerateBKZ(j - 1, k - 1, dim,sizes,mu);
+            BigVector v = enumerateBKZ(j - 1, k - 1, dim, sizes, mu);
             if (!passvec(v, j - 1, dim)) {
                 z = 0;
                 BigVector newVec = v.multiply(lattice.submatrix(j, 0, k - j + 1, colCount));
@@ -96,7 +96,7 @@ public class LLL {
                     newBlock.setRow(row + 1, lattice.getRow(row));
                 }
                 result = new LLL().reduceLLL(newBlock, params);
-                for (int row = 0; row < h+1; row++) {
+                for (int row = 0; row < h + 1; row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -116,7 +116,7 @@ public class LLL {
         return result;
     }
 
-    private BigVector enumerateBKZ(int ini, int fim, int dim, BigFraction[] B,BigMatrix blockMu) {
+    private BigVector enumerateBKZ(int ini, int fim, int dim, BigFraction[] B, BigMatrix blockMu) {
         BigFraction[] cT = new BigFraction[dim + 1];
         BigFraction[] y = new BigFraction[dim + 1];
 
@@ -126,62 +126,59 @@ public class LLL {
         BigVector u = new BigVector(dim + 1);
         BigInteger[] uT = new BigInteger[dim + 1];
         BigInteger auxUT;
-        BigFraction cL,auxY;
+        BigFraction cL, auxY;
         int s = ini, t = ini, i;
         int window = fim - ini + 1;
 
         // Initialize vectors
         cL = B[ini];
-        d[ini] = uT[ini]  = BigInteger.ONE;
-        u.set(ini,BigFraction.ONE);
+        d[ini] = uT[ini] = BigInteger.ONE;
+        u.set(ini, BigFraction.ONE);
         delta[ini] = v[ini] = BigInteger.ZERO;
         y[ini] = BigFraction.ZERO;
 
         for (i = ini + 1; i <= fim + 1; i++) {
-            uT[i] = delta[i] = v[i]  = BigInteger.ZERO;
-            u.set(i,BigFraction.ZERO);
+            uT[i] = delta[i] = v[i] = BigInteger.ZERO;
+            u.set(i, BigFraction.ZERO);
             cT[i] = y[i] = BigFraction.ZERO;
             d[i] = BigInteger.ONE;
         }
-        while(t <= fim){
+        while (t <= fim) {
 
             // cT[t] = cT[t + 1] + (auxY[t] - 2*uT[t]*y[t] + auxUT[t]) * B[t];
             // cT(t) := cT(t+1) + (y(t) + u(t))^2 * c(t)  but (y(t)+u(t))^2= y(t)^2 + u(t)^2 + 2*u(t)*y(t)
-            auxY= y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
+            auxY = y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
             auxUT = uT[t].multiply(uT[t]);
             cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT)).multiply(B[t]));
-            if (cT[t].compareTo(cL)<0){
-                if (t > ini){
+            if (cT[t].compareTo(cL) < 0) {
+                if (t > ini) {
                     t--;
-                    y[t]  = BigFraction.ZERO;
-                    for (i = t + 1; i <= s; i++){
-                        y[t] =y[t].add(blockMu.get(i,t).multiply(uT[i]));
+                    y[t] = BigFraction.ZERO;
+                    for (i = t + 1; i <= s; i++) {
+                        y[t] = y[t].add(blockMu.get(i, t).multiply(uT[i]));
                     }
                     uT[t] = v[t] = y[t].round().negate();
                     delta[t] = BigInteger.ZERO;
                     // if (uT[t] > -y[t])
-                    if (y[t].negate().compareTo(uT[t]) <0){
+                    if (y[t].negate().compareTo(uT[t]) < 0) {
                         d[t] = BigInteger.ONE.negate();
-                    }
-                    else{
+                    } else {
                         d[t] = BigInteger.ONE;
                     }
-                }
-                else{
+                } else {
                     cL = cT[ini];
                     for (int j = 0; j < window; j++) {
-                        u.set(ini+window,new BigFraction(uT[ini+window]));
+                        u.set(ini + window, new BigFraction(uT[ini + window]));
                     }
                 }
-            }
-            else{
+            } else {
                 t++;
                 s = Math.max(s, t); //Get max value
-                if(t < s){
+                if (t < s) {
                     delta[t] = delta[t].negate();
                 }
-                if(delta[t].multiply(d[t]).compareTo(BigInteger.ZERO)>=0){
-                    delta[t]=delta[t].add(d[t]);
+                if (delta[t].multiply(d[t]).compareTo(BigInteger.ZERO) >= 0) {
+                    delta[t] = delta[t].add(d[t]);
                 }
                 uT[t] = v[t].add(delta[t]);
             }
