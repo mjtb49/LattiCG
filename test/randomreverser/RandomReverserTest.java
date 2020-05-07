@@ -7,11 +7,12 @@ public class RandomReverserTest {
     public static void main(String[] args) {
         RandomReverser device = new RandomReverser();
 
-        device.addNextFloatCall(0f,0f,true,true);
-        device.consumeNextFloatCalls(1);
-        device.addNextFloatCall(0f,0f,true,true);
+        for (int i = 0; i < 12; i++) {
+            device.addNextFloatCall(0.9f,1.0f);
+            //device.consumeNextFloatCalls(1);
+        }
 
-        //device.setVerbose(true);
+        device.setVerbose(true);
 
         long start = System.nanoTime();
         // List<Long> results = device.findAllValidSeeds().boxed().collect(Collectors.toList());
