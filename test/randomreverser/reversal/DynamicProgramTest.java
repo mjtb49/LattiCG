@@ -1,7 +1,6 @@
 package randomreverser.reversal;
 
 import org.junit.Test;
-import randomreverser.reversal.asm.ReversalASM;
 import randomreverser.reversal.calltype.JavaCalls;
 import randomreverser.util.LCG;
 
@@ -43,10 +42,6 @@ public class DynamicProgramTest {
                 97890873098190L,
                 88733741831411L
         );
-        System.out.println(ReversalASM.toAsm(Program.builder(LCG.JAVA)
-                .add(JavaCalls.nextFloat())
-                .add(JavaCalls.nextFloat())
-                .build(), false));
     }
 
     @Test
