@@ -25,18 +25,6 @@ public final class BigVector {
         this.numbers = new BigFraction[this.dimension];
         Arrays.fill(numbers, BigFraction.ZERO);
     }
-    /**
-     * Constructs a vector from an array of BigInteger
-     *
-     * @param bigIntegers An array of BigInteger
-     */
-    public BigVector(BigInteger[] bigIntegers){
-        BigVector res=new BigVector(bigIntegers.length);
-        for (int i = 0; i < bigIntegers.length; i++) {
-            BigFraction temp= new BigFraction(bigIntegers[i]==null?BigInteger.ZERO:bigIntegers[i]);
-            res.set(i,temp);
-        }
-    }
 
     /**
      * Constructs a vector with the given integer elements
