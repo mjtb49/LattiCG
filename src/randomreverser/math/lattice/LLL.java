@@ -74,10 +74,16 @@ public class LLL {
         int z = 0;
         int j = 0;
         int beta = blockSize;
-        reduceLLL(lattice, params);
-        int dim = lattice.getRowCount();
-        int colCount = lattice.getColumnCount();
-        Result result = null;
+        Result result = reduceLLL(lattice, params);
+        for (int row = 0; row < result.getNumDependantVectors(); row++) {
+            lattice.setRow(row, result.getReducedBasis().getRow(row));
+            mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
+            gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
+            sizes[row] = result.getGramSchmidtSizes()[row];
+        }
+        int dim = result.getReducedBasis().getRowCount();
+        int colCount = result.getReducedBasis().getColumnCount();
+
         while (z < dim - 1) {
             j = (j % (dim - 1)) + 1;
             k = Math.min(j + beta - 1, dim);
@@ -85,18 +91,24 @@ public class LLL {
             BigVector v = enumerateBKZ(j - 1, k - 1, dim, sizes, mu);
             if (!passvec(v, j - 1, dim)) {
                 z = 0;
-                BigVector newVec = v.multiply(lattice.submatrix(j, 0, k - j + 1, colCount));
+                BigVector newVec=new BigVector(dim);
+                for (int i = 0; i < dim; i++) {
+                    for (int l = 0; l < dim; l++) {
+                        //lattice[dim][l] += v[i] * lattice[i][l];
+                        newVec.set(l,newVec.get(l).add(v.get(i).multiply(lattice.get(i,l))));
+                    }
+                }
                 BigMatrix newBlock = new BigMatrix(h + 1, colCount);
                 //can't use submatrix here cuz j might be 1???
                 for (int row = 0; row < j - 1; row++) {
                     newBlock.setRow(row, lattice.getRow(row));
                 }
                 newBlock.setRow(j, newVec);
-                for (int row = j; row < h; row++) {
-                    newBlock.setRow(row + 1, lattice.getRow(row));
+                for (int row = j+1; row < h+1; row++) {
+                    newBlock.setRow(row, lattice.getRow(row));
                 }
                 result = new LLL().reduceLLL(newBlock, params);
-                for (int row = 0; row < h + 1; row++) {
+                for (int row = 0; row < result.getNumDependantVectors(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -105,7 +117,7 @@ public class LLL {
             } else {
                 z = z + 1;
                 result = new LLL().reduceLLL(lattice, params);
-                for (int row = 0; row < h; row++) {
+                for (int row = 0; row < result.getNumDependantVectors(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
