@@ -99,13 +99,17 @@ public class LLL {
                     }
                 }
                 BigMatrix newBlock = new BigMatrix(h + 1, colCount);
-                for (int row = 0; row < j - 1; row++) {
+                for (int row = 0; row <= j - 2; row++) {
+                    // set row 0 to j-2 (eq to 1 to j-1)
                     newBlock.setRow(row, lattice.getRow(row));
                 }
+                // set row j-1 (eq j)
                 newBlock.setRow(j-1, newVec);
+                // set row j to h+1
                 for (int row = j-1; row < h; row++) {
                     newBlock.setRow(row + 1, lattice.getRow(row));
                 }
+                System.out.println(h);
                 result = reduceLLL(newBlock, params);
                 for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
@@ -178,8 +182,8 @@ public class LLL {
                     }
                 } else {
                     cL = cT[ini];
-                    for (int j = 0; j < window; j++) {
-                        u.set(ini + j, new BigFraction(uT[ini + j]));
+                    for (int j = ini; j <=fim; j++) {
+                        u.set(j, new BigFraction(uT[j]));
                     }
                 }
             } else {
