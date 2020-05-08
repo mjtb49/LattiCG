@@ -89,25 +89,28 @@ public class LLL {
             k = Math.min(j + beta - 1, dim);
             h = Math.min(k + 1, dim);
             BigVector v = enumerateBKZ(j - 1, k - 1, dim, sizes, mu);
-            if (!passvec(v, j - 1, dim)) {
+            if (!passvec(v, j-1, dim)) {
                 z = 0;
-                BigVector newVec=new BigVector(dim);
-                for (int i = 0; i < dim; i++) {
-                    for (int l = 0; l < dim; l++) {
+                BigVector newVec = new BigVector(dim);
+
+                for (int l = 0; l < dim; l++) {
+                    for (int s = j - 1; s <= k - 1; s++) {
                         //lattice[dim][l] += v[i] * lattice[i][l];
-                        newVec.set(l,newVec.get(l).add(v.get(i).multiply(lattice.get(i,l))));
+                        newVec.set(l, newVec.get(l).add(v.get(s).multiply(lattice.get(s, l))));
                     }
                 }
                 BigMatrix newBlock = new BigMatrix(h + 1, colCount);
-                //can't use submatrix here cuz j might be 1???
-                for (int row = 0; row < j - 1; row++) {
+                // set from 0 to j-2 so j-1 elements
+                for (int row = 0; row <= j - 2; row++) {
                     newBlock.setRow(row, lattice.getRow(row));
                 }
-                newBlock.setRow(j, newVec);
-                for (int row = j+1; row < h+1; row++) {
-                    newBlock.setRow(row, lattice.getRow(row));
+                // set j-1 (the jth element) with the new element
+                newBlock.setRow(j - 1, newVec);
+                // set j to h so h-j+1 elements (with j-1 to h-1)
+                for (int row = j; row <= h; row++) {
+                    newBlock.setRow(row, lattice.getRow(row - 1));
                 }
-                result = new LLL().reduceLLL(newBlock, params);
+                result = reduceLLL(newBlock, params);
                 for (int row = 0; row < result.getNumDependantVectors(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
@@ -116,7 +119,7 @@ public class LLL {
                 }
             } else {
                 z = z + 1;
-                result = new LLL().reduceLLL(lattice, params);
+                result = reduceLLL(lattice, params);
                 for (int row = 0; row < result.getNumDependantVectors(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
@@ -139,17 +142,22 @@ public class LLL {
         BigInteger[] uT = new BigInteger[dim + 1];
         BigInteger auxUT;
         BigFraction cL, auxY;
-        int s = ini, t = ini, i;
-        int window = fim - ini + 1;
+
 
         // Initialize vectors
         cL = B[ini];
-        d[ini] = uT[ini] = BigInteger.ONE;
+        uT[ini] = BigInteger.ONE;
         u.set(ini, BigFraction.ONE);
-        delta[ini] = v[ini] = BigInteger.ZERO;
         y[ini] = BigFraction.ZERO;
+        delta[ini] = BigInteger.ZERO;
+        int s = ini;
+        int t = ini;
+        d[ini] = BigInteger.ONE;
 
-        for (i = ini + 1; i <= fim + 1; i++) {
+        // non cited
+        v[ini] = BigInteger.ZERO;
+
+        for (int i = ini + 1; i <= fim + 1; i++) {
             uT[i] = delta[i] = v[i] = BigInteger.ZERO;
             u.set(i, BigFraction.ZERO);
             cT[i] = y[i] = BigFraction.ZERO;
@@ -166,7 +174,7 @@ public class LLL {
                 if (t > ini) {
                     t--;
                     y[t] = BigFraction.ZERO;
-                    for (i = t + 1; i <= s; i++) {
+                    for (int i = t + 1; i <= s; i++) {
                         y[t] = y[t].add(blockMu.get(i, t).multiply(uT[i]));
                     }
                     uT[t] = v[t] = y[t].round().negate();
@@ -179,8 +187,8 @@ public class LLL {
                     }
                 } else {
                     cL = cT[ini];
-                    for (int j = 0; j < window; j++) {
-                        u.set(ini + window, new BigFraction(uT[ini + window]));
+                    for (int j = ini; j <= fim; j++) {
+                        u.set(j, new BigFraction(uT[j]));
                     }
                 }
             } else {
