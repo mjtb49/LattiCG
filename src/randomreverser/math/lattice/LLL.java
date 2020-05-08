@@ -4,6 +4,7 @@ import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigVector;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class LLL {
@@ -75,7 +76,7 @@ public class LLL {
         int j = 0;
         int beta = blockSize;
         Result result=reduceLLL(lattice, params);
-        for (int row = 0; row < result.getNumDependantVectors(); row++) {
+        for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
             lattice.setRow(row, result.getReducedBasis().getRow(row));
             mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
             gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -91,22 +92,22 @@ public class LLL {
             if (!passvec(v, j - 1, dim)) {
                 z = 0;
                 BigVector newVec=new BigVector(dim);
-                for (int i = 0; i < dim; i++) {
-                    for (int l = 0; l < dim; l++) {
+                for (int l = 0; l < dim; l++) {
+                    for (int s = j - 1; s <= k - 1; s++) {
                         //lattice[dim][l] += v[i] * lattice[i][l];
-                        newVec.set(l,newVec.get(l).add(v.get(i).multiply(lattice.get(i,l))));
+                        newVec.set(l, newVec.get(l).add(v.get(s).multiply(lattice.get(s, l))));
                     }
                 }
                 BigMatrix newBlock = new BigMatrix(h + 1, colCount);
                 for (int row = 0; row < j - 1; row++) {
                     newBlock.setRow(row, lattice.getRow(row));
                 }
-                newBlock.setRow(j, newVec);
-                for (int row = j; row < h; row++) {
+                newBlock.setRow(j-1, newVec);
+                for (int row = j-1; row < h; row++) {
                     newBlock.setRow(row + 1, lattice.getRow(row));
                 }
-                result = new LLL().reduceLLL(newBlock, params);
-                for (int row = 0; row < result.getNumDependantVectors(); row++) {
+                result = reduceLLL(newBlock, params);
+                for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -114,8 +115,8 @@ public class LLL {
                 }
             } else {
                 z = z + 1;
-                result = new LLL().reduceLLL(lattice, params);
-                for (int row = 0; row < result.getNumDependantVectors(); row++) {
+                result = reduceLLL(lattice, params);
+                for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
                     mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
                     gramSchmidtBasis.setRow(row, result.getGramSchmidtBasis().getRow(row));
@@ -178,7 +179,7 @@ public class LLL {
                 } else {
                     cL = cT[ini];
                     for (int j = 0; j < window; j++) {
-                        u.set(ini + window, new BigFraction(uT[ini + window]));
+                        u.set(ini + j, new BigFraction(uT[ini + j]));
                     }
                 }
             } else {
@@ -195,6 +196,80 @@ public class LLL {
         }
         return u;
     }
+    /*
+    private void sizeReduction(BigMatrix lattice, int k){
+        int i, j;
+        BigInteger r;
+
+        for(i=k-1; i>=0; i--){
+            //Round mu[k][i] once
+            r = mu.get(k,i).round();
+            for(j=0; j<lattice.getRowCount(); j++){
+                lattice.set(k,j,lattice.get(k,j).subtract(lattice.get(i,j).multiply(r)));
+            }
+
+            for(j=0; j<i; j++){
+                mu.set(k,j,mu.get(k,j).subtract(mu.get(i,j).multiply(r)));
+            }
+        }
+
+        //Update the GSO accordingly the new basis
+        computeGSO(lattice);
+    }
+
+    BigFraction breakCondition(int k, int kl){
+
+        int i;
+        BigFraction res=sizes[kl];
+
+        for(i=k-1; i<kl; i++){
+            res=res.add(mu.get(kl,i).multiply(mu.get(kl,i)).multiply(sizes[i]));
+        }
+
+        return res;
+    }
+    private void computeGSO(BigMatrix lattice){
+        int i, j, k;
+
+        //Prepare first vector
+        copyVectorToDouble(baseORT[0], base[0]);
+        B[0] = innerProduct(baseORT[0], baseORT[0], dim);   //<bi,bi> equals to ||bi||^2
+
+        for(i=1; i<lattice.getRowCount(); i++){
+            copyVectorToDouble(baseORT[i], base[i]);
+
+            for(j=0; j<i; j++){
+                mu[i][j] = innerProductv2(base[i], baseORT[j], dim) / B[j];
+                for(k=0; k<dim; k++)
+                    baseORT[i][k] -= mu[i][j] * baseORT[j][k];
+            }
+            B[i] = innerProduct(baseORT[i], baseORT[i], dim);
+        }
+    }
+
+    private Result actualLLL(BigMatrix lattice, double delta, int kmax){
+        int i,k=1,kl;
+        computeGSO(lattice);
+        while (k<kmax){
+            sizeReduction(lattice,k);
+            kl=k;
+            while(k>=1 && ( (sizes[k-1].multiply(new BigFraction((long) delta)).compareTo(breakCondition(k, kl))>=0 ))){ // dont trust bigFraction with that delta
+                k--;
+            }
+
+            for(i=0; i<k; i++){
+                mu.set(k,i,mu.get(kl,i));
+            }
+
+            //Shift vectors
+            shiftVector(base, k, kl);
+
+            //Update the GSO accordingly the new basis
+            computeGSO(base);
+
+            k++;
+        }
+    }*/
 
     private Result reduceLLL(BigMatrix lattice, Params params) {
         this.params = params;
