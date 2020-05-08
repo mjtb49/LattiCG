@@ -72,7 +72,7 @@ public class LLL {
     private Result reduceBKZ0(BigMatrix lattice, int blockSize, Params params) {
         int k, h;
         int z = 0;
-        int j = 0;
+        int j = 0;  // we start at that value sadly
         int beta = blockSize;
         Result result = reduceLLL(lattice, params);
         for (int row = 0; row < result.getNumDependantVectors(); row++) {
@@ -83,18 +83,23 @@ public class LLL {
         }
         int dim = result.getReducedBasis().getRowCount();
         int colCount = result.getReducedBasis().getColumnCount();
-
+        int delta=3/4;
         while (z < dim - 1) {
-            j = (j % (dim - 1)) + 1;
-            k = Math.min(j + beta - 1, dim);
-            h = Math.min(k + 1, dim);
-            BigVector v = enumerateBKZ(j - 1, k - 1, dim, sizes, mu);
+            j++;
+            k = Math.min(j + beta -1, dim);
+            if (j==dim){
+                j=1;
+                k=beta;
+            }
+            BigVector v = enumerateBKZ(j-1, k-1, dim, sizes, mu);
+
+            h = Math.min(k+1, dim);
             if (!passvec(v, j-1, dim)) {
                 z = 0;
                 BigVector newVec = new BigVector(dim);
 
                 for (int l = 0; l < dim; l++) {
-                    for (int s = j - 1; s <= k - 1; s++) {
+                    for (int s = j-1; s <= k - 1; s++) {
                         //lattice[dim][l] += v[i] * lattice[i][l];
                         newVec.set(l, newVec.get(l).add(v.get(s).multiply(lattice.get(s, l))));
                     }
