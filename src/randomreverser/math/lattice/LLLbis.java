@@ -85,18 +85,18 @@ public class LLLbis {
 
     private void sizeReduction(BigMatrix basis, int k) {
         BigInteger r;
-        for (int i = k - 1; i >= 0; i--) {
-            r = mu.get(k, i).round();
-            for (int j = 0; j < basis.getColumnCount(); j++) {
-                basis.set(k, j, basis.get(k, j).subtract(basis.get(i, j).multiply(r)));
+        for (int j = k - 1; j >= 0; j--) {
+            r=mu.get(k,j).round();
+            if (r.compareTo(BigInteger.ZERO)!=0){ // to not set 0 the check is |mu(k,j)|>1/2
+                basis.getRow(k).subtractEquals(basis.getRow(j).multiply(r));
             }
-            for (int j = 0; j < i; j++) {
-                mu.set(k, j, mu.get(k, j).subtract(mu.get(i, j).multiply(r)));
+            for (int i = 0; i < nbRows; i++) {
+                mu.set(k, i,mu.get(k, i).subtract(mu.get(j, i).multiply(r)));
             }
         }
-        //Update the GSO accordingly the new basis
-        computeGSO();
+        computeGSO(); // change to only update for j=0 to k-1
     }
+
     // that's not a floating friendly its L3-red
     private LLLbis.Result reduceLLL(BigMatrix lattice, LLLbis.Params params) {
         this.basis = lattice.copy();
@@ -107,18 +107,12 @@ public class LLLbis {
         while (stage < maxStage) {
             sizeReduction(basis, stage);
             int kl = stage;
-            while (stage >= 1 && ((QNorms.get(stage - 1).multiply(delta).compareTo(breakCondition(stage, kl)) >= 0))) {
-                stage--;
+            if (((QNorms.get(stage - 1).multiply(delta).compareTo(breakCondition(stage, kl)) >= 0))) {
+                basis.swapRows(stage,stage-1);
+                stage=Math.max(stage-1,1);
+            }else{
+                stage++;
             }
-            for (int i = 0; i < stage; i++) {
-                mu.set(stage, i, mu.get(kl, i));
-            }
-            basis.shiftRows(stage, kl);
-            //Update the GSO accordingly the new basis
-            System.out.println("GSO");
-            System.out.println(baseGSO.toPrettyString(true));
-            computeGSO();
-            stage++;
         }
         int p = 0;
         for (int i = 0; i < nbRows; i++) {
