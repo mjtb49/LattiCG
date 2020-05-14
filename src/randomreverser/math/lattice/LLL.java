@@ -109,7 +109,6 @@ public class LLL {
                 for (int row = j-1; row < h; row++) {
                     newBlock.setRow(row + 1, lattice.getRow(row));
                 }
-                System.out.println(h);
                 result = reduceLLL(newBlock, params);
                 for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
                     lattice.setRow(row, result.getReducedBasis().getRow(row));
@@ -300,10 +299,6 @@ public class LLL {
             }
             testCondition();
         }
-        for (BigFraction size : sizes) {
-            System.out.println(size);
-        }
-        System.out.println(mu.toPrettyString());
         int p = 0;
         for (int i = 0; i < n; i++) {
             if (this.lattice.getRow(i).isZero()) {

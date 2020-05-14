@@ -257,6 +257,30 @@ public final class BigVector {
     }
 
     /**
+     * Place the element at endIndex before the one at startIndex and shifts all the elements in between
+     *
+     * @param startIndex The starting index to swap
+     * @param endIndex   The ending index to swap
+     * @return This matrix
+     * @throws IllegalArgumentException If {@code startIndex} is greater than {@code endIndex}
+     */
+    public BigVector shiftElements(int startIndex, int endIndex) {
+        if (endIndex < startIndex) {
+            throw new IllegalArgumentException("The ending index should be greater or equals to the starting one");
+        }
+        if (startIndex == endIndex) {
+            return this;
+        }
+        BigFraction last = this.get(endIndex);
+        for (int row = endIndex; row > startIndex; row--) {
+            this.set(row, this.get(row - 1));
+        }
+        this.set(startIndex, last);
+
+        return this;
+    }
+
+    /**
      * Multiplies this vector by the given scalar, modifying this vector
      *
      * @param scalar The scalar to multiply this vector by

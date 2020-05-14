@@ -93,10 +93,23 @@ public class LLLbis {
                 mu.set(k, cols,mu.get(k, cols).subtract(mu.get(row, cols).multiply(r)));
             }
         }
+        updateGSO(k);
     }
 
     private void updateGSO(int k){
+        baseGSO.setRow(k, basis.getRow(k));
+        for (int j = 0; j < k; j++) {
+            if (QNorms.get(j).compareTo(BigFraction.ZERO) == 0) {
+                mu.set(k, j, BigFraction.ZERO);
+            } else {
+                mu.set(k, j, innerProduct(basis.getRow(k), baseGSO.getRow(j)).divide(QNorms.get(j)));
+            }
+            for (int col = 0; col < nbCols; col++) {
+                baseGSO.set(k, col, baseGSO.get(k, col).subtract(mu.get(k, j).multiply(baseGSO.get(j, col))));
+            }
 
+        }
+        QNorms.set(k, innerProduct(baseGSO.getRow(k), baseGSO.getRow(k)));
     }
     private boolean testCondition(int stage,BigFraction delta){
         BigFraction muTemp=mu.get(stage,stage-1);
@@ -105,21 +118,22 @@ public class LLLbis {
     }
     // that's not a floating friendly its L3-red
     private LLLbis.Result reduceLLL(BigMatrix lattice, LLLbis.Params params) {
-        this.basis = lattice.copy();
         BigFraction delta = params.delta;
         int maxStage = params.maxStage == -1 ? lattice.getRowCount() : params.maxStage;
         int stage = 1;
         computeGSO();
         while (stage < maxStage) {
             sizeReduction(basis, stage);
-            if (testCondition(stage,delta)) {
-                stage++;
-            }else{
-                basis.swapRows(stage,stage-1);
-                computeGSO();
-                stage=Math.max(stage-1,1);
+            int kl = stage;
+            while (stage >= 1 && ((QNorms.get(stage - 1).multiply(delta).compareTo(breakCondition(stage, kl)) >= 0))) {
+                stage--;
             }
-            System.out.println(stage);
+            for (int i = 0; i < stage; i++) {
+                mu.set(stage,i,mu.get(kl,i));
+            }
+            basis.shiftRows(stage,kl);
+            computeGSO();
+            stage++;
         }
         int p = 0;
         for (int i = 0; i < nbRows; i++) {
