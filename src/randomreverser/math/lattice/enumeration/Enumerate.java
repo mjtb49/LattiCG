@@ -1,9 +1,8 @@
-package randomreverser.math.lattice;
+package randomreverser.math.lattice.enumeration;
 
 import randomreverser.math.component.*;
 import randomreverser.math.optimize.Optimize;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

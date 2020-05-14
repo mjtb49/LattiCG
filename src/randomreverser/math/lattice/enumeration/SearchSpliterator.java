@@ -1,4 +1,4 @@
-package randomreverser.math.lattice;
+package randomreverser.math.lattice.enumeration;
 
 import randomreverser.math.component.BigVector;
 
