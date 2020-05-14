@@ -190,7 +190,7 @@ public class RandomReverser {
                 for (int row = 0; row < dimensions; row++)
                     for (int col = 0; col < dimensions - 1; col++)
                         newLattice.set(row, col, lattice.get(row, col));
-            } else {
+            } else if (!MOD.equals(BigInteger.valueOf(mod))) {
                 //TODO find a way to recover the seed in the case we only have constraints of this type
                 System.err.println("First call not a bound on a seed. Junk output may be produced.");
             }

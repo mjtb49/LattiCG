@@ -28,7 +28,7 @@ public class RandomReverserTest {
             device.addModConstraint((1 + (structureSeed >> 32)) << 16, ((2 + (structureSeed >> 32)) << 16) - 1, (1L << 32));
         }
 
-        device.setVerbose(true);
+       // device.setVerbose(true);
         long start = System.nanoTime();
 
         AtomicInteger count = new AtomicInteger(0);
