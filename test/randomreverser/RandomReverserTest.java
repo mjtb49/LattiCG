@@ -1,18 +1,23 @@
 package randomreverser;
 
+import randomreverser.util.Rand;
+
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class RandomReverserTest {
     public static void main(String[] args) {
         RandomReverser device = new RandomReverser();
+        Random r = new Random(30109882286122L ^ 0x5deece66dL);
 
-        device.addNextFloatCall(0f,0f,true,true);
-        device.consumeNextFloatCalls(1);
-        device.addNextFloatCall(0f,0f,true,true);
+        device.addNextIntCall(420,69,69);
+        device.addNextIntCall(420,69,69);
+        device.addNextIntCall(420,69,69);
+        device.addNextIntCall(420,69,69);
+        device.addNextIntCall(420,69,69);
 
-        //device.setVerbose(true);
-
+        device.setVerbose(true);
         long start = System.nanoTime();
         // List<Long> results = device.findAllValidSeeds().boxed().collect(Collectors.toList());
         device.findAllValidSeeds().forEach(s -> {
