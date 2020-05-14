@@ -293,18 +293,17 @@ public class LLL {
         this.lattice = lattice.copy();
         sizes = new BigFraction[n];
         sizes[0] = this.lattice.getRow(0).magnitudeSq();
-
         while (k < n) {
             if (k > kmax && shouldUpdateGramSchmidt) {
                 kmax = k;
                 incGramSchmidt();
             }
             testCondition();
-
-            System.out.println("GSO");
-            System.out.println(gramSchmidtBasis.toPrettyString(true));
         }
-
+        for (BigFraction size : sizes) {
+            System.out.println(size);
+        }
+        System.out.println(mu.toPrettyString());
         int p = 0;
         for (int i = 0; i < n; i++) {
             if (this.lattice.getRow(i).isZero()) {

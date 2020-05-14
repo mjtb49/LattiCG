@@ -85,7 +85,7 @@ public class LLLbis {
 
     private void sizeReduction(BigMatrix basis, int k) {
         BigInteger r;
-        for (int j = k - 1; j >= 0; j--) {
+        for (int j = k-1 ; j >= 0; j--) {
             r=mu.get(k,j).round();
             if (r.compareTo(BigInteger.ZERO)!=0){ // to not set 0 the check is |mu(k,j)|>1/2
                 basis.getRow(k).subtractEquals(basis.getRow(j).multiply(r));
@@ -94,7 +94,6 @@ public class LLLbis {
                 mu.set(k, i,mu.get(k, i).subtract(mu.get(j, i).multiply(r)));
             }
         }
-        computeGSO(); // change to only update for j=0 to k-1
     }
 
     // that's not a floating friendly its L3-red
@@ -106,9 +105,9 @@ public class LLLbis {
         computeGSO();
         while (stage < maxStage) {
             sizeReduction(basis, stage);
-            int kl = stage;
-            if (((QNorms.get(stage - 1).multiply(delta).compareTo(breakCondition(stage, kl)) >= 0))) {
+            if (QNorms.get(stage - 1).multiply(delta).compareTo(QNorms.get(stage).add(mu.get(stage,stage-1).multiply(mu.get(stage,stage-1)).multiply(QNorms.get(stage-1)))) > 0) {
                 basis.swapRows(stage,stage-1);
+                computeGSO();
                 stage=Math.max(stage-1,1);
             }else{
                 stage++;
