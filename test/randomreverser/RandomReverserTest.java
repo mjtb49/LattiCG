@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 public class RandomReverserTest {
     public static void main(String[] args) {
         RandomReverser device = new RandomReverser();
+        for (int i = 0; i < 9; i++) {
+            device.addNextIntCall(32,0,0);
+        }
 
-        device.addNextFloatCall(0f,0f,true,true);
-        device.consumeNextFloatCalls(1);
-        device.addNextFloatCall(0f,0f,true,true);
-
-        //device.setVerbose(true);
+        device.setVerbose(true);
 
         long start = System.nanoTime();
         // List<Long> results = device.findAllValidSeeds().boxed().collect(Collectors.toList());

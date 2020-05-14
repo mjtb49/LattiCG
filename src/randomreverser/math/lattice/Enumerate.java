@@ -31,6 +31,8 @@ public class Enumerate {
         order.sort(Comparator.comparing(i -> widths.get(i)));
 
         try {
+
+
             SearchNode root = new SearchNode(rootSize, 0, rootInverse, rootOrigin, rootFixed, rootConstraints, order);
 
             return StreamSupport.stream(root.spliterator(), true)
@@ -51,4 +53,5 @@ public class Enumerate {
 
         return enumerate(basis, origin, builder.build());
     }
+
 }

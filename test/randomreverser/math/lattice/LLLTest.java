@@ -44,14 +44,7 @@ public class LLLTest {
                         "{8462157635811,1251368972967,-1652918150373,1387004841087,1717588765715,-2363517938153,10131123425739,-11456623266449,5477436914243,-4759160995705,5496978719611,-6245443060385}," +
                         "{14276340518069,11302502565649,-760697010115,6141148139513,-8322341108987,-2402663381215,6840633257741,3747223598729,-6011287794091,3767907907633,-10053902617891,6917101368857}}");
 
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 1, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 2, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 3, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 4, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 5, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 6, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 7, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
-        assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 8, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
+
         assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 9, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
         assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 10, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());
         assertEquals(expected.toPrettyString(), LLL.reduceBKZ(basis, 11, new LLL.Params().setDelta(0.99)).getReducedBasis().toPrettyString());

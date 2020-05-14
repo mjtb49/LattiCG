@@ -200,7 +200,7 @@ public class LLL {
         }
         return u;
     }
-    /*
+/*
     private void sizeReduction(BigMatrix lattice, int k){
         int i, j;
         BigInteger r;
@@ -221,17 +221,10 @@ public class LLL {
         computeGSO(lattice);
     }
 
-    BigFraction breakCondition(int k, int kl){
+    void shiftVector(BigMatrix lattice, int k, int kl){
 
-        int i;
-        BigFraction res=sizes[kl];
-
-        for(i=k-1; i<kl; i++){
-            res=res.add(mu.get(kl,i).multiply(mu.get(kl,i)).multiply(sizes[i]));
-        }
-
-        return res;
     }
+
     private void computeGSO(BigMatrix lattice){
         int i, j, k;
 
@@ -250,6 +243,17 @@ public class LLL {
             B[i] = innerProduct(baseORT[i], baseORT[i], dim);
         }
     }
+    BigFraction breakCondition(int k, int kl){
+
+        int i;
+        BigFraction res=sizes[kl];
+
+        for(i=k-1; i<kl; i++){
+            res=res.add(mu.get(kl,i).multiply(mu.get(kl,i)).multiply(sizes[i]));
+        }
+
+        return res;
+    }
 
     private Result actualLLL(BigMatrix lattice, double delta, int kmax){
         int i,k=1,kl;
@@ -266,15 +270,15 @@ public class LLL {
             }
 
             //Shift vectors
-            shiftVector(base, k, kl);
+            shiftVector(lattice, k, kl);
 
             //Update the GSO accordingly the new basis
-            computeGSO(base);
+            computeGSO(lattice);
 
             k++;
         }
-    }*/
-
+    }
+*/
     private Result reduceLLL(BigMatrix lattice, Params params) {
         this.params = params;
         int n = lattice.getRowCount();
@@ -296,6 +300,9 @@ public class LLL {
                 incGramSchmidt();
             }
             testCondition();
+
+            System.out.println("GSO");
+            System.out.println(gramSchmidtBasis.toPrettyString(true));
         }
 
         int p = 0;

@@ -298,6 +298,31 @@ public class BigMatrixTest {
         });
     }
 
+    @Test
+    public void testShiftRows(){
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
+            BigMatrix result=m.shiftRows(0,1);
+            assertSame(result, m);
+            assertEquals(BigMatrix.fromString("{{3, 4}, {1, 2}}"),m);
+        });
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testShiftRowsFail(){
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
+            BigMatrix result=m.shiftRows(1,0);
+        });
+    }
+
+    @Test()
+    public void testShiftRowsNothing(){
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
+            BigMatrix result=m.shiftRows(1,1);
+            assertSame(result, m);
+            assertEquals(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m);
+        });
+    }
+
     private void testMatrixFlavors(BigMatrix m, Consumer<BigMatrix> tester) {
         tester.accept(m.copy());
         tester.accept(createSubmatrix(m));

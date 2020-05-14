@@ -479,6 +479,29 @@ public final class BigMatrix {
     }
 
     /**
+     * Place the row at endIndex before startIndex and shifts all the rows in between
+     *
+     * @param startIndex The starting index to swap
+     * @param endIndex The ending index to swap
+     * @return This matrix
+     * @throws IllegalArgumentException If {@code startIndex} is greater than {@code endIndex}
+     */
+    public BigMatrix shiftRows(int startIndex, int endIndex){
+        if (endIndex<startIndex){
+            throw new IllegalArgumentException("The ending index should be greater or equals to the starting one");
+        }
+        if (startIndex==endIndex){return this;}
+        for (int col = 0; col < this.getColumnCount(); col++) {
+            BigFraction last=this.get(endIndex,col);
+            for (int row = endIndex; row >startIndex; row--) {
+                this.set(row,col,this.get(row-1,col));
+            }
+            this.set(startIndex,col,last);
+        }
+        return this;
+    }
+
+    /**
      * Creates a copy of this matrix
      *
      * @return A copy of this matrix
@@ -500,7 +523,17 @@ public final class BigMatrix {
      * @return The formatted matrix
      */
     public String toPrettyString() {
-        return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> get(row, column).toString());
+        return toPrettyString(false);
+    }
+
+    /**
+     * Formats this matrix nicely into a human-readable multi-line string
+     *
+     * @param approximate a boolean to specify if the result should be converted to double
+     * @return The formatted matrix
+     */
+    public String toPrettyString(boolean approximate) {
+        return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> approximate?String.valueOf(get(row, column).toDouble()):get(row,column).toString());
     }
 
     @Override
