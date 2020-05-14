@@ -356,6 +356,7 @@ public class LLL {
             }
             k = k + 1;
         }
+        System.out.println(k);
     }
 
     private void swapg(int n) {

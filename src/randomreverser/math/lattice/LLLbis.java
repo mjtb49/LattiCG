@@ -84,18 +84,25 @@ public class LLLbis {
     }
 
     private void sizeReduction(BigMatrix basis, int k) {
+        // babai nearest plane algorithm, beware here k is already k-1 so j start indeed at k-2
         BigInteger r;
-        for (int j = k-1 ; j >= 0; j--) {
-            r=mu.get(k,j).round();
-            if (r.compareTo(BigInteger.ZERO)!=0){ // to not set 0 the check is |mu(k,j)|>1/2
-                basis.getRow(k).subtractEquals(basis.getRow(j).multiply(r));
-            }
-            for (int i = 0; i < nbRows; i++) {
-                mu.set(k, i,mu.get(k, i).subtract(mu.get(j, i).multiply(r)));
+        for (int row = k-1 ; row >= 0; row--) {
+            r=mu.get(k,row).round();
+            basis.getRow(k).subtractEquals(basis.getRow(row).multiply(r));
+            for (int cols = 0; cols < row; cols++) {
+                mu.set(k, cols,mu.get(k, cols).subtract(mu.get(row, cols).multiply(r)));
             }
         }
     }
 
+    private void updateGSO(int k){
+
+    }
+    private boolean testCondition(int stage,BigFraction delta){
+        BigFraction muTemp=mu.get(stage,stage-1);
+        BigFraction factor=delta.subtract(muTemp.multiply(muTemp));
+        return QNorms.get(stage-1).multiply(factor).compareTo(QNorms.get(stage))<=0;
+    }
     // that's not a floating friendly its L3-red
     private LLLbis.Result reduceLLL(BigMatrix lattice, LLLbis.Params params) {
         this.basis = lattice.copy();
@@ -105,13 +112,14 @@ public class LLLbis {
         computeGSO();
         while (stage < maxStage) {
             sizeReduction(basis, stage);
-            if (QNorms.get(stage - 1).multiply(delta).compareTo(QNorms.get(stage).add(mu.get(stage,stage-1).multiply(mu.get(stage,stage-1)).multiply(QNorms.get(stage-1)))) > 0) {
+            if (testCondition(stage,delta)) {
+                stage++;
+            }else{
                 basis.swapRows(stage,stage-1);
                 computeGSO();
                 stage=Math.max(stage-1,1);
-            }else{
-                stage++;
             }
+            System.out.println(stage);
         }
         int p = 0;
         for (int i = 0; i < nbRows; i++) {
@@ -123,7 +131,6 @@ public class LLLbis {
         BigMatrix nonZeroLattice = this.basis.submatrix(p, 0, nbRows - p, nbCols);
         return new Result(p, nonZeroLattice, lattice);
     }
-
 
     public static final class Result {
         private final int numDependantVectors;
