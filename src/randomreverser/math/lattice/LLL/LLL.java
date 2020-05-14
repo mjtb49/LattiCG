@@ -1,10 +1,9 @@
-package randomreverser.math.lattice;
+package randomreverser.math.lattice.LLL;
 
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigVector;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class LLL {
@@ -297,6 +296,8 @@ public class LLL {
                 kmax = k;
                 incGramSchmidt();
             }
+            System.out.println(gramSchmidtBasis.toPrettyString());
+            System.out.println();
             testCondition();
         }
         int p = 0;
@@ -351,7 +352,6 @@ public class LLL {
             }
             k = k + 1;
         }
-        System.out.println(k);
     }
 
     private void swapg(int n) {

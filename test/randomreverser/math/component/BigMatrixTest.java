@@ -290,6 +290,16 @@ public class BigMatrixTest {
     }
 
     @Test
+    public void testSwapElementsEquals() {
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}, {5, 7}}"), m -> {
+            BigMatrix result = m.swapElementsEquals(0,1, 2,0);
+            assertSame(result, m);
+            assertEquals(BigMatrix.fromString("{{1, 5}, {3, 4}, {2, 7}}"), m);
+        });
+    }
+
+
+    @Test
     public void copy() {
         testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"), m -> {
             BigMatrix result = m.copy();

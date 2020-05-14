@@ -336,6 +336,20 @@ public final class BigMatrix {
     }
 
     /**
+     * Swaps the two elements at the given indices, stores the result in a new matrix and returns that matrix
+     *
+     * @param row1 The row to swap with {@code row2}
+     * @param col1 The col to swap with {@code col2}
+     * @param row2 The row to swap with {@code row1}
+     * @param col2 The col to swap with {@code col1}
+     * @return A new matrix containing the result
+     * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
+     */
+    public BigMatrix swapElements(int row1,int col1, int row2,int col2) {
+        return copy().swapElementsEquals(row1,col1, row2,col2);
+    }
+
+    /**
      * Computes the transpose of this matrix, stores the result in a new matrix and returns that matrix
      *
      * @return A new matrix containing the result
@@ -475,6 +489,23 @@ public final class BigMatrix {
         BigVector temp = this.getRow(row1).copy();
         this.setRow(row1, this.getRow(row2));
         this.setRow(row2, temp);
+        return this;
+    }
+
+    /**
+     * Swaps the two elements at the given indices, modifying this matrix
+     *
+     * @param row1 The row to swap with {@code row2}
+     * @param col1 The col to swap with {@code col2}
+     * @param row2 The row to swap with {@code row1}
+     * @param col2 The col to swap with {@code col1}
+     * @return This matrix
+     * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
+     */
+    public BigMatrix swapElementsEquals(int row1,int col1, int row2,int col2) {
+        BigFraction temp = this.get(row1, col1);
+        this.set(row1,col1, this.get(row2,col2));
+        this.set(row2,col2, temp);
         return this;
     }
 

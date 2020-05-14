@@ -2,6 +2,7 @@ package randomreverser.math.lattice;
 
 import org.junit.Test;
 import randomreverser.math.component.BigMatrix;
+import randomreverser.math.lattice.LLL.LLL;
 
 import static org.junit.Assert.*;
 

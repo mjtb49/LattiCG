@@ -1,7 +1,7 @@
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
-import randomreverser.math.lattice.LLL;
-import randomreverser.math.lattice.LLLbis;
+import randomreverser.math.lattice.LLL.LLL;
+import randomreverser.math.lattice.LLL.LLLbis;
 
 import static org.junit.Assert.assertEquals;
 

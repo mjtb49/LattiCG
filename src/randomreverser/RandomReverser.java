@@ -3,8 +3,8 @@ package randomreverser;
 import randomreverser.math.component.*;
 import randomreverser.util.LCG;
 import randomreverser.util.Mth;
-import randomreverser.math.lattice.LLL;
-import randomreverser.math.lattice.Enumerate;
+import randomreverser.math.lattice.LLL.LLL;
+import randomreverser.math.lattice.enumeration.Enumerate;
 import randomreverser.util.Rand;
 
 import java.math.BigInteger;

@@ -1,4 +1,4 @@
-package randomreverser.math.lattice;
+package randomreverser.math.lattice.LLL;
 
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
@@ -118,26 +118,33 @@ public class LLLbis {
     }
     // that's not a floating friendly its L3-red
     private LLLbis.Result reduceLLL(BigMatrix lattice, LLLbis.Params params) {
-        BigFraction delta = params.delta;
+        BigFraction delta = new BigFraction(99,100);
         int maxStage = params.maxStage == -1 ? lattice.getRowCount() : params.maxStage;
-        int stage = 1;
+        int i = 0;
         computeGSO();
-        while (stage < maxStage) {
-            sizeReduction(basis, stage);
-            int kl = stage;
-            while (stage >= 1 && ((QNorms.get(stage - 1).multiply(delta).compareTo(breakCondition(stage, kl)) >= 0))) {
-                stage--;
+        while (i < lattice.getRowCount()) {
+            for (int j = i-1; j >= 0; j--) {
+                basis.getRow(i).subtractEquals(basis.getRow(j).multiply(mu.get(i,j).round()));
             }
-            for (int i = 0; i < stage; i++) {
-                mu.set(stage,i,mu.get(kl,i));
+            if (i>0 && QNorms.get(i-1).compareTo(delta.multiply(QNorms.get(i)))>0){
+                BigVector gTempPrev=baseGSO.getRow(i).add(baseGSO.getRow(i-1).multiply(mu.get(i,i-1)));
+                QNorms.set(i-1,innerProduct(gTempPrev,gTempPrev));
+                BigVector gTemp=baseGSO.getRow(i-1).subtract(gTempPrev.multiply(basis.getRow(i-1).dot(gTempPrev).divide(QNorms.get(i-1))));
+                QNorms.set(i,innerProduct(gTemp,gTemp));
+                basis.swapRows(i,i-1);
+                baseGSO.setRow(i,gTemp);
+                baseGSO.setRow(i-1,gTempPrev);
+                i--;
+
+                System.out.println(baseGSO.toPrettyString());
+            }else{
+                i++;
             }
-            basis.shiftRows(stage,kl);
-            computeGSO();
-            stage++;
+            System.out.println(i);
         }
         int p = 0;
-        for (int i = 0; i < nbRows; i++) {
-            if (this.basis.getRow(i).isZero()) {
+        for (int j = 0; j < nbRows; j++) {
+            if (this.basis.getRow(j).isZero()) {
                 p++;
             }
         }
