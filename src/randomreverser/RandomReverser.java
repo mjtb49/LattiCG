@@ -100,6 +100,8 @@ public class RandomReverser {
        }
 
        BigMatrix unscaledLattice = lattice;
+       if (verbose)
+           System.out.println("Looking for points on:\n"+unscaledLattice.toPrettyString());
 
        BigMatrix scaledLattice = unscaledLattice.multiply(scales);
        LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
@@ -375,6 +377,17 @@ public class RandomReverser {
 
     public void consumeNextDoubleCalls(int numCalls) {
         addUnmeasuredSeeds(2*numCalls);
+    }
+
+    /**
+     * Add a constraint on the seed modulo something special. There is no handling for specific java Random calls
+     * so to use this method requires investigating the implementation of the method one has periodic information on.
+     * @param min low end, inclusive, of the valid range of seeds
+     * @param max high end, inclusive, of the valid range of seeds
+     * @param newMod the alternate modulus to use.
+     */
+    public void addModConstraint(long min, long max, long newMod) {
+        addModuloMeasuredSeed(min,max,newMod);
     }
 
     public void setVerbose(boolean verbose) {
