@@ -229,7 +229,7 @@ public final class BigMatrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public BigMatrix add(BigMatrix m) {
-        return copy().addEquals(m);
+        return copy().addAndSet(m);
     }
 
     /**
@@ -240,7 +240,7 @@ public final class BigMatrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public BigMatrix subtract(BigMatrix m) {
-        return copy().subtractEquals(m);
+        return copy().subtractAndSet(m);
     }
 
     /**
@@ -250,7 +250,7 @@ public final class BigMatrix {
      * @return A new matrix containing the result
      */
     public BigMatrix multiply(BigFraction scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
     }
 
     /**
@@ -332,7 +332,7 @@ public final class BigMatrix {
      * @throws IndexOutOfBoundsException If {@code row1} or {@code row2} is out of bounds
      */
     public BigMatrix swapRows(int row1, int row2) {
-        return copy().swapRowsEquals(row1, row2);
+        return copy().swapRowsAndSet(row1, row2);
     }
 
     /**
@@ -346,7 +346,7 @@ public final class BigMatrix {
      * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
      */
     public BigMatrix swapElements(int row1,int col1, int row2,int col2) {
-        return copy().swapElementsEquals(row1,col1, row2,col2);
+        return copy().swapElementsAndSet(row1,col1, row2,col2);
     }
 
     /**
@@ -371,7 +371,7 @@ public final class BigMatrix {
      * @return This matrix
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-    public BigMatrix addEquals(BigMatrix m) {
+    public BigMatrix addAndSet(BigMatrix m) {
         if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
             throw new IllegalArgumentException("Adding two matrices with different dimensions");
         }
@@ -399,7 +399,7 @@ public final class BigMatrix {
      * @return This matrix
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-    public BigMatrix subtractEquals(BigMatrix m) {
+    public BigMatrix subtractAndSet(BigMatrix m) {
         if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
@@ -426,7 +426,7 @@ public final class BigMatrix {
      * @param scalar The scalar to multiply this matrix by
      * @return This matrix
      */
-    public BigMatrix multiplyEquals(BigFraction scalar) {
+    public BigMatrix multiplyAndSet(BigFraction scalar) {
         if (this.columnCount == this.underlyingColumnCount) {
             int size = rowCount * columnCount;
             for (int i = 0; i < size; i++) {
@@ -451,7 +451,7 @@ public final class BigMatrix {
      * @throws IllegalArgumentException If this matrix is not a square matrix, or the given matrix is not the same size
      *                                  as this matrix
      */
-    public BigMatrix multiplyEquals(BigMatrix m) {
+    public BigMatrix multiplyAndSet(BigMatrix m) {
         // We have to modify this matrix, which means its dimensions must stay the same, which means it has to be square, and the same size as the other matrix
         if(this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
             throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
@@ -473,8 +473,8 @@ public final class BigMatrix {
      * @return This matrix
      * @throws ArithmeticException If the given scalar is zero
      */
-    public BigMatrix divideEquals(BigFraction scalar) {
-        return multiplyEquals(scalar.reciprocal());
+    public BigMatrix divideAndSet(BigFraction scalar) {
+        return multiplyAndSet(scalar.reciprocal());
     }
 
     /**
@@ -485,7 +485,7 @@ public final class BigMatrix {
      * @return This matrix
      * @throws IndexOutOfBoundsException If {@code row1} or {@code row2} is out of bounds
      */
-    public BigMatrix swapRowsEquals(int row1, int row2) {
+    public BigMatrix swapRowsAndSet(int row1, int row2) {
         BigVector temp = this.getRow(row1).copy();
         this.setRow(row1, this.getRow(row2));
         this.setRow(row2, temp);
@@ -502,7 +502,7 @@ public final class BigMatrix {
      * @return This matrix
      * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
      */
-    public BigMatrix swapElementsEquals(int row1,int col1, int row2,int col2) {
+    public BigMatrix swapElementsAndSet(int row1,int col1, int row2,int col2) {
         BigFraction temp = this.get(row1, col1);
         this.set(row1,col1, this.get(row2,col2));
         this.set(row2,col2, temp);

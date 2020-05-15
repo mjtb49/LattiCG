@@ -34,7 +34,7 @@ public class Optimize {
 
         for (int row = 0; row < this.transform.getRowCount(); ++row) {
             BigFraction x = lhs.get(row);
-            transformed.subtractEquals(this.transform.getRow(row).multiply(x));
+            transformed.subtractAndSet(this.transform.getRow(row).multiply(x));
         }
 
         for (int col = 0; col < this.cols - 1; ++col) {
@@ -45,7 +45,7 @@ public class Optimize {
 
         for (int row = 0; row < this.rows - 1; ++row) {
             BigFraction x = transformed.get(this.basics[row]);
-            eliminated.subtractEquals(this.table.getRow(row).multiply(x));
+            eliminated.subtractAndSet(this.table.getRow(row).multiply(x));
         }
 
         return eliminated;
@@ -62,7 +62,7 @@ public class Optimize {
         }
 
         this.table.setRow(this.rows - 1, new BigVector(this.cols));
-        this.table.getRow(this.rows - 1).subtractEquals(this.transformForTable(gradient, BigFraction.ZERO));
+        this.table.getRow(this.rows - 1).subtractAndSet(this.transformForTable(gradient, BigFraction.ZERO));
 
         this.solve();
 
@@ -70,7 +70,7 @@ public class Optimize {
 
         for (int row = 0; row < this.rows - 1; ++row) {
             int v0 = this.basics[row];
-            result.subtractEquals(this.transform.getColumn(v0).multiply(this.table.get(row, this.cols - 1)));
+            result.subtractAndSet(this.transform.getColumn(v0).multiply(this.table.get(row, this.cols - 1)));
         }
 
         return new Pair<>(result, this.table.get(this.rows - 1, this.cols - 1));
@@ -198,7 +198,7 @@ public class Optimize {
         newTable.setRow(this.rows - 1, this.transformForTable(lhs, rhs));
 
         if (newTable.get(this.rows - 1, this.cols - 1).signum() < 0) {
-            newTable.getRow(this.rows - 1).multiplyEquals(BigFraction.MINUS_ONE);
+            newTable.getRow(this.rows - 1).multiplyAndSet(BigFraction.MINUS_ONE);
         }
 
         int[] newBasics = Arrays.copyOf(this.basics, this.rows);
@@ -219,7 +219,7 @@ public class Optimize {
                 continue;
             }
 
-            table.getRow(rows - 1).addEquals(table.getRow(basicRow));
+            table.getRow(rows - 1).addAndSet(table.getRow(basicRow));
         }
 
         Optimize optimize = new Optimize(table, basics, nonbasics, null);
@@ -281,7 +281,7 @@ public class Optimize {
                 continue;
             }
 
-            innerTable.getRow(row).multiplyEquals(BigFraction.MINUS_ONE);
+            innerTable.getRow(row).multiplyAndSet(BigFraction.MINUS_ONE);
         }
 
         for (int col = 0, i = 0; col < variables; ++col) {
@@ -298,7 +298,7 @@ public class Optimize {
             }
 
             if (count == 1 && basics[index] == -1 && innerTable.get(index, col).signum() > 0) {
-                innerTable.getRow(index).divideEquals(innerTable.get(index, col));
+                innerTable.getRow(index).divideAndSet(innerTable.get(index, col));
                 basics[index] = col;
             } else {
                 nonbasicList.add(col);
@@ -329,7 +329,7 @@ public class Optimize {
                 BigVector rowVector = innerTable.getRow(row);
                 BigVector basicVector = innerTable.getRow(basicRow);
 
-                rowVector.subtractEquals(basicVector.multiply(rowVector.get(basics[basicRow])));
+                rowVector.subtractAndSet(basicVector.multiply(rowVector.get(basics[basicRow])));
             }
 
             for (int col = 0; col < nonbasicCount; ++col) {

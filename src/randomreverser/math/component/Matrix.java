@@ -219,7 +219,7 @@ public final class Matrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public Matrix add(Matrix m) {
-        return copy().addEquals(m);
+        return copy().addAndSet(m);
     }
 
     /**
@@ -230,7 +230,7 @@ public final class Matrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public Matrix subtract(Matrix m) {
-        return copy().subtractEquals(m);
+        return copy().subtractAndSet(m);
     }
 
     /**
@@ -240,7 +240,7 @@ public final class Matrix {
      * @return A new matrix containing the result
      */
     public Matrix multiply(double scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
     }
 
     /**
@@ -297,7 +297,7 @@ public final class Matrix {
      * @return A new matrix containing the result
      */
     public Matrix divide(double scalar) {
-        return copy().divideEquals(scalar);
+        return copy().divideAndSet(scalar);
     }
 
     /**
@@ -321,7 +321,7 @@ public final class Matrix {
      * @throws IndexOutOfBoundsException If {@code row1} or {@code row2} is out of bounds
      */
     public Matrix swapRows(int row1, int row2) {
-        return copy().swapRowsEquals(row1, row2);
+        return copy().swapRowsAndSet(row1, row2);
     }
 
     /**
@@ -346,7 +346,7 @@ public final class Matrix {
      * @return This matrix
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-    public Matrix addEquals(Matrix m) {
+    public Matrix addAndSet(Matrix m) {
         if (this.rowCount != m.rowCount || this.columnCount != m.columnCount) {
             throw new IllegalArgumentException("Adding two matrices with different dimensions");
         }
@@ -374,7 +374,7 @@ public final class Matrix {
      * @return This matrix
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
-    public Matrix subtractEquals(Matrix m) {
+    public Matrix subtractAndSet(Matrix m) {
         if(this.rowCount != m.rowCount || this.columnCount != m.columnCount) {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
@@ -401,7 +401,7 @@ public final class Matrix {
      * @param scalar The scalar to multiply this matrix by
      * @return This matrix
      */
-    public Matrix multiplyEquals(double scalar) {
+    public Matrix multiplyAndSet(double scalar) {
         if (this.columnCount == this.underlyingColumnCount) {
             int size = rowCount * columnCount;
             for (int i = 0; i < size; i++) {
@@ -426,7 +426,7 @@ public final class Matrix {
      * @throws IllegalArgumentException If this matrix is not a square matrix, or the given matrix is not the same size
      *                                  as this matrix
      */
-    public Matrix multiplyEquals(Matrix m) {
+    public Matrix multiplyAndSet(Matrix m) {
         // We have to modify this matrix, which means its dimensions must stay the same, which means it has to be square, and the same size as the other matrix
         if(this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
             throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
@@ -447,8 +447,8 @@ public final class Matrix {
      * @param scalar The scalar to divide this matrix by
      * @return This matrix
      */
-    public Matrix divideEquals(double scalar) {
-        return multiplyEquals(1 / scalar);
+    public Matrix divideAndSet(double scalar) {
+        return multiplyAndSet(1 / scalar);
     }
 
     /**
@@ -459,7 +459,7 @@ public final class Matrix {
      * @return This matrix
      * @throws IndexOutOfBoundsException If {@code row1} or {@code row2} is out of bounds
      */
-    public Matrix swapRowsEquals(int row1, int row2) {
+    public Matrix swapRowsAndSet(int row1, int row2) {
         Vector temp = this.getRow(row1).copy();
         this.setRow(row1, this.getRow(row2));
         this.setRow(row2, temp);

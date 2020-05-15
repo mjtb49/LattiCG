@@ -117,53 +117,53 @@ public class VectorTest {
     }
 
     @Test
-    public void testAddEquals() {
+    public void testAddAndSet() {
         Vector a = new Vector(1, 2, 3, 4, 5);
         Vector b = new Vector(5, 3, 6, -4, -1);
-        Vector result = a.addEquals(b);
+        Vector result = a.addAndSet(b);
         assertSame(result, a);
         assertEquals(new Vector(6, 5, 9, 0, 4), a);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddEqualsFail() {
-        new Vector(1, 2).addEquals(new Vector(3, 4, 5));
+    public void testAddAndSetFail() {
+        new Vector(1, 2).addAndSet(new Vector(3, 4, 5));
     }
 
     @Test
-    public void testSubtractEquals() {
+    public void testSubtractAndSet() {
         Vector a = new Vector(1, 2, 3, 4, 5);
         Vector b = new Vector(-5, -3, -6, 4, 1);
-        Vector result = a.subtractEquals(b);
+        Vector result = a.subtractAndSet(b);
         assertSame(result, a);
         assertEquals(new Vector(6, 5, 9, 0, 4), a);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSubtractEqualsFail() {
-        new Vector(1, 2).subtractEquals(new Vector(3, 4, 5));
+    public void testSubtractAndSetFail() {
+        new Vector(1, 2).subtractAndSet(new Vector(3, 4, 5));
     }
 
     @Test
-    public void testMultiplyEquals() {
+    public void testMultiplyAndSet() {
         Vector a = new Vector(1, 2, 3, 4, 5);
-        Vector result = a.multiplyEquals(2);
+        Vector result = a.multiplyAndSet(2);
         assertSame(result, a);
         assertEquals(new Vector(2, 4, 6, 8, 10), a);
     }
 
     @Test
-    public void divideEquals() {
+    public void divideAndSet() {
         Vector a = new Vector(2, 4);
-        Vector result = a.divideEquals(2);
+        Vector result = a.divideAndSet(2);
         assertSame(result, a);
         assertEquals(new Vector(1, 2), a);
     }
 
     @Test
-    public void testSwapNumsEquals() {
+    public void testSwapNumsAndSet() {
         Vector a = new Vector(1, 2, 3);
-        Vector result = a.swapNumsEquals(1, 2);
+        Vector result = a.swapNumsAndSet(1, 2);
         assertSame(result, a);
         assertEquals(new Vector(1, 3, 2), a);
     }

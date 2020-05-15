@@ -113,53 +113,53 @@ public class BigVectorTest {
     }
 
     @Test
-    public void testAddEquals() {
+    public void testAddAndSet() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
         BigVector b = new BigVector(5, 3, 6, -4, -1);
-        BigVector result = a.addEquals(b);
+        BigVector result = a.addAndSet(b);
         assertSame(result, a);
         assertEquals(new BigVector(6, 5, 9, 0, 4), a);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddEqualsFail() {
-        new BigVector(1, 2).addEquals(new BigVector(3, 4, 5));
+    public void testAddAndSetFail() {
+        new BigVector(1, 2).addAndSet(new BigVector(3, 4, 5));
     }
 
     @Test
-    public void testSubtractEquals() {
+    public void testSubtractAndSet() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
         BigVector b = new BigVector(-5, -3, -6, 4, 1);
-        BigVector result = a.subtractEquals(b);
+        BigVector result = a.subtractAndSet(b);
         assertSame(result, a);
         assertEquals(new BigVector(6, 5, 9, 0, 4), a);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSubtractEqualsFail() {
-        new BigVector(1, 2).subtractEquals(new BigVector(3, 4, 5));
+    public void testSubtractAndSetFail() {
+        new BigVector(1, 2).subtractAndSet(new BigVector(3, 4, 5));
     }
 
     @Test
-    public void testMultiplyEquals() {
+    public void testMultiplyAndSet() {
         BigVector a = new BigVector(1, 2, 3, 4, 5);
-        BigVector result = a.multiplyEquals(new BigFraction(2));
+        BigVector result = a.multiplyAndSet(new BigFraction(2));
         assertSame(result, a);
         assertEquals(new BigVector(2, 4, 6, 8, 10), a);
     }
 
     @Test
-    public void divideEquals() {
+    public void divideAndSet() {
         BigVector a = new BigVector(2, 4);
-        BigVector result = a.divideEquals(new BigFraction(2));
+        BigVector result = a.divideAndSet(new BigFraction(2));
         assertSame(result, a);
         assertEquals(new BigVector(1, 2), a);
     }
 
     @Test
-    public void testSwapNumsEquals() {
+    public void testSwapNumsAndSet() {
         BigVector a = new BigVector(1, 2, 3);
-        BigVector result = a.swapNumsEquals(1, 2);
+        BigVector result = a.swapNumsAndSet(1, 2);
         assertSame(result, a);
         assertEquals(new BigVector(1, 3, 2), a);
     }

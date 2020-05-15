@@ -139,7 +139,7 @@ public final class BigVector {
      *                                  vector
      */
     public BigVector add(BigVector a) {
-        return copy().addEquals(a);
+        return copy().addAndSet(a);
     }
 
     /**
@@ -151,7 +151,7 @@ public final class BigVector {
      *                                  vector
      */
     public BigVector subtract(BigVector a) {
-        return copy().subtractEquals(a);
+        return copy().subtractAndSet(a);
     }
 
     /**
@@ -161,7 +161,7 @@ public final class BigVector {
      * @return A new vector containing the result
      */
     public BigVector multiply(BigFraction scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
     }
 
 
@@ -172,7 +172,7 @@ public final class BigVector {
      * @return A new vector containing the result
      */
     public BigVector multiply(BigInteger scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
     }
 
     /**
@@ -205,7 +205,7 @@ public final class BigVector {
      * @return A new vector containing the result
      */
     public BigVector divide(BigFraction scalar) {
-        return copy().divideEquals(scalar);
+        return copy().divideAndSet(scalar);
     }
 
     /**
@@ -217,7 +217,7 @@ public final class BigVector {
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
     public BigVector swapNums(int i, int j) {
-        return copy().swapNumsEquals(i, j);
+        return copy().swapNumsAndSet(i, j);
     }
 
     /**
@@ -228,7 +228,7 @@ public final class BigVector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public BigVector addEquals(BigVector a) {
+    public BigVector addAndSet(BigVector a) {
         assertSameDimension(a);
 
         for (int i = 0; i < this.getDimension(); i++) {
@@ -246,7 +246,7 @@ public final class BigVector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public BigVector subtractEquals(BigVector a) {
+    public BigVector subtractAndSet(BigVector a) {
         assertSameDimension(a);
 
         for (int i = 0; i < this.getDimension(); i++) {
@@ -286,7 +286,7 @@ public final class BigVector {
      * @param scalar The scalar to multiply this vector by
      * @return This vector
      */
-    public BigVector multiplyEquals(BigFraction scalar) {
+    public BigVector multiplyAndSet(BigFraction scalar) {
         for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).multiply(scalar));
         }
@@ -301,7 +301,7 @@ public final class BigVector {
      * @param scalar The scalar to multiply this vector by
      * @return This vector
      */
-    public BigVector multiplyEquals(BigInteger scalar) {
+    public BigVector multiplyAndSet(BigInteger scalar) {
         for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).multiply(scalar));
         }
@@ -314,7 +314,7 @@ public final class BigVector {
      * @param scalar The scalar to divide this vector by
      * @return This vector
      */
-    public BigVector divideEquals(BigFraction scalar) {
+    public BigVector divideAndSet(BigFraction scalar) {
         for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).divide(scalar));
         }
@@ -330,7 +330,7 @@ public final class BigVector {
      * @return This vector
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
-    public BigVector swapNumsEquals(int i, int j) {
+    public BigVector swapNumsAndSet(int i, int j) {
         BigFraction temp = this.get(i);
         this.set(i, this.get(j));
         this.set(j, temp);

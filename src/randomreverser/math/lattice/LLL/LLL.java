@@ -148,7 +148,7 @@ public class LLL {
             } else {
                 mu.set(k, j, BigFraction.ZERO);
             }
-            newRow.subtractEquals(baseGSO.getRow(j).multiply(mu.get(k, j)));
+            newRow.subtractAndSet(baseGSO.getRow(j).multiply(mu.get(k, j)));
         }
         baseGSO.setRow(k, newRow);
         norms.set(k,newRow.magnitudeSq());
@@ -163,8 +163,8 @@ public class LLL {
         if (r.equals(BigInteger.ZERO)) { // case |mu(i,j)|<1/2 since it is rounded towards zero that's exactly that
             return;
         }
-        basis.getRow(i).subtractEquals(basis.getRow(j).multiply(r));
-        coordinates.getRow(i).subtractEquals(coordinates.getRow(j).multiply(r));
+        basis.getRow(i).subtractAndSet(basis.getRow(j).multiply(r));
+        coordinates.getRow(i).subtractAndSet(coordinates.getRow(j).multiply(r));
         mu.set(i, j, mu.get(i, j).subtract(r));
         for (int col = 0; col <= j - 1; col++) {
             mu.set(i, col, mu.get(i, col).subtract(mu.get(j, col).multiply(r)));
@@ -175,11 +175,11 @@ public class LLL {
     Exchange bk and bk-1 as well as the transformation
      */
     private void swapg(int k,int kmax) {
-        basis.swapRowsEquals(k, k - 1);
-        coordinates.swapRowsEquals(k, k - 1);
+        basis.swapRowsAndSet(k, k - 1);
+        coordinates.swapRowsAndSet(k, k - 1);
         if (k > 1) {
             for (int j = 0; j <= k - 2; j++) {
-                mu.swapElementsEquals(k,j,k-1,j);
+                mu.swapElementsAndSet(k,j,k-1,j);
             }
         }
         BigFraction tmu = mu.get(k, k - 1);
@@ -187,14 +187,14 @@ public class LLL {
         if (tB.equals(BigFraction.ZERO)) {  // here Bk and tmu are zeroes, what if B[k-1]==0 then tmu isnt zero thus condition after
             norms.set(k,norms.get(k-1));
             norms.set(k-1,BigFraction.ZERO);
-            baseGSO.swapRowsEquals(k, k - 1);
+            baseGSO.swapRowsAndSet(k, k - 1);
             for (int i = k + 1; i <= kmax; i++) {
                 mu.set(i, k, mu.get(i, k - 1));
                 mu.set(i, k - 1, BigFraction.ZERO);
             }
         } else if (norms.get(k).equals(BigFraction.ZERO) && !tmu.equals(BigFraction.ZERO)) {
             norms.set(k - 1,tB);
-            baseGSO.getRow(k - 1).multiplyEquals(tmu);
+            baseGSO.getRow(k - 1).multiplyAndSet(tmu);
             mu.set(k, k - 1, BigFraction.ONE.divide(tmu));
             for (int i = k + 1; i <= kmax; i++) {
                 mu.set(i, k - 1, mu.get(i, k - 1).divide(tmu));

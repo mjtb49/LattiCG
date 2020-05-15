@@ -225,74 +225,74 @@ public class BigMatrixTest {
     }
 
     @Test
-    public void testAddEquals() {
+    public void testAddAndSet() {
         testMatrixFlavors2(BigMatrix.fromString("{{2, 3}, {5, 7}}"), BigMatrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            BigMatrix result = m1.addEquals(m2);
+            BigMatrix result = m1.addAndSet(m2);
             assertSame(result, m1);
             assertEquals(BigMatrix.fromString("{{13, 16}, {22, 26}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddEqualsFail() {
-        new BigMatrix(2, 2).addEquals(new BigMatrix(2, 3));
+    public void testAddAndSetFail() {
+        new BigMatrix(2, 2).addAndSet(new BigMatrix(2, 3));
     }
 
     @Test
-    public void testSubtractEquals() {
+    public void testSubtractAndSet() {
         testMatrixFlavors2(BigMatrix.fromString("{{2, 3}, {5, 7}}"), BigMatrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            BigMatrix result = m1.subtractEquals(m2);
+            BigMatrix result = m1.subtractAndSet(m2);
             assertSame(result, m1);
             assertEquals(BigMatrix.fromString("{{-9, -10}, {-12, -12}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSubtractEqualsFail() {
-        new BigMatrix(2, 2).subtractEquals(new BigMatrix(2, 3));
+    public void testSubtractAndSetFail() {
+        new BigMatrix(2, 2).subtractAndSet(new BigMatrix(2, 3));
     }
 
     @Test
-    public void testMultiplyEquals() {
+    public void testMultiplyAndSet() {
         testMatrixFlavors2(BigMatrix.fromString("{{2, 3}, {5, 7}}"), BigMatrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            BigMatrix result = m1.multiplyEquals(m2);
+            BigMatrix result = m1.multiplyAndSet(m2);
             assertSame(result, m1);
             assertEquals(BigMatrix.fromString("{{73, 83}, {174, 198}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMultiplyEqualsFail() {
-        new BigMatrix(1, 2).multiplyEquals(new BigMatrix(1, 2));
+    public void testMultiplyAndSetFail() {
+        new BigMatrix(1, 2).multiplyAndSet(new BigMatrix(1, 2));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMultiplyEqualsNonSquare() {
-        new BigMatrix(2, 2).multiplyEquals(new BigMatrix(2, 3));
+    public void testMultiplyAndSetNonSquare() {
+        new BigMatrix(2, 2).multiplyAndSet(new BigMatrix(2, 3));
     }
 
     @Test
-    public void testDivideEqualsScalar() {
+    public void testDivideAndSetScalar() {
         testMatrixFlavors(BigMatrix.fromString("{{4, 6}, {10, 14}}"), m -> {
-            BigMatrix result = m.divideEquals(new BigFraction(2));
+            BigMatrix result = m.divideAndSet(new BigFraction(2));
             assertSame(result, m);
             assertEquals(BigMatrix.fromString("{{2, 3}, {5, 7}}"), m);
         });
     }
 
     @Test
-    public void testSwapRowsEquals() {
+    public void testSwapRowsAndSet() {
         testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}, {5, 7}}"), m -> {
-            BigMatrix result = m.swapRowsEquals(0, 2);
+            BigMatrix result = m.swapRowsAndSet(0, 2);
             assertSame(result, m);
             assertEquals(BigMatrix.fromString("{{5, 7}, {3, 4}, {1, 2}}"), m);
         });
     }
 
     @Test
-    public void testSwapElementsEquals() {
+    public void testSwapElementsAndSet() {
         testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}, {5, 7}}"), m -> {
-            BigMatrix result = m.swapElementsEquals(0,1, 2,0);
+            BigMatrix result = m.swapElementsAndSet(0,1, 2,0);
             assertSame(result, m);
             assertEquals(BigMatrix.fromString("{{1, 5}, {3, 4}, {2, 7}}"), m);
         });
