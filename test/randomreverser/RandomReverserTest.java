@@ -6,10 +6,8 @@ import java.util.stream.Collectors;
 public class RandomReverserTest {
     public static void main(String[] args) {
         RandomReverser device = new RandomReverser();
-
-        for (int i = 0; i < 12; i++) {
-            device.addNextFloatCall(0.9f,1.0f);
-            //device.consumeNextFloatCalls(1);
+        for (int i = 0; i < 9; i++) {
+            device.addNextIntCall(32,0,0);
         }
 
         device.setVerbose(true);

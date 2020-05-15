@@ -88,7 +88,7 @@ public final class BigVector {
     /**
      * Sets the element at the given index in the vector
      *
-     * @param i The index
+     * @param i     The index
      * @param value The value to put in that index
      * @throws IndexOutOfBoundsException If {@code i} is out of bounds
      */
@@ -110,7 +110,7 @@ public final class BigVector {
     public BigFraction magnitudeSq() {
         BigFraction magnitude = BigFraction.ZERO;
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             magnitude = magnitude.add(this.get(i).multiply(this.get(i)));
         }
 
@@ -123,8 +123,8 @@ public final class BigVector {
      * @return Whether this vector is the zero vector
      */
     public boolean isZero() {
-        for(int i = 0; i < this.getDimension(); i++) {
-            if(this.get(i).signum() != 0) return false;
+        for (int i = 0; i < this.getDimension(); i++) {
+            if (this.get(i).signum() != 0) return false;
         }
 
         return true;
@@ -139,7 +139,7 @@ public final class BigVector {
      *                                  vector
      */
     public BigVector add(BigVector a) {
-        return copy().addEquals(a);
+        return copy().addAndSet(a);
     }
 
     /**
@@ -151,7 +151,7 @@ public final class BigVector {
      *                                  vector
      */
     public BigVector subtract(BigVector a) {
-        return copy().subtractEquals(a);
+        return copy().subtractAndSet(a);
     }
 
     /**
@@ -161,7 +161,18 @@ public final class BigVector {
      * @return A new vector containing the result
      */
     public BigVector multiply(BigFraction scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
+    }
+
+
+    /**
+     * Multiplies this vector by the given scalar, stores the result in a new vector and returns that vector
+     *
+     * @param scalar The scalar to multiply by
+     * @return A new vector containing the result
+     */
+    public BigVector multiply(BigInteger scalar) {
+        return copy().multiplyAndSet(scalar);
     }
 
     /**
@@ -194,7 +205,7 @@ public final class BigVector {
      * @return A new vector containing the result
      */
     public BigVector divide(BigFraction scalar) {
-        return copy().divideEquals(scalar);
+        return copy().divideAndSet(scalar);
     }
 
     /**
@@ -206,7 +217,7 @@ public final class BigVector {
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
     public BigVector swapNums(int i, int j) {
-        return copy().swapNumsEquals(i, j);
+        return copy().swapNumsAndSet(i, j);
     }
 
     /**
@@ -217,10 +228,10 @@ public final class BigVector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public BigVector addEquals(BigVector a) {
+    public BigVector addAndSet(BigVector a) {
         assertSameDimension(a);
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).add(a.get(i)));
         }
 
@@ -235,12 +246,36 @@ public final class BigVector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public BigVector subtractEquals(BigVector a) {
+    public BigVector subtractAndSet(BigVector a) {
         assertSameDimension(a);
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).subtract(a.get(i)));
         }
+
+        return this;
+    }
+
+    /**
+     * Place the element at endIndex before the one at startIndex and shifts all the elements in between
+     *
+     * @param startIndex The starting index to swap
+     * @param endIndex   The ending index to swap
+     * @return This matrix
+     * @throws IllegalArgumentException If {@code startIndex} is greater than {@code endIndex}
+     */
+    public BigVector shiftElements(int startIndex, int endIndex) {
+        if (endIndex < startIndex) {
+            throw new IllegalArgumentException("The ending index should be greater or equals to the starting one");
+        }
+        if (startIndex == endIndex) {
+            return this;
+        }
+        BigFraction last = this.get(endIndex);
+        for (int row = endIndex; row > startIndex; row--) {
+            this.set(row, this.get(row - 1));
+        }
+        this.set(startIndex, last);
 
         return this;
     }
@@ -251,11 +286,25 @@ public final class BigVector {
      * @param scalar The scalar to multiply this vector by
      * @return This vector
      */
-    public BigVector multiplyEquals(BigFraction scalar) {
-        for(int i = 0; i < this.getDimension(); i++) {
+    public BigVector multiplyAndSet(BigFraction scalar) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).multiply(scalar));
         }
 
+        return this;
+    }
+
+
+    /**
+     * Multiplies this vector by the given scalar, modifying this vector
+     *
+     * @param scalar The scalar to multiply this vector by
+     * @return This vector
+     */
+    public BigVector multiplyAndSet(BigInteger scalar) {
+        for (int i = 0; i < this.getDimension(); i++) {
+            this.set(i, this.get(i).multiply(scalar));
+        }
         return this;
     }
 
@@ -265,8 +314,8 @@ public final class BigVector {
      * @param scalar The scalar to divide this vector by
      * @return This vector
      */
-    public BigVector divideEquals(BigFraction scalar) {
-        for(int i = 0; i < this.getDimension(); i++) {
+    public BigVector divideAndSet(BigFraction scalar) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i).divide(scalar));
         }
 
@@ -281,7 +330,7 @@ public final class BigVector {
      * @return This vector
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
-    public BigVector swapNumsEquals(int i, int j) {
+    public BigVector swapNumsAndSet(int i, int j) {
         BigFraction temp = this.get(i);
         this.set(i, this.get(j));
         this.set(j, temp);
@@ -301,7 +350,7 @@ public final class BigVector {
 
         BigFraction dot = BigFraction.ZERO;
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             dot = dot.add(this.get(i).multiply(v.get(i)));
         }
 
@@ -388,7 +437,7 @@ public final class BigVector {
     public String toString() {
         StringBuilder sb = new StringBuilder("{");
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             sb.append(this.get(i))
                     .append(i == this.getDimension() - 1 ? "" : ", ");
         }
@@ -402,15 +451,15 @@ public final class BigVector {
      * @param raw The string in wolfram-style vector notation
      * @return The parsed vector
      * @throws IllegalArgumentException If the input is malformed
-     * @throws NumberFormatException If the input is malformed
+     * @throws NumberFormatException    If the input is malformed
      */
     public static BigVector fromString(String raw) {
-        raw = raw.replaceAll("\\s+","");
+        raw = raw.replaceAll("\\s+", "");
 
         String[] data = raw.split(",");
         BigVector v = new BigVector(data.length);
 
-        for(int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             v.set(i, BigFraction.parse(data[i]));
         }
 
@@ -421,7 +470,7 @@ public final class BigVector {
      * Create a basis vector of length 1.
      *
      * @param size dimension of the vector
-     * @param i index of the 1
+     * @param i    index of the 1
      * @return a basis vector
      */
     public static BigVector basis(int size, int i) {
@@ -431,8 +480,8 @@ public final class BigVector {
     /**
      * Create a basis vector of the specified length.
      *
-     * @param size dimension of the vector
-     * @param i index of the provided component
+     * @param size  dimension of the vector
+     * @param i     index of the provided component
      * @param scale the length of the vector
      * @return a basis vector
      */
@@ -442,4 +491,5 @@ public final class BigVector {
 
         return vector;
     }
+
 }

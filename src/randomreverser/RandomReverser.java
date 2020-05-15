@@ -1,15 +1,19 @@
 package randomreverser;
 
 import randomreverser.math.component.*;
+import randomreverser.math.lattice.LLL.Params;
+import randomreverser.math.lattice.LLL.Result;
 import randomreverser.util.LCG;
 import randomreverser.util.Mth;
-import randomreverser.math.lattice.LLL;
-import randomreverser.math.lattice.Enumerate;
+import randomreverser.math.lattice.LLL.LLL;
+import randomreverser.math.lattice.enumeration.Enumerate;
 import randomreverser.util.Rand;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.stream.LongStream;
+
+import static randomreverser.math.lattice.LLL.Params.recommendedDelta;
 
 public class RandomReverser {
 
@@ -109,11 +113,11 @@ public class RandomReverser {
            }
        }
        BigMatrix scaledLattice = unscaledLattice.multiply(scales);
-       LLL.Params params = new LLL.Params().setDelta(.99).setDebug(false);
+       Params params = new Params().setDelta(recommendedDelta).setDebug(false);
        if(verbose)
            System.out.println("Reducing:\n"+scaledLattice.toPrettyString());
       // BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
-       LLL.Result result = LLL.reduce(scaledLattice, params);
+       Result result = LLL.reduce(scaledLattice, params);
        //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
        if(verbose) {
            System.out.println("Found Reduced Scaled Basis:\n" + result.getReducedBasis().toPrettyString());

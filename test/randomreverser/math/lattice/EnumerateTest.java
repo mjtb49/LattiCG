@@ -1,12 +1,10 @@
 package randomreverser.math.lattice;
 
-import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
+import randomreverser.math.lattice.enumeration.Enumerate;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
