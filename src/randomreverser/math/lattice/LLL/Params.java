@@ -6,6 +6,7 @@ public class Params {
     protected BigFraction delta = new BigFraction(75, 100);
     protected boolean debug;
     protected int maxStage = -1;
+    public static BigFraction recommendedDelta =new BigFraction(99,100);
 
     public Params setMaxStage(int maxStage) {
         this.maxStage = maxStage;
