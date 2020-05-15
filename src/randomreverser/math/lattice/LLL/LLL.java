@@ -5,7 +5,7 @@ import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
 
 import java.math.BigInteger;
-
+// @formatter:off
 /**
  * This algorithm is as described in A course in Computational Algebraic Number Theory
  * The run down is: Given a basis b0,b2,...,bn-1 of a lattice L (can be given by its Gram matrix), we transform the vector
@@ -90,6 +90,8 @@ import java.math.BigInteger;
  *      mu(i,k-1):=t+mu(k,k-1).mu(i,k)
  *
  */
+// @formatter:on
+
 public class LLL {
     // GSO stands for Gram-Schmidt Orthogonalization
     private BigMatrix baseGSO; // this is the Gram-Schmidt (almost Orthogonal thus GSO) basis
@@ -102,7 +104,7 @@ public class LLL {
     private Params params;
     private static final BigFraction eta = BigFraction.HALF;
 
-    public LLL(BigMatrix lattice,Params params) {
+    public LLL(BigMatrix lattice, Params params) {
         this.basis = lattice.copy();
         this.nbRows = lattice.getRowCount();
         this.nbCols = lattice.getColumnCount();
@@ -110,10 +112,8 @@ public class LLL {
         this.mu = new BigMatrix(this.nbRows, this.nbRows);
         this.norms = new BigVector(this.nbRows);
         this.coordinates = BigMatrix.identityMatrix(this.nbRows);
-        this.params=params;
+        this.params = params;
     }
-
-
 
     /**
      * LLL lattice reduction implemented as described on page 95 of Henri Cohen's
@@ -124,20 +124,21 @@ public class LLL {
      * @return the reduced lattice
      */
     public static Result reduce(BigMatrix lattice, Params params) {
-        return new LLL(lattice,params).reduceLLL(lattice);
+        return new LLL(lattice, params).reduceLLL(lattice);
     }
+
     public static Result reduce(BigMatrix lattice) {
-        return new LLL(lattice,new Params()).reduceLLL(lattice);
+        return new LLL(lattice, new Params()).reduceLLL(lattice);
     }
 
     public void setParams(Params params) {
         this.params = params;
     }
 
-    private boolean testCondition(int k,BigFraction delta){
-        BigFraction muTemp=mu.get(k,k-1);
-        BigFraction factor=delta.subtract(muTemp.multiply(muTemp));
-        return norms.get(k).compareTo(norms.get(k-1).multiply(factor))<0;
+    private boolean testCondition(int k, BigFraction delta) {
+        BigFraction muTemp = mu.get(k, k - 1);
+        BigFraction factor = delta.subtract(muTemp.multiply(muTemp));
+        return norms.get(k).compareTo(norms.get(k - 1).multiply(factor)) < 0;
     }
 
     private void updateGSO(int k) {
@@ -151,8 +152,8 @@ public class LLL {
             newRow.subtractAndSet(baseGSO.getRow(j).multiply(mu.get(k, j)));
         }
         baseGSO.setRow(k, newRow);
-        norms.set(k,newRow.magnitudeSq());
-        if (norms.get(k).equals(BigFraction.ZERO)){
+        norms.set(k, newRow.magnitudeSq());
+        if (norms.get(k).equals(BigFraction.ZERO)) {
             //throw new Exception("The bi did not form a basis");
             System.err.print("The bi's did not form a basis\n");
         }
@@ -171,29 +172,26 @@ public class LLL {
         }
     }
 
-    /*
-    Exchange bk and bk-1 as well as the transformation
-     */
-    private void swapg(int k,int kmax) {
+    private void swapg(int k, int kmax) {
         basis.swapRowsAndSet(k, k - 1);
         coordinates.swapRowsAndSet(k, k - 1);
         if (k > 1) {
             for (int j = 0; j <= k - 2; j++) {
-                mu.swapElementsAndSet(k,j,k-1,j);
+                mu.swapElementsAndSet(k, j, k - 1, j);
             }
         }
         BigFraction tmu = mu.get(k, k - 1);
-        BigFraction tB = norms.get(k).add(tmu.multiply(tmu).multiply(norms.get(k-1)));
-        if (tB.equals(BigFraction.ZERO)) {  // here Bk and tmu are zeroes, what if B[k-1]==0 then tmu isnt zero thus condition after
-            norms.set(k,norms.get(k-1));
-            norms.set(k-1,BigFraction.ZERO);
+        BigFraction tB = norms.get(k).add(tmu.multiply(tmu).multiply(norms.get(k - 1)));
+        if (tB.equals(BigFraction.ZERO)) {
+            norms.set(k, norms.get(k - 1));
+            norms.set(k - 1, BigFraction.ZERO);
             baseGSO.swapRowsAndSet(k, k - 1);
             for (int i = k + 1; i <= kmax; i++) {
                 mu.set(i, k, mu.get(i, k - 1));
                 mu.set(i, k - 1, BigFraction.ZERO);
             }
         } else if (norms.get(k).equals(BigFraction.ZERO) && !tmu.equals(BigFraction.ZERO)) {
-            norms.set(k - 1,tB);
+            norms.set(k - 1, tB);
             baseGSO.getRow(k - 1).multiplyAndSet(tmu);
             mu.set(k, k - 1, BigFraction.ONE.divide(tmu));
             for (int i = k + 1; i <= kmax; i++) {
@@ -205,8 +203,8 @@ public class LLL {
             BigVector b = baseGSO.getRow(k - 1).copy();
             baseGSO.setRow(k - 1, baseGSO.getRow(k).add(b.multiply(tmu)));
             baseGSO.setRow(k, (b.multiply(norms.get(k).divide(tB)).subtract(baseGSO.getRow(k).multiply(mu.get(k, k - 1)))));
-            norms.set(k,norms.get(k).multiply(t));
-            norms.set(k - 1,tB);
+            norms.set(k, norms.get(k).multiply(t));
+            norms.set(k - 1, tB);
             for (int i = k + 1; i <= kmax; i++) {
                 t = mu.get(i, k);
                 mu.set(i, k, mu.get(i, k - 1).subtract(tmu.multiply(t)));
@@ -215,17 +213,17 @@ public class LLL {
         }
     }
 
-    private int removeZeroes(){
+    private int removeZeroes() {
         int p = 0;
         for (int i = 0; i < nbRows; i++) {
             if (basis.getRow(i).isZero()) {
                 p++;
             }
         }
-        basis= basis.submatrix(p, 0, nbRows - p, nbCols);
+        basis = basis.submatrix(p, 0, nbRows - p, nbCols);
         baseGSO = baseGSO.submatrix(p, 0, nbRows - p, nbCols);
         mu = mu.submatrix(p, p, nbRows - p, nbRows - p);
-        BigVector nonZeroQNorms=new BigVector(nbRows-p);
+        BigVector nonZeroQNorms = new BigVector(nbRows - p);
         for (int i = 0; i < nbRows - p; i++) {
             nonZeroQNorms.set(i, norms.get(i + p));
         }
@@ -233,11 +231,11 @@ public class LLL {
         return p;
     }
 
-    private Result reduceLLL(BigMatrix lattice) {
-        this.basis=lattice.copy();
+    public Result reduceLLL(BigMatrix lattice) {
+        this.basis = lattice.copy();
         int k = 1;
         int kmax = 0;
-        int n=params.maxStage==-1?nbRows:params.maxStage;
+        int n = params.maxStage == -1 ? nbRows : params.maxStage;
         baseGSO.setRow(0, basis.getRow(0));
         boolean updateGSO = true;
         norms.set(0, basis.getRow(0).magnitudeSq());
@@ -246,21 +244,20 @@ public class LLL {
                 kmax = k;
                 updateGSO(k);
             }
-
             red(k, k - 1);
-            if (testCondition(k,this.params.delta)) {
-                swapg(k,kmax); // we update the GSO in here
+            if (testCondition(k, this.params.delta)) {
+                swapg(k, kmax); // we update the GSO in here
                 k = Math.max(1, k - 1);
-                updateGSO=false;
+                updateGSO = false;
             } else {
                 for (int l = k - 2; l >= 0; l--) {
                     red(k, l);
                 }
                 k++;
-                updateGSO=true;
+                updateGSO = true;
             }
         }
-        int p=removeZeroes();
+        int p = removeZeroes();
         return new Result(p, basis, coordinates).setGramSchmidtInfo(baseGSO, mu, norms);
     }
 
