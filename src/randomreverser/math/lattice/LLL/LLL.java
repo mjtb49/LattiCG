@@ -296,8 +296,6 @@ public class LLL {
                 kmax = k;
                 incGramSchmidt();
             }
-            System.out.println(gramSchmidtBasis.toPrettyString());
-            System.out.println();
             testCondition();
         }
         int p = 0;
