@@ -3,7 +3,9 @@ package randomreverser.reversal;
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
-import randomreverser.math.lattice.LLL;
+import randomreverser.math.lattice.LLL.LLL;
+import randomreverser.math.lattice.LLL.Params;
+import randomreverser.math.lattice.LLL.Result;
 import randomreverser.reversal.calltype.CallType;
 import randomreverser.reversal.constraint.Constraint;
 import randomreverser.reversal.constraint.ConstraintType;
@@ -19,6 +21,8 @@ import randomreverser.util.Mth;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import static randomreverser.math.lattice.LLL.Params.recommendedDelta;
 
 public class ProgramBuilder {
 
@@ -123,7 +127,7 @@ public class ProgramBuilder {
             }
         }
         BigMatrix unreduced = untransformed.multiply(transform);
-        LLL.Result lllResult = LLL.reduce(unreduced, new LLL.Params().setDelta(0.99));
+        Result lllResult = LLL.reduce(unreduced, new Params().setDelta(recommendedDelta));
         //TODO: transform is diagonal so this is a little expensive
         BigMatrix reduced = lllResult.getReducedBasis().multiply(transform.inverse());
         // TODO: build this transpose into the entire matrix construction
