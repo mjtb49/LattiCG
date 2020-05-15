@@ -2,14 +2,14 @@ package randomreverser.reversal;
 
 import randomreverser.reversal.calltype.CallType;
 import randomreverser.reversal.constraint.Constraint;
+import randomreverser.reversal.instruction.Instruction;
 import randomreverser.util.LCG;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.LongStream;
 
-public class ReversalProgram {
+public class Program {
 
     private final LCG lcg;
     private final List<CallType<?>> calls;
@@ -17,7 +17,7 @@ public class ReversalProgram {
     private final Map<Constraint<?>, Integer> constraintIndices = new HashMap<>();
     private final List<Instruction> instructions;
 
-    protected ReversalProgram(LCG lcg, List<CallType<?>> calls, List<Constraint<?>> constraints, List<Instruction> instructions) {
+    protected Program(LCG lcg, List<CallType<?>> calls, List<Constraint<?>> constraints, List<Instruction> instructions) {
         this.lcg = lcg;
         this.calls = calls;
         this.constraints = constraints;
@@ -27,12 +27,12 @@ public class ReversalProgram {
         }
     }
 
-    public static ReversalProgramBuilder builder(LCG lcg) {
-        return new ReversalProgramBuilder(lcg);
+    public static ProgramBuilder builder(LCG lcg) {
+        return new ProgramBuilder(lcg);
     }
 
-    public ReversalProgramInstance start() {
-        return new ReversalProgramInstance(this);
+    public ProgramInstance start() {
+        return new ProgramInstance(this);
     }
 
     public LCG getLcg() {
@@ -54,10 +54,4 @@ public class ReversalProgram {
     public List<Instruction> getInstructions() {
         return instructions;
     }
-
-    @FunctionalInterface
-    public interface Instruction {
-        LongStream filter(ReversalProgramInstance program, LongStream seeds);
-    }
-
 }

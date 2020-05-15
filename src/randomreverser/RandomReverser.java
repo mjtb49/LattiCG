@@ -29,6 +29,8 @@ public class RandomReverser {
     private int dimensions;
     private boolean verbose;
 
+    private double failureChance;
+
     public RandomReverser() {
         verbose = false;
         dimensions = 0;
@@ -36,6 +38,7 @@ public class RandomReverser {
         maxes = new ArrayList<>();
         callIndices = new ArrayList<>();
         currentCallIndex = 0;
+        failureChance = 1.0;
     }
 
     //TODO Make this pick and choose which dimensions to use instead of using all of them
@@ -63,6 +66,9 @@ public class RandomReverser {
         }
 
         LCG r = LCG.JAVA.combine(-callIndices.get(0));
+
+        if (failureChance != 1.0)
+            System.err.printf("Ignored approximately %.2e of all seeds %n", 1 - failureChance);;
 
         return Enumerate.enumerate(lattice.transpose(), lower, upper, offset)
                 .map(vec -> vec.get(0))
@@ -97,21 +103,10 @@ public class RandomReverser {
            scales.set(i,i,new BigFraction(lcm.divide(sideLengths[i])));
        }
 
-       BigMatrix unscaledLattice = new BigMatrix(dimensions,dimensions);
-       for(int i = 0; i < dimensions; i++) {
-           for (int j = 0; j < dimensions; j++)
-               unscaledLattice.set(i,j, BigFraction.ZERO);
-           if (i == 0) {
-               unscaledLattice.set(0, i, BigFraction.ONE);
-           } else {
-               unscaledLattice.set(0, i, unscaledLattice.get(0, i-1));
-               //for (int j = 0; j < callIndices.get(i); j ++) {
-               BigInteger tempMult = MULT.modPow(BigInteger.valueOf(callIndices.get(i) - callIndices.get(0)), MOD);
-               unscaledLattice.set(0, i, new BigFraction(tempMult));
-               //}
-               unscaledLattice.set(i, i, new BigFraction(MOD));
-           }
-       }
+       BigMatrix unscaledLattice = lattice;
+       if (verbose)
+           System.out.println("Looking for points on:\n"+unscaledLattice.toPrettyString());
+
        BigMatrix scaledLattice = unscaledLattice.multiply(scales);
        Params params = new Params().setDelta(recommendedDelta).setDebug(false);
        if(verbose)
@@ -121,11 +116,12 @@ public class RandomReverser {
        //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
        if(verbose) {
            System.out.println("Found Reduced Scaled Basis:\n" + result.getReducedBasis().toPrettyString());
-           System.out.println("Found Reduced Basis:\n" + result.getTransformations().multiply(unscaledLattice).toPrettyString());
-           //System.out.println("Found Reduced Basis:\n" + result.multiply(scales.inverse()).toPrettyString());
+          // System.out.println("Found Reduced Basis:\n" + result.getTransformations().multiply(unscaledLattice).toPrettyString());
+           System.out.println("Found Reduced Basis:\n" + result.getReducedBasis().multiply(scales.inverse()).toPrettyString());
        }
        //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
-       lattice = result.getTransformations().multiply(unscaledLattice);
+      // lattice = result.getTransformations().multiply(unscaledLattice);
+        lattice = result.getReducedBasis().multiply(scales.inverse());
     }
 
     private void addMeasuredSeed(long min, long max) {
@@ -135,6 +131,79 @@ public class RandomReverser {
         dimensions += 1;
         currentCallIndex += 1;
         callIndices.add(currentCallIndex);
+        BigMatrix newLattice = new BigMatrix(dimensions+1,dimensions);
+        if (dimensions != 1) {
+            for (int row = 0; row < dimensions; row++)
+                for (int col = 0; col < dimensions - 1; col++)
+                    newLattice.set(row, col, lattice.get(row, col));
+        }
+        BigInteger tempMult = MULT.modPow(BigInteger.valueOf(callIndices.get(dimensions - 1) - callIndices.get(0)), MOD);
+        newLattice.set(0,dimensions - 1, new BigFraction(tempMult));
+        newLattice.set(dimensions, dimensions - 1, new BigFraction(MOD));
+        lattice = newLattice;
+    }
+
+    private void addModuloMeasuredSeed(long min, long max, long mod) {
+        long residue = (1L << 48) % mod; // (1L << 48) specific to Java LCG
+        if (residue != 0) {
+            failureChance *= 1 - (double) residue / (double) (1L << 48);
+            //First condition - is the seed real. This conveys more info than it seems since the normal mod vector not present.
+            mins.add(0L);
+            maxes.add((1L << 48) - residue); // in the case the seed is > (1L << 48) - residue, the do while in java's nextInt will trigger.
+            currentCallIndex += 1;
+            callIndices.add(currentCallIndex);
+            //Second condition - does the seed have a number within the bounds in its residue class.
+            mins.add(min);
+            maxes.add(max);
+            callIndices.add(currentCallIndex); //We don't increment the call index here because this is really 2 conditions on the same seed
+
+            dimensions+=2; //We added 2 conditions
+
+            BigMatrix newLattice = new BigMatrix(dimensions+1,dimensions);
+
+            if (dimensions != 2) { //Copy the old lattice over
+                for (int row = 0; row < dimensions - 1; row++)
+                    for (int col = 0; col < dimensions - 2; col++)
+                        newLattice.set(row, col, lattice.get(row, col));
+            }
+
+            BigInteger tempMult = MULT.modPow(BigInteger.valueOf(callIndices.get(dimensions - 1) - callIndices.get(0)), MOD);
+            newLattice.set(0,dimensions - 2, new BigFraction(tempMult));
+            newLattice.set(0,dimensions - 1, new BigFraction(tempMult));
+
+            //vector capturing the effect of the modulo 2^48 operation on the residue class modulo mod
+            newLattice.set(dimensions-1, dimensions - 1, new BigFraction(MOD));
+            newLattice.set(dimensions-1, dimensions - 2, new BigFraction(MOD));
+
+            //vector identifying everything in residue classes modulo mod
+            newLattice.set(dimensions, dimensions - 1, new BigFraction(mod));
+
+            //update the lattice.
+            lattice = newLattice;
+        } else {
+            // the conditions are compatible so we can get away with just one new dimension. Caution should
+            // be taken in case the this condition is the very first one in the lattice as other calls
+            // may force upper bits
+            mins.add(min);
+            maxes.add(max);
+            dimensions += 1;
+            currentCallIndex += 1;
+            callIndices.add(currentCallIndex);
+            BigMatrix newLattice = new BigMatrix(dimensions+1,dimensions);
+            if (dimensions != 1) {
+                for (int row = 0; row < dimensions; row++)
+                    for (int col = 0; col < dimensions - 1; col++)
+                        newLattice.set(row, col, lattice.get(row, col));
+            } else if (!MOD.equals(BigInteger.valueOf(mod))) {
+                //TODO find a way to recover the seed in the case we only have constraints of this type
+                System.err.println("First call not a bound on a seed. Junk output may be produced.");
+            }
+            //we might be able to use the provided modulus here instead
+            BigInteger tempMult = MULT.modPow(BigInteger.valueOf(callIndices.get(dimensions - 1) - callIndices.get(0)), MOD);
+            newLattice.set(0,dimensions - 1, new BigFraction(tempMult));
+            newLattice.set(dimensions, dimensions - 1, new BigFraction(mod)); //Note this is not MOD.
+            lattice = newLattice;
+        }
     }
 
     private void addUnmeasuredSeeds(int numSeeds) {
@@ -148,9 +217,7 @@ public class RandomReverser {
             addMeasuredSeed(min * (1L << (48 - log)), (max+1) * (1L << (48 - log)) - 1);
         }
         else {
-            System.err.println("Reversal now has small chance of failure");
-            //TODO
-            consumeNextIntCalls(1);
+            addModuloMeasuredSeed(min*(1L << 17), (max*(1L << 17)) | 0x1ffff, n*(1L << 17));
         }
     }
 
@@ -158,8 +225,11 @@ public class RandomReverser {
         addMeasuredSeed(min * (1L << (16)), (max+1) * (1L << (16)) - 1);
     }
 
-    public void consumeNextIntCalls(int numCalls) {
-        //TODO add handling for the potential of skipping a call in here
+    public void consumeNextIntCalls(int numCalls, int bound) {
+        long residue = (1L << 48) % ((1L << 17) * bound);
+        if (residue != 0) {
+                failureChance *= Math.pow(1 - (double) residue / (double) (1L << 48), numCalls);
+        }
         addUnmeasuredSeeds(numCalls);
     }
 
@@ -311,6 +381,17 @@ public class RandomReverser {
 
     public void consumeNextDoubleCalls(int numCalls) {
         addUnmeasuredSeeds(2*numCalls);
+    }
+
+    /**
+     * Add a constraint on the seed modulo something special. There is no handling for specific java Random calls
+     * so to use this method requires investigating the implementation of the method one has periodic information on.
+     * @param min low end, inclusive, of the valid range of seeds
+     * @param max high end, inclusive, of the valid range of seeds
+     * @param newMod the alternate modulus to use.
+     */
+    public void addModConstraint(long min, long max, long newMod) {
+        addModuloMeasuredSeed(min,max,newMod);
     }
 
     public void setVerbose(boolean verbose) {

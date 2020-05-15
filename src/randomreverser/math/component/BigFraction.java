@@ -1,5 +1,10 @@
 package randomreverser.math.component;
 
+import randomreverser.reversal.asm.ParseException;
+import randomreverser.reversal.asm.StringParser;
+import randomreverser.reversal.asm.Token;
+import randomreverser.util.Pair;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -79,18 +84,37 @@ public final class BigFraction implements Comparable<BigFraction> {
      *
      * @param str The string to parse
      * @return A fraction represented by the input string
-     * @throws NumberFormatException If the input string has invalid format, or the denominator is zero
+     * @throws ParseException If the input string has invalid format, or the denominator is zero
      */
     public static BigFraction parse(String str) {
-        String[] parts = str.split("\\s*/\\s*", 2);
-        try {
-            if (parts.length == 1) {
-                return new BigFraction(new BigInteger(parts[0]));
-            } else {
-                return new BigFraction(new BigInteger(parts[0]), new BigInteger(parts[1]));
+        StringParser parser = StringParser.of(str);
+        BigFraction fraction = parse(parser);
+        parser.expectEof();
+        return fraction;
+    }
+
+    /**
+     * Parses a fraction from a string parser
+     *
+     * @param parser The parser to parse from
+     * @return A fraction from the input
+     * @throws ParseException If the input has invalid format, or the denominator is zero
+     */
+    public static BigFraction parse(StringParser parser) {
+        Pair<BigInteger, Token> ntorPair = parser.consumeInteger();
+        Token ntorToken = ntorPair.getSecond();
+        BigInteger ntor = ntorPair.getFirst();
+        if (parser.peek().filter(token -> token.getText().equals("/")).isPresent()) {
+            parser.expect("/");
+            Pair<BigInteger, Token> dtorPair = parser.consumeInteger();
+            Token dtorToken = dtorPair.getSecond();
+            BigInteger dtor = dtorPair.getFirst();
+            if (dtor.signum() == 0) {
+                throw new ParseException("Invalid fraction '" + ntorToken.getText() + "/" + dtorToken.getText() + "'", ntorToken);
             }
-        } catch (NumberFormatException | ArithmeticException e) {
-            throw new NumberFormatException("For input string: " + str);
+            return new BigFraction(ntor, dtor);
+        } else {
+            return new BigFraction(ntor);
         }
     }
 

@@ -9,18 +9,18 @@ import java.util.stream.LongStream;
 
 import static org.junit.Assert.*;
 
-public class DynamicReversalProgramTest {
+public class DynamicProgramTest {
 
     @Test
     public void testNoCalls() {
         // mainly just to check it doesn't crash on this case
-        assertTrue(DynamicReversalProgram.create(LCG.JAVA).reverse().findAny().isPresent());
+        assertTrue(DynamicProgram.create(LCG.JAVA).reverse().findAny().isPresent());
     }
 
     @Test
     public void testInitialSkip() {
         assertStreamEquals(
-                DynamicReversalProgram.create(LCG.JAVA)
+                DynamicProgram.create(LCG.JAVA)
                         .skip(1)
                         .add(JavaCalls.nextFloat(), 0f)
                         .add(JavaCalls.nextFloat(), 0f)
@@ -34,7 +34,7 @@ public class DynamicReversalProgramTest {
     @Test
     public void testNextFloatsZero() {
         assertStreamEquals(
-                DynamicReversalProgram.create(LCG.JAVA)
+                DynamicProgram.create(LCG.JAVA)
                         .add(JavaCalls.nextFloat(), 0f)
                         .add(JavaCalls.nextFloat(), 0f)
                         .reverse(),
@@ -47,7 +47,7 @@ public class DynamicReversalProgramTest {
     @Test
     public void testNextFloatsGap() {
         assertStreamEquals(
-                DynamicReversalProgram.create(LCG.JAVA)
+                DynamicProgram.create(LCG.JAVA)
                         .add(JavaCalls.nextFloat(), 0f)
                         .skip(1)
                         .add(JavaCalls.nextFloat(), 0f)
@@ -59,7 +59,7 @@ public class DynamicReversalProgramTest {
     @Test
     public void test16NextInt8() {
         assertStreamEquals(
-                DynamicReversalProgram.create(LCG.JAVA)
+                DynamicProgram.create(LCG.JAVA)
                         .add(JavaCalls.nextInt(8), 0)
                         .add(JavaCalls.nextInt(8), 0)
                         .add(JavaCalls.nextInt(8), 0)
@@ -84,7 +84,7 @@ public class DynamicReversalProgramTest {
     @Test
     public void testNextInt8UpperBound() {
         assertStreamEquals(
-                DynamicReversalProgram.create(LCG.JAVA)
+                DynamicProgram.create(LCG.JAVA)
                         .add(JavaCalls.nextInt(8), 7)
                         .add(JavaCalls.nextInt(8), 7)
                         .add(JavaCalls.nextInt(8), 7)

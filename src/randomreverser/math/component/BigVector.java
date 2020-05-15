@@ -1,7 +1,12 @@
 package randomreverser.math.component;
 
+import randomreverser.reversal.asm.ParseException;
+import randomreverser.reversal.asm.StringParser;
+import randomreverser.reversal.asm.Token;
+import java.util.ArrayList;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A vector with {@link BigFraction} elements
@@ -451,19 +456,22 @@ public final class BigVector {
      * @param raw The string in wolfram-style vector notation
      * @return The parsed vector
      * @throws IllegalArgumentException If the input is malformed
-     * @throws NumberFormatException    If the input is malformed
+     * @throws NumberFormatException If the input is malformed
      */
     public static BigVector fromString(String raw) {
-        raw = raw.replaceAll("\\s+", "");
+        raw = raw.replaceAll("\\s+","");
 
         String[] data = raw.split(",");
         BigVector v = new BigVector(data.length);
 
-        for (int i = 0; i < data.length; i++) {
+        for(int i = 0; i < data.length; i++) {
             v.set(i, BigFraction.parse(data[i]));
         }
-
-        return v;
+        parser.expect("}");
+        if (numbers.isEmpty()) {
+            throw new ParseException("Empty vector", firstToken);
+        }
+        return new BigVector(numbers.toArray(new BigFraction[0]));
     }
 
     /**

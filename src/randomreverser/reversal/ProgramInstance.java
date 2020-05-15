@@ -2,24 +2,29 @@ package randomreverser.reversal;
 
 import randomreverser.reversal.calltype.CallType;
 import randomreverser.reversal.constraint.Constraint;
+import randomreverser.reversal.instruction.Instruction;
 import randomreverser.reversal.observation.Observation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
-public class ReversalProgramInstance {
+public class ProgramInstance {
 
-    private final ReversalProgram program;
+    private final Program program;
     private final List<Observation> observations = new ArrayList<>();
     private int callIndex = 0;
 
-    protected ReversalProgramInstance(ReversalProgram program) {
+    protected ProgramInstance(Program program) {
         this.program = program;
     }
 
+    public Program getProgram() {
+        return program;
+    }
+
     @SuppressWarnings("unchecked")
-    public <T> ReversalProgramInstance add(Object value) {
+    public <T> ProgramInstance add(Object value) {
         CallType<T> callType = (CallType<T>) program.getCalls().get(callIndex++);
         T thing = callType.getType().cast(value);
         callType.addObservations(thing, observations);
@@ -34,7 +39,7 @@ public class ReversalProgramInstance {
 
     public LongStream reverse() {
         LongStream stream = null;
-        for (ReversalProgram.Instruction instruction : program.getInstructions()) {
+        for (Instruction instruction : program.getInstructions()) {
             stream = instruction.filter(this, stream);
         }
         return stream;

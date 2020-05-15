@@ -12,16 +12,31 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class RangeCallType<T extends Comparable<T>> extends CallType<T> {
-    private final LCG lcg;
-    private final T minPossible; // inclusive
-    private final T maxPossible; // inclusive
-    private final long seedsPerValue;
+    private LCG lcg;
+    private T minPossible; // inclusive
+    private T maxPossible; // inclusive
+    private long seedsPerValue;
+
+    public RangeCallType() {
+    }
 
     public RangeCallType(Class<T> type, LCG lcg, long impliedSteps, T minPossible, T maxPossible, long seedsPerValue) {
         super(type, impliedSteps);
         this.lcg = lcg;
         this.minPossible = minPossible;
         this.maxPossible = maxPossible;
+        this.seedsPerValue = seedsPerValue;
+    }
+
+    protected void setMinPossible(T minPossible) {
+        this.minPossible = minPossible;
+    }
+
+    protected void setMaxPossible(T maxPossible) {
+        this.maxPossible = maxPossible;
+    }
+
+    protected void setSeedsPerValue(long seedsPerValue) {
         this.seedsPerValue = seedsPerValue;
     }
 

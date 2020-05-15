@@ -1,6 +1,7 @@
 package randomreverser.reversal.constraint;
 
-import randomreverser.reversal.ReversalProgramInstance;
+import randomreverser.reversal.ProgramInstance;
+import randomreverser.reversal.asm.StringParser;
 import randomreverser.reversal.observation.Observation;
 
 public abstract class Constraint<O extends Observation> {
@@ -26,5 +27,17 @@ public abstract class Constraint<O extends Observation> {
         this.steps = steps;
     }
 
-    public abstract boolean check(ReversalProgramInstance program, long seed, O observation);
+    public abstract boolean check(ProgramInstance program, long seed, O observation);
+
+    public abstract void readOperands(StringParser parser);
+
+    public abstract void writeOperands(StringBuilder output, boolean verbose);
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type.getName()).append(" ");
+        writeOperands(sb, true);
+        return sb.toString();
+    }
 }
