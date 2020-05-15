@@ -40,10 +40,10 @@ public class LUDecomposition {
 			}
 
 			p.set(i, pivot);
-			inv.swapRowsEquals(i, pivot);
+			inv.swapRowsAndSet(i, pivot);
 
 			if(pivot != i) {
-				m.swapRowsEquals(i, pivot);
+				m.swapRowsAndSet(i, pivot);
 				swaps++;
 			}
 
@@ -119,10 +119,10 @@ public class LUDecomposition {
 			}
 
 			p.set(i, new BigFraction(pivot));
-			inv.swapRowsEquals(i, pivot);
+			inv.swapRowsAndSet(i, pivot);
 
 			if(pivot != i) {
-				m.swapRowsEquals(i, pivot);
+				m.swapRowsAndSet(i, pivot);
 				swaps++;
 			}
 
@@ -194,7 +194,7 @@ public class LUDecomposition {
 			this.P = Matrix.identityMatrix(this.size);
 
 			for(int i = 0; i < this.size; i++) {
-				this.P.swapRowsEquals(i, (int)p.get(i));
+				this.P.swapRowsAndSet(i, (int)p.get(i));
 			}
 
 			this.det = det;
@@ -272,7 +272,7 @@ public class LUDecomposition {
 			this.P = BigMatrix.identityMatrix(this.size);
 
 			for(int i = 0; i < this.size; i++) {
-				this.P.swapRowsEquals(i, p.get(i).getNumerator().intValue());
+				this.P.swapRowsAndSet(i, p.get(i).getNumerator().intValue());
 			}
 
 			this.det = det;

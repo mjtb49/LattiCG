@@ -3,7 +3,7 @@ package randomreverser.reversal.instruction;
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.component.BigVector;
-import randomreverser.math.lattice.Enumerate;
+import randomreverser.math.lattice.enumeration.Enumerate;
 import randomreverser.math.optimize.Optimize;
 import randomreverser.reversal.ProgramInstance;
 import randomreverser.reversal.asm.ParseException;

@@ -148,7 +148,7 @@ public final class Vector {
      *                                  vector
      */
     public Vector add(Vector a) {
-        return copy().addEquals(a);
+        return copy().addAndSet(a);
     }
 
     /**
@@ -160,7 +160,7 @@ public final class Vector {
      *                                  vector
      */
     public Vector subtract(Vector a) {
-        return copy().subtractEquals(a);
+        return copy().subtractAndSet(a);
     }
 
     /**
@@ -170,7 +170,7 @@ public final class Vector {
      * @return A new vector containing the result
      */
     public Vector multiply(double scalar) {
-        return copy().multiplyEquals(scalar);
+        return copy().multiplyAndSet(scalar);
     }
 
     /**
@@ -203,7 +203,7 @@ public final class Vector {
      * @return A new vector containing the result
      */
     public Vector divide(double scalar) {
-        return copy().divideEquals(scalar);
+        return copy().divideAndSet(scalar);
     }
 
     /**
@@ -215,7 +215,7 @@ public final class Vector {
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
     public Vector swapNums(int i, int j) {
-        return copy().swapNumsEquals(i, j);
+        return copy().swapNumsAndSet(i, j);
     }
 
     /**
@@ -226,7 +226,7 @@ public final class Vector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public Vector addEquals(Vector a) {
+    public Vector addAndSet(Vector a) {
         assertSameDimension(a);
 
         for(int i = 0; i < this.getDimension(); i++) {
@@ -244,7 +244,7 @@ public final class Vector {
      * @throws IllegalArgumentException If the dimension of the given vector is not the same as the dimension of this
      *                                  vector
      */
-    public Vector subtractEquals(Vector a) {
+    public Vector subtractAndSet(Vector a) {
         assertSameDimension(a);
 
         for(int i = 0; i < this.getDimension(); i++) {
@@ -260,7 +260,7 @@ public final class Vector {
      * @param scalar The scalar to multiply this vector by
      * @return This vector
      */
-    public Vector multiplyEquals(double scalar) {
+    public Vector multiplyAndSet(double scalar) {
         for(int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) * scalar);
         }
@@ -274,7 +274,7 @@ public final class Vector {
      * @param scalar The scalar to divide this vector by
      * @return This vector
      */
-    public Vector divideEquals(double scalar) {
+    public Vector divideAndSet(double scalar) {
         for(int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) / scalar);
         }
@@ -290,7 +290,7 @@ public final class Vector {
      * @return This vector
      * @throws IndexOutOfBoundsException If {@code i} or {@code j} is out of bounds
      */
-    public Vector swapNumsEquals(int i, int j) {
+    public Vector swapNumsAndSet(int i, int j) {
         double temp = this.get(i);
         this.set(i, this.get(j));
         this.set(j, temp);

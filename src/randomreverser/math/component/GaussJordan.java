@@ -43,7 +43,7 @@ public class GaussJordan {
 
                 final BigFraction finalPivot = matrix.get(finalPivotRow, finalPivotColumn);
 
-                forAll(matrix, others, m -> m.getRow(finalPivotRow).divideEquals(finalPivot));
+                forAll(matrix, others, m -> m.getRow(finalPivotRow).divideAndSet(finalPivot));
 
                 for (int i = 0; i < matrix.getRowCount(); ++i) {
                     if (i == finalPivotRow) {
@@ -53,10 +53,10 @@ public class GaussJordan {
                     final int finalI = i;
                     final BigFraction finalScale = matrix.get(i, finalPivotColumn);
 
-                    forAll(matrix, others, m -> m.getRow(finalI).subtractEquals(m.getRow(finalPivotRow).multiply(finalScale)));
+                    forAll(matrix, others, m -> m.getRow(finalI).subtractAndSet(m.getRow(finalPivotRow).multiply(finalScale)));
                 }
 
-                forAll(matrix, others, m -> m.swapRowsEquals(finalRow, finalPivotRow));
+                forAll(matrix, others, m -> m.swapRowsAndSet(finalRow, finalPivotRow));
                 pivotRows[finalPivotColumn] = finalRow;
                 ++row;
             }

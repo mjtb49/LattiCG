@@ -233,74 +233,74 @@ public class MatrixTest {
     }
 
     @Test
-    public void testAddEquals() {
+    public void testAddAndSet() {
         testMatrixFlavors2(Matrix.fromString("{{2, 3}, {5, 7}}"), Matrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            Matrix result = m1.addEquals(m2);
+            Matrix result = m1.addAndSet(m2);
             assertSame(result, m1);
             assertEquals(Matrix.fromString("{{13, 16}, {22, 26}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddEqualsFail() {
-        new Matrix(2, 2).addEquals(new Matrix(2, 3));
+    public void testAddAndSetFail() {
+        new Matrix(2, 2).addAndSet(new Matrix(2, 3));
     }
 
     @Test
-    public void testSubtractEquals() {
+    public void testSubtractAndSet() {
         testMatrixFlavors2(Matrix.fromString("{{2, 3}, {5, 7}}"), Matrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            Matrix result = m1.subtractEquals(m2);
+            Matrix result = m1.subtractAndSet(m2);
             assertSame(result, m1);
             assertEquals(Matrix.fromString("{{-9, -10}, {-12, -12}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSubtractEqualsFail() {
-        new Matrix(2, 2).subtractEquals(new Matrix(2, 3));
+    public void testSubtractAndSetFail() {
+        new Matrix(2, 2).subtractAndSet(new Matrix(2, 3));
     }
 
     @Test
-    public void testMultiplyEqualsScalar() {
+    public void testMultiplyAndSetScalar() {
         testMatrixFlavors(Matrix.fromString("{{2, 3}, {5, 7}}"), m -> {
-            Matrix result = m.multiplyEquals(2);
+            Matrix result = m.multiplyAndSet(2);
             assertSame(result, m);
             assertEquals(Matrix.fromString("{{4, 6}, {10, 14}}"), m);
         });
     }
 
     @Test
-    public void testMultiplyEqualsMatrix() {
+    public void testMultiplyAndSetMatrix() {
         testMatrixFlavors2(Matrix.fromString("{{2, 3}, {5, 7}}"), Matrix.fromString("{{11, 13}, {17, 19}}"), (m1, m2) -> {
-            Matrix result = m1.multiplyEquals(m2);
+            Matrix result = m1.multiplyAndSet(m2);
             assertSame(result, m1);
             assertEquals(Matrix.fromString("{{73, 83}, {174, 198}}"), m1);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMultiplyEqualsMatrixFail() {
-        new Matrix(1, 2).multiplyEquals(new Matrix(1, 2));
+    public void testMultiplyAndSetMatrixFail() {
+        new Matrix(1, 2).multiplyAndSet(new Matrix(1, 2));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMultiplyEqualsNonSquare() {
-        new Matrix(2, 2).multiplyEquals(new Matrix(2, 3));
+    public void testMultiplyAndSetNonSquare() {
+        new Matrix(2, 2).multiplyAndSet(new Matrix(2, 3));
     }
 
     @Test
-    public void testDivideEqualsScalar() {
+    public void testDivideAndSetScalar() {
         testMatrixFlavors(Matrix.fromString("{{4, 6}, {10, 14}}"), m -> {
-            Matrix result = m.divideEquals(2);
+            Matrix result = m.divideAndSet(2);
             assertSame(result, m);
             assertEquals(Matrix.fromString("{{2, 3}, {5, 7}}"), m);
         });
     }
 
     @Test
-    public void testSwapRowsEquals() {
+    public void testSwapRowsAndSet() {
         testMatrixFlavors(Matrix.fromString("{{1, 2}, {3, 4}, {5, 7}}"), m -> {
-            Matrix result = m.swapRowsEquals(0, 2);
+            Matrix result = m.swapRowsAndSet(0, 2);
             assertSame(result, m);
             assertEquals(Matrix.fromString("{{5, 7}, {3, 4}, {1, 2}}"), m);
         });

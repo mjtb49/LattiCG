@@ -21,13 +21,13 @@ public class BigAugmentedMatrix {
 	}
 
 	public void divideRow(int y, BigFraction scalar) {
-		this.base.getRow(y).divideEquals(scalar);
-		this.extra.getRow(y).divideEquals(scalar);
+		this.base.getRow(y).divideAndSet(scalar);
+		this.extra.getRow(y).divideAndSet(scalar);
 	}
 
 	public void subtractScaledRow(int y1, BigFraction scalar, int y2) {
-		this.base.getRow(y1).subtractEquals(this.base.getRow(y2).multiply(scalar));
-		this.extra.getRow(y1).subtractEquals(this.extra.getRow(y2).multiply(scalar));
+		this.base.getRow(y1).subtractAndSet(this.base.getRow(y2).multiply(scalar));
+		this.extra.getRow(y1).subtractAndSet(this.extra.getRow(y2).multiply(scalar));
 	}
 
 	@Override
