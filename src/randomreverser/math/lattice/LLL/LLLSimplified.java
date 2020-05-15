@@ -264,13 +264,4 @@ public class LLLSimplified {
         return new Result(p, basis, coordinates).setGramSchmidtInfo(baseGSO, mu, norms);
     }
 
-
-
-
-
-
-
-
-
-
 }
