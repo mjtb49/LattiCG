@@ -12,8 +12,8 @@ public class LLLTest {
 
     @Test
     public void testReduce2ConsecutiveJavaCalls() {
-        BigMatrix basis = BigMatrix.fromString("{{1, 2}, {48, 4}}");
-        BigMatrix expected = BigMatrix.fromString("{{1, 2}, {37, -18}}");
+        BigMatrix basis = BigMatrix.fromString("{{1, 25214903917}, {0, 281474976710656}}");
+        BigMatrix expected = BigMatrix.fromString("{{7847617, 4824621}, {-18218081, 24667315}}");
         assertEquals(expected, LLL.reduce(basis, new Params()).getReducedBasis());
     }
 
