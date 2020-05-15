@@ -1,7 +1,9 @@
 import randomreverser.math.component.BigFraction;
 import randomreverser.math.component.BigMatrix;
 import randomreverser.math.lattice.LLL.LLL;
+import randomreverser.math.lattice.LLL.LLLSimplified;
 import randomreverser.math.lattice.LLL.LLLbis;
+import randomreverser.math.lattice.LLL.Params;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,10 +40,32 @@ public class Test {
                         "{14276340518069,11302502565649,-760697010115,6141148139513,-8322341108987,-2402663381215,6840633257741,3747223598729,-6011287794091,3767907907633,-10053902617891,6917101368857}}");
 
         assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
-        System.out.println("Time: " + (System.currentTimeMillis() - time));
+        System.out.println("Time LLL matthew: " + (System.currentTimeMillis() - time));
         time=System.currentTimeMillis();
-        assertEquals(expected, LLLbis.reduce(basis, new LLLbis.Params().setDelta(new BigFraction(99,100))).getReducedBasis());
-        System.out.println("Time: " + (System.currentTimeMillis() - time));
+        assertEquals(expected, LLLSimplified.reduce(basis, new Params().setDelta(new BigFraction(99,100))).getReducedBasis());
+        System.out.println("Time LLL simplified: " + (System.currentTimeMillis() - time));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
+        System.out.println("Time LLL matthew: " + (System.currentTimeMillis() - time));
+        time=System.currentTimeMillis();
+        assertEquals(expected, LLLSimplified.reduce(basis, new Params().setDelta(new BigFraction(99,100))).getReducedBasis());
+        System.out.println("Time LLL simplified: " + (System.currentTimeMillis() - time));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
+        System.out.println("Time LLL matthew: " + (System.currentTimeMillis() - time));
+        time=System.currentTimeMillis();
+        assertEquals(expected, LLLSimplified.reduce(basis, new Params().setDelta(new BigFraction(99,100))).getReducedBasis());
+        System.out.println("Time LLL simplified: " + (System.currentTimeMillis() - time));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
+        System.out.println("Time LLL matthew: " + (System.currentTimeMillis() - time));
+        time=System.currentTimeMillis();
+        assertEquals(expected, LLLSimplified.reduce(basis, new Params().setDelta(new BigFraction(99,100))).getReducedBasis());
+        System.out.println("Time LLL simplified: " + (System.currentTimeMillis() - time));
+        assertEquals(expected, LLL.reduce(basis, new LLL.Params().setDelta(0.99)).getReducedBasis());
+        System.out.println("Time LLL matthew: " + (System.currentTimeMillis() - time));
+        time=System.currentTimeMillis();
+        assertEquals(expected, LLLSimplified.reduce(basis, new Params().setDelta(new BigFraction(99,100))).getReducedBasis());
+        System.out.println("Time LLL simplified: " + (System.currentTimeMillis() - time));
+
+
     }
 
 }
