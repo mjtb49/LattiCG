@@ -154,7 +154,7 @@ public class LLLSimplified {
         norms.set(k,newRow.magnitudeSq());
         if (norms.get(k).equals(BigFraction.ZERO)){
             //throw new Exception("The bi did not form a basis");
-            System.err.print("The bi's did not form a basis");
+            System.err.print("The bi's did not form a basis\n");
         }
     }
 
@@ -205,7 +205,7 @@ public class LLLSimplified {
             BigVector b = baseGSO.getRow(k - 1).copy();
             baseGSO.setRow(k - 1, baseGSO.getRow(k).add(b.multiply(tmu)));
             baseGSO.setRow(k, (b.multiply(norms.get(k).divide(tB)).subtract(baseGSO.getRow(k).multiply(mu.get(k, k - 1)))));
-            norms.multiplyEquals(t);
+            norms.set(k,norms.get(k).multiply(t));
             norms.set(k - 1,tB);
             for (int i = k + 1; i <= kmax; i++) {
                 t = mu.get(i, k);
@@ -248,8 +248,6 @@ public class LLLSimplified {
             }
 
             red(k, k - 1);
-            System.out.println(baseGSO.toPrettyString());
-            System.out.println();
             if (testCondition(k,this.params.delta)) {
                 swapg(k,kmax); // we update the GSO in here
                 k = Math.max(1, k - 1);
