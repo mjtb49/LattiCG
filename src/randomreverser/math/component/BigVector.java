@@ -452,6 +452,16 @@ public final class BigVector {
         return sb.append("}").toString();
     }
 
+    public String toApproximatetring() {
+        StringBuilder sb = new StringBuilder("[");
+
+        for (int i = 0; i < this.getDimension(); i++) {
+            sb.append(this.get(i).toDouble()).append(i == this.getDimension() - 1 ? "" : " ");
+        }
+
+        return sb.append("]").toString();
+    }
+
     /**
      * Parses a string in wolfram-style vector notation
      *

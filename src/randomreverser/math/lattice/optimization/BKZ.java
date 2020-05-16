@@ -91,6 +91,10 @@ public class BKZ {
         this.basis = lattice.copy();
         Result result = LLL.reduce(basis, params);
         updateWithResult(result);
+
+        System.out.println(basis.toPrettyString());
+        System.out.println(norms.toApproximatetring());
+        System.out.println();
         int colCount = result.getReducedBasis().getColumnCount();
         while (z < nbRows - 1) {
             j = (j % (nbRows - 1)) + 1;
@@ -98,6 +102,7 @@ public class BKZ {
             h = Math.min(k + 1, nbRows);
             BigVector v = enumerateBKZ(j - 1, k - 1, nbRows, norms, mu);
             if (!passvec(v, j - 1, nbRows)) {
+                System.out.println("BRANCH 1");
                 z = 0;
                 BigVector newVec = new BigVector(colCount);
                 for (int l = 0; l < colCount; l++) {
@@ -119,6 +124,7 @@ public class BKZ {
                 }
                 result = LLL.reduce(newBlock, params);
             } else {
+                System.out.println("BRANCH 2");
                 z = z + 1;
                 result = LLL.reduce(basis, params);
             }
@@ -128,7 +134,7 @@ public class BKZ {
     }
 
     private void updateWithResult(Result result) {
-        System.out.println(result.getReducedBasis().getRowCount()+ " old: "+nbRows);
+        //System.out.println(result.getReducedBasis().getRowCount()+ " old: "+nbRows);
         this.nbRows = result.getReducedBasis().getRowCount();
         this.nbCols = result.getReducedBasis().getColumnCount();
         this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
