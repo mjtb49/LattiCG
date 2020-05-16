@@ -8,6 +8,7 @@ import randomreverser.math.lattice.LLL.Params;
 import randomreverser.math.lattice.LLL.Result;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class BKZ {
     private Params params;
@@ -21,6 +22,13 @@ public class BKZ {
     private final BigFraction redFudgeFactor;
     private BigVector BKZConstant = null;
     private BigVector BKZTresh = null;
+    BigFraction[] cT;
+    BigFraction[] y;
+    BigInteger[] v;
+    BigInteger[] delta;
+    BigInteger[] d;
+    BigVector u;
+    BigInteger[] uT;
 
     public BKZ(BigMatrix lattice, Params params) {
         this.params = params;
@@ -31,7 +39,14 @@ public class BKZ {
         this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
         this.mu = new BigMatrix(this.nbRows, this.nbRows);
         this.norms = new BigVector(this.nbRows);
-        this.redFudgeFactor = calulateFudge(128); // change here the precision you want
+        this.redFudgeFactor = calulateFudge(51); // change here the precision you want
+        cT = new BigFraction[nbRows + 2];
+        v = new BigInteger[nbRows + 2];
+        y = new BigFraction[nbRows + 2];
+        u = new BigVector(nbRows + 2);
+        uT = new BigInteger[nbRows + 2];
+        delta = new BigInteger[nbRows + 2];
+        d = new BigInteger[nbRows + 2];
     }
 
     /**
@@ -91,6 +106,8 @@ public class BKZ {
         this.basis = lattice.copy();
         Result result = LLL.reduce(basis, params);
         updateWithResult(result);
+        System.out.println(basis.toPrettyString());
+        System.out.println(norms.toApproximatetring());
         if (params.pruneFactor > 0) {
             BKZConstant = calculateBKZConstant(beta, params.pruneFactor); // this is cost intensive
         }
@@ -106,15 +123,19 @@ public class BKZ {
             if (params.pruneFactor > 0) {
                 BKZTresh = computeBKZThresh(j, k - j + 1);
             }
-            Object[] objects = enumerateBKZ(j, k-1, nbRows, norms, mu);
+            Object[] objects = enumerateBKZ(j, k, nbRows, norms, mu);
             BigVector uvec = (BigVector) objects[1];
             BigFraction cbar = (BigFraction) objects[0];
             h = Math.min(k + 1, nbRows);
             // (delta-8*red_fudge) * norms[jj] > cbar
-            if ((params.delta.subtract(redFudgeFactor.multiply(8))).multiply(norms.get(j)).compareTo(cbar) > 0) {
-                clean = false;
+            System.out.println(String.format("h %d delta %f redfuge %s normj %f cbar %f", h,
+                    params.delta.toDouble(), redFudgeFactor.toString(), norms.get(j - 1).toDouble(), cbar.toDouble()));
 
-                /*
+            System.out.println(basis.toPrettyString());
+            if ((params.delta.subtract(redFudgeFactor.multiply(8))).multiply(norms.get(j - 1)).compareTo(cbar) > 0) {
+                clean = false;
+                System.out.println("BRANCH 1");
+                System.out.println(norms.toApproximatetring());
                 int s = 0;
                 for (int i = j + 1; i <= k; i++) {
                     if (!uvec.get(i).equals(BigFraction.ZERO)) {
@@ -124,27 +145,55 @@ public class BKZ {
                 if (s == 0) {
                     System.err.println("Huge error, impossible case for s");
                 }
+                System.out.println("s= "+s);
                 if (s > 0) {
                     //we treat the case that the new vector is b[s] (j < s <= k)
-                    for (int i = s; i > k; i--) {
-                        // swap i, i-1
-                        basis.swapRowsAndSet(i - 1, i);
-                        baseGSO.swapRowsAndSet(i - 1, i);
-                        norms.swapNumsAndSet(i - 1, i);
-                    }
+                    basis.shiftRows(j-1,s-1);
+                    baseGSO.shiftRows(j-1,s-1);
+                    norms.shiftElements(j-1,s-1);
                     result = LLL.reduce(basis, params);
+                    System.out.println();
                     updateWithResult(result);
-                } else {*/
-                    //general case
-                    z = 0;
-                    BigVector newVec = new BigVector(nbCols);
-                    for (int l = 0; l < nbCols; l++) {
-                        for (int i = j - 1; i <= i - 1; i++) {
-                            //basis[dim][l] += v[i] * basis[i][l];
-                            newVec.set(l, newVec.get(l).add(uvec.get(i).multiply(basis.get(i, l))));
+                    System.out.println(basis.toPrettyString());
+                } else {
+                    //general case (error here)
+                    /*
+
+                        for (i = jj; i <= kk; i++) {
+                            if (uvec[i] == 0) continue;
+                            conv(MU, uvec[i]);
+                            RowTransform2(B(m + 1), B(i), MU);
                         }
+                        for (i = m + 1; i >= jj + 1; i--) {
+                            // swap i, i-1
+                            swap(B(i - 1), B(i));
+                            tp = B1[i - 1];
+                            B1[i - 1] = B1[i];
+                            B1[i] = tp;
+                            t1 = b[i - 1];
+                            b[i - 1] = b[i];
+                            b[i] = t1;
+                        }
+                        new_m = ll_LLL_QP(B, U, delta, 0, 0, B1, mu, b, norms, kk + 1, jj, quit);
+*/
+                    System.out.println("eee");
+                    System.out.println(basis.toPrettyString());
+                    System.out.println("eee");
+                    BigVector newVec = new BigVector(nbCols);
+                    for (int i = 0; i < nbCols; i++) {
+                        newVec.set(i,BigFraction.ZERO);
                     }
-                    BigMatrix newBlock = new BigMatrix(h + 1, nbCols);
+                    for (int i = j; i <= k; i++) {
+                        if (uvec.get(i).equals(BigFraction.ZERO)){
+                            continue;
+                        }
+                        for (int l = 0; l < nbCols; l++) {
+                            newVec.set(l,newVec.get(l).add(uvec.get(i).multiply(basis.get(i-1,l))));
+                        }
+                        System.out.println(newVec);
+                    }
+
+                    BigMatrix newBlock = new BigMatrix(nbRows + 1, nbCols);
                     for (int row = 0; row <= j - 2; row++) {
                         // set row 0 to j-2 (eq to 1 to j-1)
                         newBlock.setRow(row, basis.getRow(row));
@@ -152,12 +201,16 @@ public class BKZ {
                     // set row j-1 (eq j)
                     newBlock.setRow(j - 1, newVec);
                     // set row j to h+1
-                    for (int row = j - 1; row < h; row++) {
+                    for (int row = j - 1; row < nbRows; row++) {
                         newBlock.setRow(row + 1, basis.getRow(row));
                     }
+                    System.out.println("eee");
+                    System.out.println(newBlock.toPrettyString());
                     result = LLL.reduce(newBlock, params);
                     updateWithResult(result);
-               // }
+                }
+                z = 0;
+                System.out.println(norms.toApproximatetring());
             } else {
                 System.out.println("BRANCH 2");
                 z = z + 1;
@@ -166,6 +219,9 @@ public class BKZ {
                     updateWithResult(result);
                 }
             }
+            System.out.println("z :"+z+"/"+(nbRows-1));
+            System.out.println(basis.toPrettyString());
+            System.out.println();
         }
         return result;
     }
@@ -174,33 +230,21 @@ public class BKZ {
         //System.out.println(result.getReducedBasis().getRowCount()+ " old: "+nbRows);
         this.nbRows = result.getReducedBasis().getRowCount();
         this.nbCols = result.getReducedBasis().getColumnCount();
-        this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
-        this.mu = new BigMatrix(this.nbRows, this.nbRows);
-        this.norms = new BigVector(this.nbRows);
+        this.baseGSO = result.getGramSchmidtBasis().copy();
+        this.mu = result.getGramSchmidtCoefficients().copy();
+        this.norms = result.getGramSchmidtSizes().copy();
         basis = result.getReducedBasis().copy();
-        for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
-            mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
-            baseGSO.setRow(row, result.getGramSchmidtBasis().getRow(row));
-            norms.set(row, result.getGramSchmidtSizes().get(row));
-        }
 
     }
 
     private Object[] enumerateBKZ(int jj, int k, int dim, BigVector norms, BigMatrix blockMu) {
-        BigFraction[] cT = new BigFraction[dim + 1];
-        BigFraction[] y = new BigFraction[dim + 1];
-        BigFraction t1;
-        BigInteger[] v = new BigInteger[dim + 1];
-        BigInteger[] delta = new BigInteger[dim + 1];
-        BigInteger[] d = new BigInteger[dim + 1];
-        BigVector u = new BigVector(dim + 1);
-        BigInteger[] uT = new BigInteger[dim + 1];
+
         BigInteger auxUT;
         BigFraction cbar, auxY;
         int s = jj, t = jj;
 
         // Initialize vectors
-        cbar = norms.get(jj);
+        cbar = norms.get(jj - 1);
         d[jj] = uT[jj] = BigInteger.ONE;
         u.set(jj, BigFraction.ONE);
         delta[jj] = v[jj] = BigInteger.ZERO;
@@ -212,26 +256,39 @@ public class BKZ {
             cT[i] = y[i] = BigFraction.ZERO;
             d[i] = BigInteger.ONE;
         }
-        BigFraction eta = BigFraction.ZERO;
+        System.out.println("j= " + jj + " k= " + k);
+        BigFraction eta;
         while (t <= k) {
 
             // cT[t] = cT[t + 1] + (auxY[t] - 2*uT[t]*y[t] + auxUT[t]) * B[t];
             // cT(t) := cT(t+1) + (y(t) + u(t))^2 * c(t)  but (y(t)+u(t))^2= y(t)^2 + u(t)^2 + 2*u(t)*y(t)
             auxY = y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
             auxUT = uT[t].multiply(uT[t]);
-            cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT)).multiply(norms.get(t)));
+            cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT)).multiply(norms.get(t - 1)));
+            System.out.println(String.format("ct+1 %f product %f norm %f\n",
+                    cT[t + 1].toDouble(), auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT).toDouble(), norms.get(t - 1).toDouble()));
+            //System.out.println(y[t].add(uT[t]).multiply(y[t].add(uT[t])).toDouble());
+            //System.out.println(auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT).toDouble());
+            System.out.println(norms.toApproximatetring());
+            printVec(cT, "beg");
             if (params.pruneFactor > 0 && t > jj) {
                 eta = BKZTresh.get(t - jj - 1);
             } else {
                 eta = BigFraction.ZERO;
             }
+            System.out.println(cbar.toDouble());
             if (cT[t].compareTo(cbar.subtract(eta)) < 0) {
+                System.out.println("ENUM BRANCH 1");
                 if (t > jj) {
                     t--;
                     y[t] = BigFraction.ZERO;
+                    System.out.print("Mu ");
                     for (int i = t + 1; i <= s; i++) {
-                        y[t] = y[t].add(blockMu.get(i, t).multiply(uT[i]));
+                        System.out.print(blockMu.get(i-1, t-1).toDouble()+ " ");
+                        y[t] = y[t].add(blockMu.get(i-1, t-1).multiply(uT[i]));
                     }
+                    System.out.println();
+                    System.out.println(y[t].toDouble());
                     uT[t] = v[t] = y[t].round().negate();
                     delta[t] = BigInteger.ZERO;
                     // if (uT[t] > -y[t]) -> -y[t]< uT[t]
@@ -241,12 +298,14 @@ public class BKZ {
                         d[t] = BigInteger.ONE;
                     }
                 } else {
+                    System.out.println("BRANCH WARNING");
                     cbar = cT[jj];
                     for (int j = jj; j <= k; j++) {
                         u.set(j, new BigFraction(uT[j]));
                     }
                 }
             } else {
+                System.out.println("ENUM BRANCH 2");
                 t++;
                 s = Math.max(s, t); //Get max value
                 if (t < s) {
@@ -257,8 +316,21 @@ public class BKZ {
                 }
                 uT[t] = v[t].add(delta[t]);
             }
+            printVec(cT, "end");
         }
         return new Object[]{cbar, u};
+    }
+
+    private void printVec(BigFraction[] vec, String msg) {
+        System.out.print("vec " + msg + " =");
+        for (BigFraction bigFraction : vec) {
+            if (bigFraction == null) {
+                System.out.print("0 ");
+            } else {
+                System.out.print(bigFraction.toDouble() + " ");
+            }
+        }
+        System.out.println();
     }
 
     private static BigFraction calulateFudge(int precision) {
