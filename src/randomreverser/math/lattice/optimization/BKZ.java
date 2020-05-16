@@ -18,6 +18,9 @@ public class BKZ {
     private LLL lll;
     private int nbRows;
     private int nbCols;
+    private final BigFraction redFudgeFactor;
+    private BigVector BKZConstant = null;
+    private BigVector BKZTresh = null;
 
     public BKZ(BigMatrix lattice, Params params) {
         this.params = params;
@@ -28,6 +31,7 @@ public class BKZ {
         this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
         this.mu = new BigMatrix(this.nbRows, this.nbRows);
         this.norms = new BigVector(this.nbRows);
+        this.redFudgeFactor = calulateFudge(128); // change here the precision you want
     }
 
     /**
@@ -39,15 +43,21 @@ public class BKZ {
      * @return the reduced lattice
      */
     public static Result reduce(BigMatrix lattice, int blockSize, Params params) {
-        if (blockSize<2 || blockSize>lattice.getRowCount()){
-            throw new IllegalArgumentException("Invalid blocksize: "+blockSize+" for range 2-"+lattice.getRowCount());
+        if (blockSize < 2 || blockSize > lattice.getRowCount()) {
+            throw new IllegalArgumentException("Invalid blocksize: " + blockSize + " for range 2-" + lattice.getRowCount());
+        }
+        if (blockSize > 100) {
+            throw new IllegalArgumentException("BlockSize not supported: " + blockSize);
         }
         return new BKZ(lattice, params).reduceBKZ(lattice, blockSize);
     }
 
     public static Result reduce(BigMatrix lattice, int blockSize) {
-        if (blockSize<2 || blockSize>lattice.getRowCount()){
-            throw new IllegalArgumentException("Invalid blocksize: "+blockSize+" for range 2-"+lattice.getRowCount());
+        if (blockSize < 2 || blockSize > lattice.getRowCount()) {
+            throw new IllegalArgumentException("Invalid blocksize: " + blockSize + " for range 2-" + lattice.getRowCount());
+        }
+        if (blockSize > 100) {
+            throw new IllegalArgumentException("BlockSize not supported: " + blockSize);
         }
         return new BKZ(lattice, new Params()).reduceBKZ(lattice, blockSize);
     }
@@ -202,6 +212,59 @@ public class BKZ {
             }
         }
         return u;
+    }
+
+    private static BigFraction calulateFudge(int precision) {
+        BigFraction fudge = BigFraction.ONE;
+        for (int i = precision; i > 0; i--) {
+            fudge = fudge.multiply(BigFraction.HALF);
+        }
+        return fudge;
+    }
+
+    private BigVector calculateBKZConstant(int beta, int p) {
+        BigVector res = new BigVector(beta - 1);
+        BigVector log = new BigVector(beta);
+
+        for (int j = 1; j <= beta; j++) {
+            log.set(j, BigVector.LOG_TABLE.get(j));
+        }
+        BigFraction x, y;
+        for (int i = 1; i <= beta - 1; i++) {
+            // First, we compute x = gamma(i/2)^{2/i}
+            BigFraction k = new BigFraction(i).divide(BigInteger.TWO);
+            if ((i & 1) == 0) { // i even
+                x = BigFraction.ZERO;
+                for (int j = 1; j <= k.toDouble(); j++) {
+                    x = x.add(log.get(j));
+                }
+                x = x.multiply(BigFraction.ONE.divide(k));
+                x = x.exp();
+            } else { // i odd
+                x = BigFraction.ZERO;
+                for (int j = k.round().intValue() + 2; j <= 2 * k.toDouble() + 2; j++) {
+                    x = x.add(log.get(j));
+                }
+                x = BigFraction.HALF.multiply(BigFraction.LOG_PI).add(x).subtract((k.add(BigInteger.ONE).multiply(log.get(2))).multiply(BigInteger.TWO));
+                x = x.multiply(new BigFraction(2, i));
+                x = x.exp();
+            }
+            // Second, we compute y = 2^{2*p/i}
+            y = new BigFraction(-2, i).multiply(log.get(2)).multiply(p);
+            y = y.exp();
+            res.set(i - 1, x.multiply(y).divide(BigFraction.PI));
+        }
+        return res;
+    }
+
+    private BigVector computeBKZThresh(int j, int beta) {
+        BigVector res = new BigVector(beta - 1);
+        BigFraction x = BigFraction.ZERO;
+        for (int i = 0; i < beta - 1; i++) {
+            x.add(norms.get(j + i).log());
+            res.set(i, x.divide(new BigFraction(i + 1)).exp().multiply(BKZConstant.get(i)));
+        }
+        return res;
     }
 
 }
