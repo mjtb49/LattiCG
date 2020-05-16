@@ -106,7 +106,7 @@ public class BKZ {
                         newVec.set(l, newVec.get(l).add(v.get(s).multiply(basis.get(s, l))));
                     }
                 }
-                BigMatrix newBlock = new BigMatrix(h + 1, colCount);
+                BigMatrix newBlock = new BigMatrix(nbRows + 1, colCount);
                 for (int row = 0; row <= j - 2; row++) {
                     // set row 0 to j-2 (eq to 1 to j-1)
                     newBlock.setRow(row, basis.getRow(row));
@@ -114,7 +114,7 @@ public class BKZ {
                 // set row j-1 (eq j)
                 newBlock.setRow(j - 1, newVec);
                 // set row j to h+1
-                for (int row = j - 1; row < h; row++) {
+                for (int row = j - 1; row < nbRows; row++) {
                     newBlock.setRow(row + 1, basis.getRow(row));
                 }
                 result = LLL.reduce(newBlock, params);
@@ -128,6 +128,7 @@ public class BKZ {
     }
 
     private void updateWithResult(Result result) {
+        System.out.println(result.getReducedBasis().getRowCount()+ " old: "+nbRows);
         this.nbRows = result.getReducedBasis().getRowCount();
         this.nbCols = result.getReducedBasis().getColumnCount();
         this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
