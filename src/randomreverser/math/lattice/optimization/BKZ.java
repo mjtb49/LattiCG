@@ -16,25 +16,40 @@ public class BKZ {
     private BigMatrix mu; // those are the mu that are used in the Gram-Schimdt process*
     private BigVector norms; // those are simply the magnitude of each GS vectors
     private LLL lll;
-    public BKZ(BigMatrix lattice,Params params) {
-        this.params=params;
-        this.basis=lattice.copy();
-        this.lll=new LLL(lattice,params);
+    private int nbRows;
+    private int nbCols;
+
+    public BKZ(BigMatrix lattice, Params params) {
+        this.params = params;
+        this.basis = lattice.copy();
+        this.nbRows = lattice.getRowCount();
+        this.nbCols = lattice.getColumnCount();
+        this.lll = new LLL(lattice, params);
+        this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
+        this.mu = new BigMatrix(this.nbRows, this.nbRows);
+        this.norms = new BigVector(this.nbRows);
     }
 
     /**
      * The BKZ algorithm as described
      *
-     * @param lattice the lattice to reduce
+     * @param lattice   the lattice to reduce
      * @param blockSize the block size to use in BKZ
-     * @param params  the parameters to be passed to LLL
+     * @param params    the parameters to be passed to LLL
      * @return the reduced lattice
      */
-    public static Result reduce(BigMatrix lattice, int blockSize,Params params) {
-        return new BKZ(lattice,params).reduceBKZ(lattice,blockSize);
+    public static Result reduce(BigMatrix lattice, int blockSize, Params params) {
+        if (blockSize<2 || blockSize>lattice.getRowCount()){
+            throw new IllegalArgumentException("Invalid blocksize: "+blockSize+" for range 2-"+lattice.getRowCount());
+        }
+        return new BKZ(lattice, params).reduceBKZ(lattice, blockSize);
     }
-    public static Result reduce(BigMatrix lattice,int blockSize) {
-        return new BKZ(lattice,new Params()).reduceBKZ(lattice,blockSize);
+
+    public static Result reduce(BigMatrix lattice, int blockSize) {
+        if (blockSize<2 || blockSize>lattice.getRowCount()){
+            throw new IllegalArgumentException("Invalid blocksize: "+blockSize+" for range 2-"+lattice.getRowCount());
+        }
+        return new BKZ(lattice, new Params()).reduceBKZ(lattice, blockSize);
     }
 
 
@@ -64,8 +79,8 @@ public class BKZ {
         int z = 0;
         int j = 0;
         int beta = blockSize;
-        this.basis=lattice.copy();
-        Result result= lll.reduceLLL(basis);
+        this.basis = lattice.copy();
+        Result result = LLL.reduce(basis, params);
         updateWithResult(result);
         int dim = result.getReducedBasis().getRowCount();
         int colCount = result.getReducedBasis().getColumnCount();
@@ -76,7 +91,7 @@ public class BKZ {
             BigVector v = enumerateBKZ(j - 1, k - 1, dim, norms, mu);
             if (!passvec(v, j - 1, dim)) {
                 z = 0;
-                BigVector newVec=new BigVector(dim);
+                BigVector newVec = new BigVector(dim);
                 for (int l = 0; l < dim; l++) {
                     for (int s = j - 1; s <= k - 1; s++) {
                         //basis[dim][l] += v[i] * basis[i][l];
@@ -89,28 +104,34 @@ public class BKZ {
                     newBlock.setRow(row, basis.getRow(row));
                 }
                 // set row j-1 (eq j)
-                newBlock.setRow(j-1, newVec);
+                newBlock.setRow(j - 1, newVec);
                 // set row j to h+1
-                for (int row = j-1; row < h; row++) {
+                for (int row = j - 1; row < h; row++) {
                     newBlock.setRow(row + 1, basis.getRow(row));
                 }
-                result = lll.reduceLLL(newBlock);
-
+                result = LLL.reduce(newBlock, params);
             } else {
                 z = z + 1;
-                result = lll.reduceLLL(basis);
-                updateWithResult(result);
+                result = LLL.reduce(basis, params);
             }
+            updateWithResult(result);
         }
         return result;
     }
-    private void updateWithResult(Result result){
+
+    private void updateWithResult(Result result) {
+        this.nbRows = result.getReducedBasis().getRowCount();
+        this.nbCols = result.getReducedBasis().getColumnCount();
+        this.baseGSO = new BigMatrix(this.nbRows, this.nbCols);
+        this.mu = new BigMatrix(this.nbRows, this.nbRows);
+        this.norms = new BigVector(this.nbRows);
+        basis=result.getReducedBasis().copy();
         for (int row = 0; row < result.getReducedBasis().getRowCount(); row++) {
-            basis.setRow(row, result.getReducedBasis().getRow(row));
             mu.setRow(row, result.getGramSchmidtCoefficients().getRow(row));
             baseGSO.setRow(row, result.getGramSchmidtBasis().getRow(row));
-            norms.set(row,result.getGramSchmidtSizes().get(row));
+            norms.set(row, result.getGramSchmidtSizes().get(row));
         }
+
     }
 
     private BigVector enumerateBKZ(int ini, int fim, int dim, BigVector B, BigMatrix blockMu) {
@@ -164,7 +185,7 @@ public class BKZ {
                     }
                 } else {
                     cL = cT[ini];
-                    for (int j = ini; j <=fim; j++) {
+                    for (int j = ini; j <= fim; j++) {
                         u.set(j, new BigFraction(uT[j]));
                     }
                 }

@@ -102,7 +102,6 @@ public class LLL {
     private BigVector norms; // those are simply the magnitude of each GS vectors
     private BigMatrix basis; // also knows as the lattice, it's the internal representation so its easier to have it named like that
     private Params params;
-    private static final BigFraction eta = BigFraction.HALF;
 
     public LLL(BigMatrix lattice, Params params) {
         this.basis = lattice.copy();
@@ -153,10 +152,7 @@ public class LLL {
         }
         baseGSO.setRow(k, newRow);
         norms.set(k, newRow.magnitudeSq());
-        if (norms.get(k).equals(BigFraction.ZERO)) {
-            //throw new Exception("The bi did not form a basis");
-            System.err.print("The bi's did not form a basis\n");
-        }
+        //if (norms.get(k).equals(BigFraction.ZERO)) {System.err.print("The bi's did not form a basis\n");}
     }
 
     private void red(int i, int j) {
