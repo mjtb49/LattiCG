@@ -27,6 +27,9 @@ public final class BigFraction implements Comparable<BigFraction> {
     public static final BigFraction ONE = new BigFraction(1);
     public static final BigFraction HALF = new BigFraction(1, 2);
     public static final BigFraction MINUS_ONE = new BigFraction(-1);
+    public static final BigFraction PI = new BigFraction(30246273033735921L,9627687726852338L); // Rationalize[pi,10^-32]
+    public static final BigFraction LOG_PI = new BigFraction(14405300475444212L,12584017114880639L); //Rationalize[log(pi),10^-32]
+    public static final BigFraction EXP = new BigFraction(47813267563899719L,17589518151988078L); //Rationalize[e,10^-32]
 
     private BigInteger ntor;
     private BigInteger dtor;
@@ -370,6 +373,45 @@ public final class BigFraction implements Comparable<BigFraction> {
      */
     public BigFraction abs() {
         return ntor.signum() == -1 ? negate() : this;
+    }
+
+
+    /**
+     * Returns the exponential value of this fraction
+     * Using simple serie expansion
+     *
+     * @return The exponential value of this fraction.
+     */
+    public BigFraction exp(){
+        BigInteger dtor=BigInteger.ONE;
+        BigFraction result=BigFraction.ONE;
+        BigFraction ntor=this;
+        for (int i = 1; i < 10; i++) {
+            dtor=dtor.multiply(new BigInteger(String.valueOf(i)));
+            result.add(ntor.divide(dtor));
+            ntor=ntor.multiply(ntor);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the logarithm value of this fraction
+     * Using simple serie expansion
+     *
+     * @return The logarithm value of this fraction.
+     */
+    public BigFraction log(){
+        BigInteger dtor=BigInteger.ONE;
+        BigFraction result=BigFraction.ONE;
+        BigFraction ntor=this.subtract(BigInteger.ONE);
+        BigInteger sign=BigInteger.ONE;
+        for (int i = 1; i < 20; i++) {
+            result.add(ntor.divide(dtor).multiply(sign));
+            ntor=ntor.multiply(ntor);
+            dtor=dtor.add(BigInteger.ONE);
+            sign=sign.negate();
+        }
+        return result;
     }
 
     @Override
