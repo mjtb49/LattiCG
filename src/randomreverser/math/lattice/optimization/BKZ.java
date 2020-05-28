@@ -221,7 +221,7 @@ public class BKZ {
             // cT(t) := cT(t+1) + (y(t) + u(t))^2 * c(t)  but (y(t)+u(t))^2= y(t)^2 + u(t)^2 + 2*u(t)*y(t)
             auxY = y[t].multiply(y[t]); // this is done to overcome loss in precision remember how they cumulate...
             auxUT = uT[t].multiply(uT[t]);
-            cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigInteger.TWO)).add(auxUT)).multiply(norms.get(t - 1)));
+            cT[t] = cT[t + 1].add((auxY.add(y[t].multiply(uT[t]).multiply(BigFraction.TWO)).add(auxUT)).multiply(norms.get(t - 1)));
             if (params.pruneFactor > 0 && t > jj) {
                 eta = BKZTresh.get(t - jj - 1);
             } else {
@@ -293,7 +293,7 @@ public class BKZ {
         BigFraction x, y;
         for (int i = 1; i <= beta - 1; i++) {
             // First, we compute x = gamma(i/2)^{2/i}
-            BigFraction k = new BigFraction(i).divide(BigInteger.TWO);
+            BigFraction k = new BigFraction(i).divide(BigFraction.TWO);
             if ((i & 1) == 0) { // i even
                 x = BigFraction.ZERO;
                 for (int j = 1; j <= k.toDouble(); j++) {
@@ -306,7 +306,7 @@ public class BKZ {
                 for (int j = k.round().intValue() + 2; j <= 2 * k.toDouble() + 2; j++) {
                     x = x.add(log.get(j));
                 }
-                x = BigFraction.HALF.multiply(BigFraction.LOG_PI).add(x).subtract((k.add(BigInteger.ONE).multiply(log.get(2))).multiply(BigInteger.TWO));
+                x = BigFraction.HALF.multiply(BigFraction.LOG_PI).add(x).subtract((k.add(BigInteger.ONE).multiply(log.get(2))).multiply(BigFraction.TWO));
                 x = x.multiply(new BigFraction(2, i));
                 x = x.exp();
             }

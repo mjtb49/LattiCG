@@ -27,9 +27,17 @@ public final class BigFraction implements Comparable<BigFraction> {
     public static final BigFraction ONE = new BigFraction(1);
     public static final BigFraction HALF = new BigFraction(1, 2);
     public static final BigFraction MINUS_ONE = new BigFraction(-1);
-    public static final BigFraction PI = new BigFraction(30246273033735921L,9627687726852338L); // Rationalize[pi,10^-32]
-    public static final BigFraction LOG_PI = new BigFraction(14405300475444212L,12584017114880639L); //Rationalize[log(pi),10^-32]
-    public static final BigFraction EXP = new BigFraction(47813267563899719L,17589518151988078L); //Rationalize[e,10^-32]
+    public static final BigFraction PI = new BigFraction(30246273033735921L, 9627687726852338L); // Rationalize[pi,10^-32]
+    public static final BigFraction LOG_PI = new BigFraction(14405300475444212L, 12584017114880639L); //Rationalize[log(pi),10^-32]
+    public static final BigFraction EXP = new BigFraction(47813267563899719L, 17589518151988078L); //Rationalize[e,10^-32]
+    /**
+     * https://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/math/BigInteger.java#l1182
+     * The BigInteger constant two.  (Not exported.)
+     * private static final BigInteger TWO = valueOf(2);
+     * since 9 it is public http://hg.openjdk.java.net/jdk/jdk11/file/tip/src/java.base/share/classes/java/math/BigInteger.java#l1277
+     *
+     */
+    public static final BigInteger TWO = new BigInteger("2");
 
     private BigInteger ntor;
     private BigInteger dtor;
@@ -37,7 +45,7 @@ public final class BigFraction implements Comparable<BigFraction> {
     /**
      * Creates a {@code BigFraction} with the given numerator and denominator
      *
-     * @param numerator The numerator
+     * @param numerator   The numerator
      * @param denominator The denominator
      * @throws ArithmeticException If {@code denominator} is zero
      */
@@ -53,7 +61,7 @@ public final class BigFraction implements Comparable<BigFraction> {
     /**
      * Creates a {@code BigFraction} with the given numerator and denominator
      *
-     * @param numerator The numerator
+     * @param numerator   The numerator
      * @param denominator The denominator
      * @throws ArithmeticException If {@code denominator} is zero
      */
@@ -166,6 +174,7 @@ public final class BigFraction implements Comparable<BigFraction> {
     }
 
     private static final MathContext TO_DOUBLE_CONTEXT = MathContext.DECIMAL64;
+
     /**
      * Converts this fraction to a {@code double}, rounding where necessary
      *
@@ -382,14 +391,14 @@ public final class BigFraction implements Comparable<BigFraction> {
      *
      * @return The exponential value of this fraction.
      */
-    public BigFraction exp(){
-        BigInteger dtor=BigInteger.ONE;
-        BigFraction result=BigFraction.ONE;
-        BigFraction ntor=this;
+    public BigFraction exp() {
+        BigInteger dtor = BigInteger.ONE;
+        BigFraction result = BigFraction.ONE;
+        BigFraction ntor = this;
         for (int i = 1; i < 10; i++) {
-            dtor=dtor.multiply(new BigInteger(String.valueOf(i)));
+            dtor = dtor.multiply(new BigInteger(String.valueOf(i)));
             result.add(ntor.divide(dtor));
-            ntor=ntor.multiply(ntor);
+            ntor = ntor.multiply(ntor);
         }
         return result;
     }
@@ -400,16 +409,16 @@ public final class BigFraction implements Comparable<BigFraction> {
      *
      * @return The logarithm value of this fraction.
      */
-    public BigFraction log(){
-        BigInteger dtor=BigInteger.ONE;
-        BigFraction result=BigFraction.ONE;
-        BigFraction ntor=this.subtract(BigInteger.ONE);
-        BigInteger sign=BigInteger.ONE;
+    public BigFraction log() {
+        BigInteger dtor = BigInteger.ONE;
+        BigFraction result = BigFraction.ONE;
+        BigFraction ntor = this.subtract(BigInteger.ONE);
+        BigInteger sign = BigInteger.ONE;
         for (int i = 1; i < 20; i++) {
             result.add(ntor.divide(dtor).multiply(sign));
-            ntor=ntor.multiply(ntor);
-            dtor=dtor.add(BigInteger.ONE);
-            sign=sign.negate();
+            ntor = ntor.multiply(ntor);
+            dtor = dtor.add(BigInteger.ONE);
+            sign = sign.negate();
         }
         return result;
     }
@@ -420,7 +429,7 @@ public final class BigFraction implements Comparable<BigFraction> {
     }
 
     public int compareTo(BigInteger other) {
-        BigFraction other_frac=new BigFraction(other);
+        BigFraction other_frac = new BigFraction(other);
         return ntor.multiply(other_frac.dtor).compareTo(other_frac.ntor.multiply(dtor));
     }
 
