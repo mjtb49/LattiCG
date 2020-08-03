@@ -1,0 +1,177 @@
+package randomreverser.reversal;
+
+import org.jetbrains.annotations.ApiStatus;
+import randomreverser.RandomReverser;
+import randomreverser.reversal.calltype.CallType;
+import randomreverser.reversal.calltype.java.NextBooleanCall;
+import randomreverser.reversal.calltype.java.NextDoubleCall;
+import randomreverser.reversal.calltype.java.NextFloatCall;
+import randomreverser.reversal.calltype.java.NextIntCall;
+import randomreverser.reversal.calltype.java.NextLongCall;
+import randomreverser.reversal.calltype.java.UnboundedNextIntCall;
+import randomreverser.util.LCG;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.LongStream;
+
+public class ProgramInstance {
+
+    private final Program program;
+    private final List<Object> observations = new ArrayList<>();
+    private int callIndex = 0;
+
+    @ApiStatus.Internal
+    protected ProgramInstance(Program program) {
+        this.program = program;
+    }
+
+    public Program getProgram() {
+        return program;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> ProgramInstance add(Object value) {
+        if (callIndex >= program.getCalls().size()) {
+            throw new IndexOutOfBoundsException("Too many observations for the number of calls specified");
+        }
+        CallType<T> callType = (CallType<T>) program.getCalls().get(callIndex++);
+        T thing = callType.getType().cast(value);
+        observations.add(thing);
+        return this;
+    }
+
+    public LongStream reverse() {
+        if (!LCG.JAVA.equals(program.getLcg())) {
+            throw new IllegalStateException("Only the Java LCG is currently supported");
+        }
+
+        if (callIndex != program.getCalls().size()) {
+            throw new IllegalStateException("Not all specified calls have been given observations");
+        }
+
+        RandomReverser reverser = new RandomReverser();
+
+        List<CallType<?>> calls = program.getCalls();
+        List<Long> skips = program.getSkips();
+        for (int i = 0; i < calls.size(); i++) {
+            CallType<?> call = calls.get(i);
+            Object observation = observations.get(i);
+            reverser.addUnmeasuredSeeds(skips.get(i));
+
+            if (call instanceof NextBooleanCall) {
+                NextBooleanCall booleanCall = (NextBooleanCall) call;
+                boolean value = (Boolean) observation;
+                if (booleanCall.isInverted()) {
+                    value = !value;
+                }
+                reverser.addNextBooleanCall(value);
+            } else if (call instanceof NextDoubleCall) {
+                double value = (Double) observation;
+                reverser.addNextDoubleCall(value, value, true, true);
+            } else if (call instanceof NextFloatCall) {
+                float value = (Float) observation;
+                reverser.addNextFloatCall(value, value, true, true);
+            } else if (call instanceof NextIntCall) {
+                NextIntCall intCall = (NextIntCall) call;
+                int value = (Integer) observation;
+                reverser.addNextIntCall(intCall.getBound(), value, value);
+            } else if (call instanceof UnboundedNextIntCall) {
+                int value = (Integer) observation;
+                reverser.addNextIntCall(value, value);
+            } else if (call instanceof NextLongCall) {
+                long value = (Long) observation;
+                reverser.addNextLongCall(value, value);
+            } else if (call instanceof NextFloatCall.FloatRange) {
+                NextFloatCall.FloatRange floatRange = (NextFloatCall.FloatRange) call;
+                boolean value = (Boolean) observation;
+                if (floatRange.isInverted()) {
+                    value = !value;
+                }
+                if (value) {
+                    reverser.addNextFloatCall(floatRange.getMin(), floatRange.getMax(), !floatRange.isMinStrict(), !floatRange.isMaxStrict());
+                } else {
+                    // TODO support this
+                    reverser.addUnmeasuredSeeds(1);
+                }
+            } else if (call instanceof NextIntCall.IntRange) {
+                NextIntCall.IntRange intRange = (NextIntCall.IntRange) call;
+                boolean value = (Boolean) observation;
+                if (intRange.isInverted()) {
+                    value = !value;
+                }
+                int min = intRange.getMin();
+                int max = intRange.getMax();
+                if (intRange.isMinStrict()) {
+                    min++;
+                }
+                if (intRange.isMaxStrict()) {
+                    max--;
+                }
+                if (value) {
+                    reverser.addNextIntCall(intRange.getBound(), min, max);
+                } else {
+                    // TODO: support this
+                    reverser.addUnmeasuredSeeds(1);
+                }
+            } else if (call instanceof UnboundedNextIntCall.IntRange) {
+                UnboundedNextIntCall.IntRange intRange = (UnboundedNextIntCall.IntRange) call;
+                boolean value = (Boolean) observation;
+                if (intRange.isInverted()) {
+                    value = !value;
+                }
+                int min = intRange.getMin();
+                int max = intRange.getMax();
+                if (intRange.isMinStrict()) {
+                    min++;
+                }
+                if (intRange.isMaxStrict()) {
+                    max--;
+                }
+                if (value) {
+                    reverser.addNextIntCall(min, max);
+                } else {
+                    // TODO: support this
+                    reverser.addUnmeasuredSeeds(1);
+                }
+            } else if (call instanceof NextDoubleCall.DoubleRange) {
+                NextDoubleCall.DoubleRange doubleRange = (NextDoubleCall.DoubleRange) call;
+                boolean value = (Boolean) observation;
+                if (doubleRange.isInverted()) {
+                    value = !value;
+                }
+                if (value) {
+                    reverser.addNextDoubleCall(doubleRange.getMin(), doubleRange.getMax(), !doubleRange.isMinStrict(), !doubleRange.isMaxStrict());
+                } else {
+                    // TODO support this
+                    reverser.addUnmeasuredSeeds(2);
+                }
+            } else if (call instanceof NextLongCall.LongRange) {
+                NextLongCall.LongRange intRange = (NextLongCall.LongRange) call;
+                boolean value = (Boolean) observation;
+                if (intRange.isInverted()) {
+                    value = !value;
+                }
+                long min = intRange.getMin();
+                long max = intRange.getMax();
+                if (intRange.isMinStrict()) {
+                    min++;
+                }
+                if (intRange.isMaxStrict()) {
+                    max--;
+                }
+                if (value) {
+                    reverser.addNextLongCall(min, max);
+                } else {
+                    // TODO: support this
+                    reverser.addUnmeasuredSeeds(2);
+                }
+            } else {
+                throw new IllegalStateException("Unsupported call type: " + call.getClass().getName());
+            }
+        }
+
+        return reverser.findAllValidSeeds();
+    }
+
+}
