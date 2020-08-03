@@ -6,6 +6,7 @@ import com.seedfinding.latticg.reversal.calltype.CallType;
 
 import java.util.List;
 
+@ApiStatus.Experimental
 public class Program {
 
     private final LCG lcg;
