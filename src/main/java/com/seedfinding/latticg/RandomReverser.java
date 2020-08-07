@@ -252,7 +252,7 @@ public class RandomReverser {
     }
 
     /**
-     * Add a constraint that min < / <= nextFloat() < / <= max, with strict inequalities when minInclusive or
+     * Add a constraint that min {@literal <} / {@literal <}= nextFloat() {@literal <} / {@literal <}= max, with strict inequalities when minInclusive or
      * maxInclusive are false, respectively.
      *
      * @param min low end of the valid range
@@ -287,7 +287,7 @@ public class RandomReverser {
     }
 
     /**
-     * Add a constraint that min <= nextFloat() < max.
+     * Add a constraint that min {@literal <}= nextFloat() {@literal <} max.
      *
      * @param min low end of the valid range
      * @param max high end of the valid range
@@ -331,7 +331,7 @@ public class RandomReverser {
     }
 
     /**
-     * Add a constraint that min < / <= nextDouble() < / <= max, with strict inequalities when minInclusive or
+     * Add a constraint that min {@literal <} / {@literal <}= nextDouble() {@literal <} / {@literal <}= max, with strict inequalities when minInclusive or
      * maxInclusive are false, respectively.
      *
      * @param min low end of the valid range
@@ -376,7 +376,7 @@ public class RandomReverser {
     }
 
     /**
-     * Add a constraint that min <= nextDouble() < max.
+     * Add a constraint that min {@literal <}= nextDouble() {@literal <} max.
      *
      * @param min low end of the valid range
      * @param max high end of the valid range
