@@ -1,7 +1,10 @@
 plugins {
     id 'java'
+    id 'maven'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
     id 'org.jetbrains.kotlin.jvm' version '1.3.72'
-	id 'maven'
 }
 
 group = 'com.seedfinding'
@@ -10,6 +13,10 @@ archivesBaseName = project.name
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 repositories {
     mavenCentral()
 }
@@ -30,3 +37,64 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'latticg'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Latticg'
+                description = 'Reverses the possible internal seed(s) of Java\'s java.util.Random class given information on its output in the form of a system of inequalities on various Random calls'
+                url = 'http://www.latticg.com'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'mjtb49'
+                        name = 'Matthew Bolan'
+                    }
+                    developer {
+                        id = 'Earthcomputer'
+                        name = 'Joseph Burton'
+                    }
+                }
+                git {
+                    connection = 'https://github.com/mjtb49/LattiCG.git'
+                    developerConnection = 'https://github.com/mjtb49/LattiCG.git'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://maven.latticg.com/releases"
+            def snapshotsRepoUrl = "https://maven.latticg.com/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
