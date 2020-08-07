@@ -1,6 +1,4 @@
 plugins {
-    id 'java'
-    id 'maven'
     id 'java-library'
     id 'maven-publish'
     id 'signing'
@@ -70,10 +68,6 @@ publishing {
                         id = 'Earthcomputer'
                         name = 'Joseph Burton'
                     }
-                }
-                git {
-                    connection = 'https://github.com/mjtb49/LattiCG.git'
-                    developerConnection = 'https://github.com/mjtb49/LattiCG.git'
                 }
             }
         }
