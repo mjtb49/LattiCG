@@ -32,7 +32,7 @@ import java.math.BigInteger;
  *  H:=Identity_matrix(n,n)
  *
  * Step 2: Incremental GS
- *  if k<=kmax then go to Step 3
+ *  if k{@literal <}=kmax then go to Step 3
  *  else
  *      kmax:=k
  *      bk*:=bk
@@ -44,7 +44,7 @@ import java.math.BigInteger;
  *
  * Step 3: LLL condition
  *  RED(k,k-1) // size reduce the vector bk
- *  if Bk< (delta - mu(k,k-1)^2).B[k-1] then
+ *  if Bk{@literal <} (delta - mu(k,k-1)^2).B[k-1] then
  *      SWAP(k) // swap vector k and k-1
  *      k:=max(1,k-1); // clamp value to 1 at worse
  *  else
@@ -53,7 +53,7 @@ import java.math.BigInteger;
  *      k:=k-1
  *
  * Step 4: Finish
- *  if k<n then go to Step 2
+ *  if k{@literal <}n then go to Step 2
  *  else
  *      output b0...bn-1 and H0...Hn-1
  *
@@ -61,7 +61,7 @@ import java.math.BigInteger;
  * The RED and SWAP algorithm are pretty straight forward (we ignore dependent vector for SWAP)
  *
  * RED(k,l)
- *  if |mu(k,l)|<=0.5 then return // (this is due to the rounding later)
+ *  if |mu(k,l)|{@literal <}=0.5 then return // (this is due to the rounding later)
  *  else
  *      q=round(mu(k,l))
  *      bk:=bk-q.bl
@@ -71,7 +71,7 @@ import java.math.BigInteger;
  *          mu(k,i):=mu(k,i)-q.mu(l,i)
  * SWAP(k)
  *  bk,b[k-1],Hk,H[k-1]:=b[k-1],bk,H[k-1],Hk
- *  if k>1 then
+ *  if k{@literal >}1 then
  *      for j:=0...k-2
  *          mu(k,j),mu(k-1,j):=mu(k-1,j),mu(k,j)
  *  tmu:=mu(k,k-1)

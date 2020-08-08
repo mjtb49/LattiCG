@@ -1,0 +1,92 @@
+pipeline {
+    agent {
+        label "master"
+    }
+    tools {
+        maven "Maven"
+    }
+    environment {
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "https"
+        NEXUS_URL = "nexus.seedfinding.com"
+        NEXUS_REPOSITORY = "maven-latticg"
+        NEXUS_CREDENTIAL_ID = "nexus-user-creds"
+    }
+    stages {
+        stage("Clone code from VCS") {
+            steps {
+                script {
+                    git 'https://github.com/mjtb49/LattiCG.git';
+                }
+            }
+        }
+        stage("Maven Build") {
+            steps {
+                script {
+                    sh "./gradlew publishMavenJavaPublicationToMavenLocal"
+                }
+            }
+        }
+        stage("Publish to Nexus Repository Manager") {
+            steps {
+                script {
+                    def ret = sh(script: 'ls -lR build', returnStdout: true)
+                    println ret
+                    ret = sh(script: 'find . -name \'*.xml\'', returnStdout: true)
+                    println ret
+                    def pomPath="build/publications/mavenJava/pom-default.xml"
+                    pom = readMavenPom file: pomPath;
+                    filesByGlob = findFiles(glob: "build/libs/*.jar");
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    artifactPath = filesByGlob[0].path;
+                    javadocPath = filesByGlob[1].path;
+                    sourcePath = filesByGlob[2].path;
+                    if(fileExists(artifactPath) && fileExists(javadocPath) && fileExists(sourcePath)) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        echo "*** File: ${javadocPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        echo "*** File: ${sourcePath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
+                            groupId: pom.groupId,
+                            version: pom.version,
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            artifacts: [
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: 'javadoc',
+                                file: javadocPath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: 'sources',
+                                file: sourcePath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: pomPath,
+                                type: "pom"]
+                            ]
+                        );
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
+            }
+        }
+        stage('Upload'){
+            steps {
+                withCredentials([usernameColonPassword(credentialsId: 'ftplogin', variable: 'FTP')]) {
+                    script {
+                        sh "cd build/docs/javadoc && find . -type f -exec curl -k --ssl-reqd -u ${FTP} --ftp-create-dirs -T {} ftp://<ip>:8021/{} \\; "
+                
+                    }
+                }
+            }
+        }
+    }
+}
