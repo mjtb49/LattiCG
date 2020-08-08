@@ -78,5 +78,15 @@ pipeline {
                 }
             }
         }
+        stage('Upload'){
+            steps {
+                withCredentials([usernameColonPassword(credentialsId: 'ftplogin', variable: 'FTP')]) {
+                    script {
+                        sh "cd build/docs/javadoc && find . -type f -exec curl -k --ssl-reqd -u ${FTP} --ftp-create-dirs -T {} ftp://<ip>:8021/{} \\; "
+                
+                    }
+                }
+            }
+        }
     }
 }
