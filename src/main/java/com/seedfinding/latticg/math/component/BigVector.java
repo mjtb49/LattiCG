@@ -445,14 +445,13 @@ public final class BigVector {
         StringBuilder sb = new StringBuilder("{");
 
         for (int i = 0; i < this.getDimension(); i++) {
-            sb.append(this.get(i))
-                    .append(i == this.getDimension() - 1 ? "" : ", ");
+            sb.append(this.get(i)).append(i == this.getDimension() - 1 ? "" : ", ");
         }
 
         return sb.append("}").toString();
     }
 
-    public String toApproximatetring() {
+    public String toApproximateString() {
         StringBuilder sb = new StringBuilder("[");
 
         for (int i = 0; i < this.getDimension(); i++) {
