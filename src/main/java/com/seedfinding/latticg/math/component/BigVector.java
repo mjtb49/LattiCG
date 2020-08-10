@@ -4,6 +4,7 @@ import com.seedfinding.latticg.reversal.asm.ParseException;
 import com.seedfinding.latticg.reversal.asm.StringParser;
 import com.seedfinding.latticg.reversal.asm.Token;
 
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -455,7 +456,7 @@ public final class BigVector {
         StringBuilder sb = new StringBuilder("[");
 
         for (int i = 0; i < this.getDimension(); i++) {
-            sb.append(this.get(i).toDouble()).append(i == this.getDimension() - 1 ? "" : " ");
+            sb.append(this.get(i).toBigDecimal(MathContext.UNLIMITED)).append(i == this.getDimension() - 1 ? "" : " ");
         }
 
         return sb.append("]").toString();
