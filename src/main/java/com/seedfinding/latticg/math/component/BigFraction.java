@@ -405,7 +405,7 @@ public final class BigFraction implements Comparable<BigFraction> {
 
     /**
      * Returns the logarithm value of this fraction
-     * Using simple serie expansion
+     * Using simple series expansion
      *
      * @return The logarithm value of this fraction.
      */
@@ -430,7 +430,7 @@ public final class BigFraction implements Comparable<BigFraction> {
 
     public int compareTo(BigInteger other) {
         BigFraction other_frac = new BigFraction(other);
-        return ntor.multiply(other_frac.dtor).compareTo(other_frac.ntor.multiply(dtor));
+        return this.compareTo(other_frac);
     }
 
     @Override
