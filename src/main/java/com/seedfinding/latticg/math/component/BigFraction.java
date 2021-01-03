@@ -29,13 +29,13 @@ public final class BigFraction implements Comparable<BigFraction> {
     public static final BigFraction MINUS_ONE = new BigFraction(-1);
     public static final BigFraction PI = new BigFraction(30246273033735921L, 9627687726852338L); // Rationalize[pi,10^-32]
     public static final BigFraction LOG_PI = new BigFraction(14405300475444212L, 12584017114880639L); //Rationalize[log(pi),10^-32]
+    public static final BigFraction LOG_10 = new BigFraction(152469287047331902L, 66216570024379193L); //Rationalize[log(10),10^-32]
     public static final BigFraction EXP = new BigFraction(47813267563899719L, 17589518151988078L); //Rationalize[e,10^-32]
     /**
      * https://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/math/BigInteger.java#l1182
      * The BigInteger constant two.  (Not exported.)
      * private static final BigInteger TWO = valueOf(2);
      * since 9 it is public http://hg.openjdk.java.net/jdk/jdk11/file/tip/src/java.base/share/classes/java/math/BigInteger.java#l1277
-     *
      */
     public static final BigInteger TWO = new BigInteger("2");
 
@@ -89,7 +89,7 @@ public final class BigFraction implements Comparable<BigFraction> {
 
     /**
      * Parses a string into a fraction.
-     *
+     * <p>
      * If the input string does not contain a "/", then the input is assumed to be an integer. Otherwise, the numerator
      * and denominator are separated by a single "/" character and possibly some whitespace
      *
@@ -191,7 +191,9 @@ public final class BigFraction implements Comparable<BigFraction> {
      * @return The result of the sum
      */
     public BigFraction add(BigFraction other) {
-        return new BigFraction(ntor.multiply(other.dtor).add(other.ntor.multiply(dtor)), dtor.multiply(other.dtor));
+        return new BigFraction(
+                ntor.multiply(other.dtor).add(other.ntor.multiply(dtor)),
+                dtor.multiply(other.dtor));
     }
 
     /**
@@ -221,7 +223,9 @@ public final class BigFraction implements Comparable<BigFraction> {
      * @return The result of the subtraction
      */
     public BigFraction subtract(BigFraction other) {
-        return new BigFraction(ntor.multiply(other.dtor).subtract(other.ntor.multiply(dtor)), dtor.multiply(other.dtor));
+        return new BigFraction(
+                ntor.multiply(other.dtor).subtract(other.ntor.multiply(dtor)),
+                dtor.multiply(other.dtor));
     }
 
     /**
@@ -282,7 +286,9 @@ public final class BigFraction implements Comparable<BigFraction> {
      * @throws ArithmeticException If {@code other} is zero
      */
     public BigFraction divide(BigFraction other) {
-        return new BigFraction(ntor.multiply(other.dtor), dtor.multiply(other.ntor));
+        return new BigFraction(
+                ntor.multiply(other.dtor),
+                dtor.multiply(other.ntor));
     }
 
     /**
@@ -397,8 +403,8 @@ public final class BigFraction implements Comparable<BigFraction> {
         BigFraction ntor = this;
         for (int i = 1; i < 10; i++) {
             dtor = dtor.multiply(new BigInteger(String.valueOf(i)));
-            result.add(ntor.divide(dtor));
-            ntor = ntor.multiply(ntor);
+            result = result.add(ntor.divide(dtor));
+            ntor = ntor.multiply(this);
         }
         return result;
     }
@@ -410,18 +416,35 @@ public final class BigFraction implements Comparable<BigFraction> {
      * @return The logarithm value of this fraction.
      */
     public BigFraction log() {
-        BigInteger dtor = BigInteger.ONE;
-        BigFraction result = BigFraction.ONE;
-        BigFraction ntor = this.subtract(BigInteger.ONE);
-        BigInteger sign = BigInteger.ONE;
-        for (int i = 1; i < 20; i++) {
-            result.add(ntor.divide(dtor).multiply(sign));
-            ntor = ntor.multiply(ntor);
-            dtor = dtor.add(BigInteger.ONE);
-            sign = sign.negate();
+        if (this.ntor.compareTo(BigInteger.ONE) == 0 && this.dtor.compareTo(BigInteger.ONE) == 0) {
+            return ZERO;
         }
-        return result;
+        String digits = Double.toString(this.toDouble()).split("\\.")[0];
+        int lenght = digits.charAt(0) == '1' || digits.charAt(0) == '0' ? digits.length() - 1 : digits.length();
+        BigFraction y = this.divide(BigInteger.TEN.pow(lenght));
+        if (y.compareTo(BigInteger.ZERO) <= 0) {
+            throw new ArithmeticException("Domain error " + this.toDouble());
+        }
+        if (y.compareTo(TWO) <= 0) {
+            BigFraction result = BigFraction.ZERO;
+            BigFraction x = y.subtract(BigInteger.ONE);
+            BigFraction ntor = x;
+            BigInteger dtor = BigInteger.ONE;
+            BigInteger sign = BigInteger.ONE;
+            for (int i = 1; i < 200; i++) {
+                BigFraction temp = ntor.divide(dtor).multiply(sign);
+                result = result.add(temp);
+                ntor = ntor.multiply(x);
+                dtor = dtor.add(BigInteger.ONE);
+                sign = sign.negate();
+            }
+            return result.add(LOG_10.multiply(lenght));
+        } else {
+            throw new ArithmeticException("Unexpected division by largest power of 10");
+        }
+
     }
+
 
     @Override
     public int compareTo(BigFraction other) {

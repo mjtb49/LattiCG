@@ -125,9 +125,6 @@ public class BKZBlockSizeTest {
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{8462157635811,1251368972967,-1652918150373,1387004841087,1717588765715,-2363517938153,10131123425739,-11456623266449,5477436914243,-4759160995705,5496978719611,-6245443060385},\n" +
                 "{14276340518069,11302502565649,-760697010115,6141148139513,-8322341108987,-2402663381215,6840633257741,3747223598729,-6011287794091,3767907907633,-10053902617891,6917101368857}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 2, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -147,9 +144,6 @@ public class BKZBlockSizeTest {
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{8462157635811,1251368972967,-1652918150373,1387004841087,1717588765715,-2363517938153,10131123425739,-11456623266449,5477436914243,-4759160995705,5496978719611,-6245443060385},\n" +
                 "{14276340518069,11302502565649,-760697010115,6141148139513,-8322341108987,-2402663381215,6840633257741,3747223598729,-6011287794091,3767907907633,-10053902617891,6917101368857}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 3, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -169,9 +163,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 4, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -191,9 +182,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 5, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -213,9 +201,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 6, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -235,9 +220,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 7, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -258,9 +240,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 8, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -280,9 +259,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 9, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -303,9 +279,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 10, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -326,9 +299,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 11, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -348,9 +318,6 @@ public class BKZBlockSizeTest {
                 "{-2927275271675,4358198759969,-749428089331,-5906764121719,6996620318037,-8434527046863,4013008064989,10544347457817,4690845726117,-1572849494719,-1562550095187,-15622834716247},\n" +
                 "{3913481047550,11457107519782,11295936833838,-4892876006250,-2349194285090,-3961586281082,-10007826133490,-9624601063434,-4233142841410,5269765269478,-132373012242,-8329452594858},\n" +
                 "{2061373912094,9210433152198,988237794382,-4258740350666,-2513632749570,-9075210294490,-4284690611410,4090527182486,-660764304930,19160463718278,1862849529870,8595956826614}}");
-        System.out.println("Running " + (new Throwable().getStackTrace())[0].getMethodName() + " expecting: ");
-        System.out.println(expected.toPrettyString() + "\n");
-
         Result result = BKZ.reduce(basis, 12, params);
         assertEquals(basis.toPrettyString(), control.toPrettyString());
         assertEquals(expected.toPrettyString(), result.getReducedBasis().toPrettyString());
@@ -359,6 +326,7 @@ public class BKZBlockSizeTest {
     @Test(expected = IllegalArgumentException.class)
     public void testThirteen() {
         Result result = BKZ.reduce(basis, 13, params);
+        // TODO compute it for test
     }
 
 
