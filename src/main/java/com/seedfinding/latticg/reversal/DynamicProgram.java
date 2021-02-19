@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.LongStream;
 
 public final class DynamicProgram {
-
+    private boolean verbose = false;
     private final ProgramBuilder programBuilder;
     private final List<Object> values = new ArrayList<>();
     private boolean valid = true;
@@ -38,9 +38,17 @@ public final class DynamicProgram {
         return this;
     }
 
+    public DynamicProgram setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        return this;
+    }
+
     public LongStream reverse() {
         checkValid();
         Program program = programBuilder.build();
+        if (this.verbose) {
+            program.setVerbose(true);
+        }
         ProgramInstance instance = program.start();
         for (Object value : values) {
             instance.add(value);
@@ -56,4 +64,7 @@ public final class DynamicProgram {
         }
     }
 
+    public boolean isVerbose() {
+        return verbose;
+    }
 }
