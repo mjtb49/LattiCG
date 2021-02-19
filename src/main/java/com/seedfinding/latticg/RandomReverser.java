@@ -24,9 +24,9 @@ public class RandomReverser {
 
     private BigMatrix lattice;
 
-    private ArrayList<Long> mins;
-    private ArrayList<Long> maxes;
-    private ArrayList<Long> callIndices;
+    private final ArrayList<Long> mins;
+    private final ArrayList<Long> maxes;
+    private final ArrayList<Long> callIndices;
     private long currentCallIndex;
     private int dimensions;
     private boolean verbose;

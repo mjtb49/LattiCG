@@ -8,7 +8,7 @@ import java.util.List;
 
 @ApiStatus.Experimental
 public class Program {
-
+    private boolean verbose=false;
     private final LCG lcg;
     private final List<CallType<?>> calls;
     private final List<Long> skips;
@@ -27,6 +27,10 @@ public class Program {
         return new ProgramInstance(this);
     }
 
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
     public LCG getLcg() {
         return lcg;
     }
@@ -39,5 +43,10 @@ public class Program {
     @ApiStatus.Internal
     public List<Long> getSkips() {
         return skips;
+    }
+
+    @ApiStatus.Internal
+    public boolean isVerbose() {
+        return verbose;
     }
 }
