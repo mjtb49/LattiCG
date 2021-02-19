@@ -36,8 +36,8 @@ public class ProgramInstance {
             throw new IndexOutOfBoundsException("Too many observations for the number of calls specified");
         }
         CallType<T> callType = (CallType<T>) program.getCalls().get(callIndex++);
-        T thing = callType.getType().cast(value);
-        observations.add(thing);
+        T observation = callType.getType().cast(value);
+        observations.add(observation);
         return this;
     }
 
@@ -51,7 +51,9 @@ public class ProgramInstance {
         }
 
         RandomReverser reverser = new RandomReverser();
-
+        if (this.program.isVerbose()){
+            reverser.setVerbose(true);
+        }
         List<CallType<?>> calls = program.getCalls();
         List<Long> skips = program.getSkips();
         for (int i = 0; i < calls.size(); i++) {
