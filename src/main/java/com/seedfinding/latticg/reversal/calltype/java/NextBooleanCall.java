@@ -12,7 +12,7 @@ public class NextBooleanCall extends CallType<Boolean> {
     private final boolean inverted;
 
     private NextBooleanCall(boolean inverted) {
-        super(Boolean.class);
+        super(Boolean.class, 1);
         this.inverted = inverted;
     }
 

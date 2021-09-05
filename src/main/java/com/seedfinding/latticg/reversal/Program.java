@@ -1,6 +1,7 @@
 package com.seedfinding.latticg.reversal;
 
 import com.seedfinding.latticg.reversal.calltype.CallType;
+import com.seedfinding.latticg.reversal.calltype.FilteredSkip;
 import com.seedfinding.latticg.util.LCG;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -11,12 +12,14 @@ public class Program {
     private final LCG lcg;
     private final List<CallType<?>> calls;
     private final List<Long> skips;
+    private final List<FilteredSkip> filteredSkips;
     private boolean verbose = false;
 
-    protected Program(LCG lcg, List<CallType<?>> calls, List<Long> skips) {
+    protected Program(LCG lcg, List<CallType<?>> calls, List<Long> skips, List<FilteredSkip> filteredSkips) {
         this.lcg = lcg;
         this.calls = calls;
         this.skips = skips;
+        this.filteredSkips = filteredSkips;
     }
 
     public static ProgramBuilder builder(LCG lcg) {
@@ -39,6 +42,11 @@ public class Program {
     @ApiStatus.Internal
     public List<Long> getSkips() {
         return skips;
+    }
+
+    @ApiStatus.Internal
+    public List<FilteredSkip> getFilteredSkips() {
+        return filteredSkips;
     }
 
     @ApiStatus.Internal

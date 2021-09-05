@@ -50,7 +50,7 @@ public class ProgramInstance {
             throw new IllegalStateException("Not all specified calls have been given observations");
         }
 
-        RandomReverser reverser = new RandomReverser();
+        RandomReverser reverser = new RandomReverser(program.getFilteredSkips());
         if (this.program.isVerbose()) {
             reverser.setVerbose(true);
         }
@@ -91,8 +91,8 @@ public class ProgramInstance {
                     value = !value;
                 }
                 // if we have the full range [0.0f;1.0f) then we don't observe that call
-                if (floatRange.getMin()==0.0f && !floatRange.isMinStrict() && floatRange.getMax()==1.0f && floatRange.isMaxStrict()){
-                    value=false;
+                if (floatRange.getMin() == 0.0f && !floatRange.isMinStrict() && floatRange.getMax() == 1.0f && floatRange.isMaxStrict()) {
+                    value = false;
                 }
                 if (value) {
                     reverser.addNextFloatCall(floatRange.getMin(), floatRange.getMax(), !floatRange.isMinStrict(), !floatRange.isMaxStrict());
@@ -115,8 +115,8 @@ public class ProgramInstance {
                     max--;
                 }
                 // if we use the full range no need of monitoring that call
-                if (intRange.getBound()==(max-min+1)){
-                    value=false;
+                if (intRange.getBound() == (max - min + 1)) {
+                    value = false;
                 }
                 if (value) {
                     reverser.addNextIntCall(intRange.getBound(), min, max);
@@ -139,8 +139,8 @@ public class ProgramInstance {
                     max--;
                 }
                 // if we use the full range no need of monitoring that call
-                if (min==Integer.MIN_VALUE && max==Integer.MAX_VALUE){
-                    value=false;
+                if (min == Integer.MIN_VALUE && max == Integer.MAX_VALUE) {
+                    value = false;
                 }
                 if (value) {
                     reverser.addNextIntCall(min, max);
@@ -155,8 +155,8 @@ public class ProgramInstance {
                     value = !value;
                 }
                 // if we have the full range [0.0D;1.0D) then we don't observe that call
-                if (doubleRange.getMin()==0.0D && !doubleRange.isMinStrict() && doubleRange.getMax()==1.0D && doubleRange.isMaxStrict()){
-                    value=false;
+                if (doubleRange.getMin() == 0.0D && !doubleRange.isMinStrict() && doubleRange.getMax() == 1.0D && doubleRange.isMaxStrict()) {
+                    value = false;
                 }
                 if (value) {
                     reverser.addNextDoubleCall(doubleRange.getMin(), doubleRange.getMax(), !doubleRange.isMinStrict(), !doubleRange.isMaxStrict());

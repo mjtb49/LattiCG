@@ -13,7 +13,7 @@ public class NextFloatCall extends RangeableCallType<Float> {
     private static final Float ABS_MAX = 1f;
 
     private NextFloatCall() {
-        super(Float.class);
+        super(Float.class, 1);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class NextFloatCall extends RangeableCallType<Float> {
     @ApiStatus.Internal
     public static class FloatRange extends RangeCallType<Float> {
         public FloatRange(Float min, Float max, boolean minStrict, boolean maxStrict, boolean inverted) {
-            super(min, max, minStrict, maxStrict, inverted);
+            super(min, max, minStrict, maxStrict, inverted, 1);
         }
 
         @Override

@@ -7,6 +7,7 @@ import com.seedfinding.latticg.math.lattice.LLL.LLL;
 import com.seedfinding.latticg.math.lattice.LLL.Params;
 import com.seedfinding.latticg.math.lattice.LLL.Result;
 import com.seedfinding.latticg.math.lattice.enumeration.Enumerate;
+import com.seedfinding.latticg.reversal.calltype.FilteredSkip;
 import com.seedfinding.latticg.util.LCG;
 import com.seedfinding.latticg.util.Mth;
 import com.seedfinding.latticg.util.Rand;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.LongStream;
 
 @ApiStatus.Internal
@@ -24,22 +26,23 @@ public class RandomReverser {
     private final ArrayList<Long> mins;
     private final ArrayList<Long> maxes;
     private final ArrayList<Long> callIndices;
+    private final List<FilteredSkip> filteredSkips;
     private BigMatrix lattice;
     private long currentCallIndex;
     private int dimensions;
     private boolean verbose;
-
     private double successChance;
 
     @ApiStatus.Internal
-    public RandomReverser() {
-        verbose = false;
-        dimensions = 0;
-        mins = new ArrayList<>();
-        maxes = new ArrayList<>();
-        callIndices = new ArrayList<>();
-        currentCallIndex = 0;
-        successChance = 1.0;
+    public RandomReverser(List<FilteredSkip> filteredSkips) {
+        this.verbose = false;
+        this.dimensions = 0;
+        this.mins = new ArrayList<>();
+        this.maxes = new ArrayList<>();
+        this.callIndices = new ArrayList<>();
+        this.currentCallIndex = 0;
+        this.successChance = 1.0;
+        this.filteredSkips = filteredSkips;
     }
 
     //TODO Make this pick and choose which dimensions to use instead of using all of them
@@ -79,7 +82,17 @@ public class RandomReverser {
             .map(vec -> vec.get(0))
             .map(BigFraction::getNumerator)
             .mapToLong(BigInteger::longValue)
-            .map(r::nextSeed);
+            .map(r::nextSeed)
+            .filter(seed -> {
+                    for (FilteredSkip call : this.filteredSkips) {
+                        Rand rr = Rand.ofInternalSeed(seed);
+                        if (!call.checkState(rr)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            );
     }
 
     private void createLattice() {

@@ -2,9 +2,11 @@ package com.seedfinding.latticg.reversal;
 
 import com.seedfinding.latticg.reversal.calltype.CallType;
 import com.seedfinding.latticg.util.LCG;
+import com.seedfinding.latticg.util.Rand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.LongStream;
 
 public final class DynamicProgram {
@@ -30,6 +32,12 @@ public final class DynamicProgram {
 
     public DynamicProgram add(CallType<Boolean> callType) {
         return add(callType, true);
+    }
+
+    public DynamicProgram filteredSkip(Predicate<Rand> filter, long steps) {
+        checkValid();
+        programBuilder.filteredSkip(filter, steps);
+        return this;
     }
 
     public DynamicProgram skip(long steps) {

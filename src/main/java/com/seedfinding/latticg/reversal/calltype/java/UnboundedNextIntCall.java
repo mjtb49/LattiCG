@@ -13,7 +13,7 @@ public class UnboundedNextIntCall extends RangeableCallType<Integer> {
     private static final Integer ABS_MAX = Integer.MAX_VALUE;
 
     private UnboundedNextIntCall() {
-        super(Integer.class);
+        super(Integer.class, 1);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class UnboundedNextIntCall extends RangeableCallType<Integer> {
     @ApiStatus.Internal
     public static class IntRange extends RangeCallType<Integer> {
         public IntRange(Integer min, Integer max, boolean minStrict, boolean maxStrict, boolean inverted) {
-            super(min, max, minStrict, maxStrict, inverted);
+            super(min, max, minStrict, maxStrict, inverted, 1);
         }
 
         @Override
