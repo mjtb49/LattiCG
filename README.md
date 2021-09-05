@@ -14,17 +14,17 @@ To use the libs you need first to declare the maven `maven { url "https://maven.
 
 Gradle Groovy DSL :
 
-`implementation 'com.seedfinding:latticg:1.05@jar'`
+`implementation 'com.seedfinding:latticg:1.06@jar'`
 
 Apache Maven:
 ```
 <dependency>
   <groupId>com.seedfinding</groupId>
   <artifactId>latticg</artifactId>
-  <version>1.05</version>
+  <version>1.06</version>
 </dependency>
 ```
 
 Scala SBT
 
-`libraryDependencies += "com.seedfinding" % "latticg" % "1.05"`
+`libraryDependencies += "com.seedfinding" % "latticg" % "1.06"`
