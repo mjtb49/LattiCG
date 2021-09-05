@@ -264,6 +264,7 @@ public class RandomReverser {
     /**
      * Add a constraint that min {@literal <} / {@literal <}= nextFloat() {@literal <} / {@literal <}= max, with strict inequalities when minInclusive or
      * maxInclusive are false, respectively.
+     * As per the Java Random documentation min {@literal >}= 0 and max {@literal <} 1
      *
      * @param min          low end of the valid range
      * @param max          high end of the valid range
@@ -271,7 +272,7 @@ public class RandomReverser {
      * @param maxInclusive true if the high end of the valid range should be inclusive
      */
     public void addNextFloatCall(float min, float max, boolean minInclusive, boolean maxInclusive) {
-        if (max < min || min < 0.0f || max >= 1.0f || (!(minInclusive && maxInclusive) && max == min)) {
+        if (max < min || min < 0.0f || max >= 1.0f && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
             throw new IllegalArgumentException(String.format("Bounds should be 0<=/<min<=/<max but were min: %f " +
                 "max: %f with min included : %s and max included %s", min, max, minInclusive, maxInclusive));
         }
@@ -358,7 +359,7 @@ public class RandomReverser {
      * @param maxInclusive true if the high end of the valid range should be inclusive
      */
     public void addNextDoubleCall(double min, double max, boolean minInclusive, boolean maxInclusive) {
-        if (max < min || min < 0.0D || max >= 1.0D || (!(minInclusive && maxInclusive) && max == min)) {
+        if (max < min || min < 0.0D || max >= 1.0D && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
             throw new IllegalArgumentException(String.format("Bounds should be 0<=/<min<=/<max but were min: %f " +
                 "max: %f with min included : %s and max included %s", min, max, minInclusive, maxInclusive));
         }
