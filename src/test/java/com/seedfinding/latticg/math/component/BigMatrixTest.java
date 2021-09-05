@@ -5,7 +5,9 @@ import org.junit.Test;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 /** @noinspection CodeBlock2Expr */
 public class BigMatrixTest {
@@ -174,11 +176,11 @@ public class BigMatrixTest {
     @Test(expected = IllegalStateException.class)
     public void testInverseSingular() {
         BigMatrix m = BigMatrix.fromString(
-                "{{0, 1, 1, 2, 3}," +
-                        "{5, 8, 13, 21, 34}," +
-                        "{55, 89, 144, 233, 377}," +
-                        "{610, 987, 1597, 2584, 4181}," +
-                        "{6765, 10946, 17711, 28657, 46368}}"
+            "{{0, 1, 1, 2, 3}," +
+                "{5, 8, 13, 21, 34}," +
+                "{55, 89, 144, 233, 377}," +
+                "{610, 987, 1597, 2584, 4181}," +
+                "{6765, 10946, 17711, 28657, 46368}}"
         );
         m.inverse();
     }
@@ -186,18 +188,18 @@ public class BigMatrixTest {
     @Test
     public void testInvesre5x5() {
         testMatrixFlavors(BigMatrix.fromString(
-                "{{1, 8, 24, 7, 16}," +
-                        "{4, 5, 6, 22, 25}," +
-                        "{10, 20, 18, 12, 9}," +
-                        "{2, 13, 3, 23, 11}," +
-                        "{19, 14, 21, 15, 17}}"
+            "{{1, 8, 24, 7, 16}," +
+                "{4, 5, 6, 22, 25}," +
+                "{10, 20, 18, 12, 9}," +
+                "{2, 13, 3, 23, 11}," +
+                "{19, 14, 21, 15, 17}}"
         ), m -> {
             BigMatrix expected = BigMatrix.fromString(
-                    "{{-9516, -1107, -4077, -3855, 15237}," +
-                            "{-12486, 16731, 39465, -18660, -21672}," +
-                            "{16955, -18494, -20727, 15324, 12297}," +
-                            "{9837, -20547, -31365, 31833, 16965}," +
-                            "{-8706, 28434, 25335, -27342, -15984}}"
+                "{{-9516, -1107, -4077, -3855, 15237}," +
+                    "{-12486, 16731, 39465, -18660, -21672}," +
+                    "{16955, -18494, -20727, 15324, 12297}," +
+                    "{9837, -20547, -31365, 31833, 16965}," +
+                    "{-8706, 28434, 25335, -27342, -15984}}"
             ).divide(new BigFraction(227079));
             assertEquals(expected, m.inverse());
         });
@@ -292,7 +294,7 @@ public class BigMatrixTest {
     @Test
     public void testSwapElementsAndSet() {
         testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}, {5, 7}}"), m -> {
-            BigMatrix result = m.swapElementsAndSet(0,1, 2,0);
+            BigMatrix result = m.swapElementsAndSet(0, 1, 2, 0);
             assertSame(result, m);
             assertEquals(BigMatrix.fromString("{{1, 5}, {3, 4}, {2, 7}}"), m);
         });
@@ -309,27 +311,27 @@ public class BigMatrixTest {
     }
 
     @Test
-    public void testShiftRows(){
-        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
-            BigMatrix result=m.shiftRows(0,1);
+    public void testShiftRows() {
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"), m -> {
+            BigMatrix result = m.shiftRows(0, 1);
             assertSame(result, m);
-            assertEquals(BigMatrix.fromString("{{3, 4}, {1, 2}}"),m);
+            assertEquals(BigMatrix.fromString("{{3, 4}, {1, 2}}"), m);
         });
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testShiftRowsFail(){
-        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
-            BigMatrix result=m.shiftRows(1,0);
+    public void testShiftRowsFail() {
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"), m -> {
+            BigMatrix result = m.shiftRows(1, 0);
         });
     }
 
     @Test()
-    public void testShiftRowsNothing(){
-        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m -> {
-            BigMatrix result=m.shiftRows(1,1);
+    public void testShiftRowsNothing() {
+        testMatrixFlavors(BigMatrix.fromString("{{1, 2}, {3, 4}}"), m -> {
+            BigMatrix result = m.shiftRows(1, 1);
             assertSame(result, m);
-            assertEquals(BigMatrix.fromString("{{1, 2}, {3, 4}}"),m);
+            assertEquals(BigMatrix.fromString("{{1, 2}, {3, 4}}"), m);
         });
     }
 

@@ -1,8 +1,8 @@
 package com.seedfinding.latticg.reversal.calltype.java;
 
 import com.seedfinding.latticg.reversal.calltype.RangeCallType;
-import org.jetbrains.annotations.ApiStatus;
 import com.seedfinding.latticg.reversal.calltype.RangeableCallType;
+import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
 public class NextDoubleCall extends RangeableCallType<Double> {

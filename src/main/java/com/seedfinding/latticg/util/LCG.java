@@ -39,8 +39,8 @@ public class LCG {
         long intermediateMultiplier = this.multiplier;
         long intermediateAddend = this.addend;
 
-        for(long k = steps; k != 0; k >>>= 1) {
-            if((k & 1) != 0) {
+        for (long k = steps; k != 0; k >>>= 1) {
+            if ((k & 1) != 0) {
                 multiplier *= intermediateMultiplier;
                 addend = intermediateMultiplier * addend + intermediateAddend;
             }
@@ -69,12 +69,12 @@ public class LCG {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this)return true;
-        if(!(obj instanceof LCG))return false;
-        LCG lcg = (LCG)obj;
+        if (obj == this) return true;
+        if (!(obj instanceof LCG)) return false;
+        LCG lcg = (LCG) obj;
         return this.multiplier == lcg.multiplier &&
-                this.addend == lcg.addend &&
-                this.modulus == lcg.modulus;
+            this.addend == lcg.addend &&
+            this.modulus == lcg.modulus;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class LCG {
     @Override
     public String toString() {
         return "LCG{" + "multiplier=" + this.multiplier +
-                ", addend=" + this.addend + ", modulo=" + this.modulus + '}';
+            ", addend=" + this.addend + ", modulo=" + this.modulus + '}';
     }
 
 }

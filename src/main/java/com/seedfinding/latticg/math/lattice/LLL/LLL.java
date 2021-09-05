@@ -93,12 +93,12 @@ import java.math.BigInteger;
 // @formatter:on
 
 public class LLL {
-    // GSO stands for Gram-Schmidt Orthogonalization
-    private BigMatrix baseGSO; // this is the Gram-Schmidt (almost Orthogonal thus GSO) basis
-    private BigMatrix mu; // those are the mu that are used in the Gram-Schimdt process
     private final int nbRows;
     private final int nbCols;
     private final BigMatrix coordinates; // also knows as H, give coordinates of the LLL-reduced basis in terms of the initial one
+    // GSO stands for Gram-Schmidt Orthogonalization
+    private BigMatrix baseGSO; // this is the Gram-Schmidt (almost Orthogonal thus GSO) basis
+    private BigMatrix mu; // those are the mu that are used in the Gram-Schimdt process
     private BigVector norms; // those are simply the magnitude of each GS vectors
     private BigMatrix basis; // also knows as the lattice, it's the internal representation so its easier to have it named like that
     private Params params;

@@ -38,7 +38,7 @@ public final class BigFraction implements Comparable<BigFraction> {
      * since 9 it is public http://hg.openjdk.java.net/jdk/jdk11/file/tip/src/java.base/share/classes/java/math/BigInteger.java#l1277
      */
     public static final BigInteger TWO = new BigInteger("2");
-
+    private static final MathContext TO_DOUBLE_CONTEXT = MathContext.DECIMAL64;
     private BigInteger ntor;
     private BigInteger dtor;
 
@@ -173,8 +173,6 @@ public final class BigFraction implements Comparable<BigFraction> {
         return new BigDecimal(ntor).divide(new BigDecimal(dtor), mc);
     }
 
-    private static final MathContext TO_DOUBLE_CONTEXT = MathContext.DECIMAL64;
-
     /**
      * Converts this fraction to a {@code double}, rounding where necessary
      *
@@ -192,8 +190,8 @@ public final class BigFraction implements Comparable<BigFraction> {
      */
     public BigFraction add(BigFraction other) {
         return new BigFraction(
-                ntor.multiply(other.dtor).add(other.ntor.multiply(dtor)),
-                dtor.multiply(other.dtor));
+            ntor.multiply(other.dtor).add(other.ntor.multiply(dtor)),
+            dtor.multiply(other.dtor));
     }
 
     /**
@@ -224,8 +222,8 @@ public final class BigFraction implements Comparable<BigFraction> {
      */
     public BigFraction subtract(BigFraction other) {
         return new BigFraction(
-                ntor.multiply(other.dtor).subtract(other.ntor.multiply(dtor)),
-                dtor.multiply(other.dtor));
+            ntor.multiply(other.dtor).subtract(other.ntor.multiply(dtor)),
+            dtor.multiply(other.dtor));
     }
 
     /**
@@ -287,8 +285,8 @@ public final class BigFraction implements Comparable<BigFraction> {
      */
     public BigFraction divide(BigFraction other) {
         return new BigFraction(
-                ntor.multiply(other.dtor),
-                dtor.multiply(other.ntor));
+            ntor.multiply(other.dtor),
+            dtor.multiply(other.ntor));
     }
 
     /**

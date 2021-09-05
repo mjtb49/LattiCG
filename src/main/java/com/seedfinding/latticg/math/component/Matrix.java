@@ -14,17 +14,16 @@ import java.util.List;
  */
 public final class Matrix {
 
-    private double[] numbers;
-    private int rowCount;
-    private int columnCount;
-
+    private final double[] numbers;
+    private final int rowCount;
+    private final int columnCount;
+    private final int underlyingColumnCount;
     private int startIndex = 0;
-    private int underlyingColumnCount;
 
     /**
      * Constructs the zero matrix of the given size
      *
-     * @param rowCount The number of rows
+     * @param rowCount    The number of rows
      * @param columnCount The number of columns
      * @throws IllegalArgumentException If {@code rowCount} or {@code columnCount} isn't positive
      */
@@ -33,7 +32,7 @@ public final class Matrix {
         this.columnCount = columnCount;
         this.underlyingColumnCount = columnCount;
 
-        if(rowCount <= 0 || columnCount <= 0) {
+        if (rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
         }
 
@@ -43,15 +42,15 @@ public final class Matrix {
     /**
      * Constructs a matrix of the given size, using the given function to fill in each element.
      *
-     * @param rowCount The number of rows
+     * @param rowCount    The number of rows
      * @param columnCount The number of columns
-     * @param gen The function to call for each element of the matrix
+     * @param gen         The function to call for each element of the matrix
      */
     public Matrix(int rowCount, int columnCount, DataProvider gen) {
         this(rowCount, columnCount);
 
-        for(int row = 0; row < this.rowCount; row++) {
-            for(int col = 0; col < this.columnCount; col++) {
+        for (int row = 0; row < this.rowCount; row++) {
+            for (int col = 0; col < this.columnCount; col++) {
                 this.set(row, col, gen.getValue(row, col));
             }
         }
@@ -110,8 +109,8 @@ public final class Matrix {
     /**
      * Sets a single value in the matrix
      *
-     * @param row The row of the value to set
-     * @param col The column of the value to set
+     * @param row   The row of the value to set
+     * @param col   The column of the value to set
      * @param value The value to set
      * @throws IndexOutOfBoundsException If {@code row} or {@code col} is out of bounds
      */
@@ -154,9 +153,9 @@ public final class Matrix {
      * Sets the row at the given index to be the same as the given vector. Copies that vector into this matrix
      *
      * @param rowIndex The index of the row to set
-     * @param newRow The vector to set the row to
-     * @throws IllegalArgumentException If the dimension of the given vector is not equal to the number of columns in
-     *                                  this matrix
+     * @param newRow   The vector to set the row to
+     * @throws IllegalArgumentException  If the dimension of the given vector is not equal to the number of columns in
+     *                                   this matrix
      * @throws IndexOutOfBoundsException If {@code rowIndex} is out of bounds
      */
     public void setRow(int rowIndex, Vector newRow) {
@@ -180,9 +179,9 @@ public final class Matrix {
      * Sets the column at the given index to be the same as the given vector. Copies that vector into this matrix
      *
      * @param columnIndex The index of the column to set
-     * @param newColumn The vector to set the column to
-     * @throws IllegalArgumentException If the dimension of the given vector is not equal to the number of rows in this
-     *                                  matrix
+     * @param newColumn   The vector to set the column to
+     * @throws IllegalArgumentException  If the dimension of the given vector is not equal to the number of rows in this
+     *                                   matrix
      * @throws IndexOutOfBoundsException If {@code columnIndex} is out of bounds
      */
     public void setColumn(int columnIndex, Vector newColumn) {
@@ -202,9 +201,9 @@ public final class Matrix {
      * Gets a submatrix <i>view</i> starting at the given position and of the given size. Modifying this matrix will
      * modify the original matrix
      *
-     * @param startRow The row of the top of the submatrix
+     * @param startRow    The row of the top of the submatrix
      * @param startColumn The column on the left of the submatrix
-     * @param rowCount The number of rows in the submatrix
+     * @param rowCount    The number of rows in the submatrix
      * @param columnCount The number of columns in the submatrix
      * @return A view of the submatrix
      * @throws IndexOutOfBoundsException If {@code startRow}, {@code startColumn}, {@code rowCount} or
@@ -283,13 +282,13 @@ public final class Matrix {
      *                                  this matrix
      */
     public Vector multiply(Vector v) {
-        if(this.columnCount != v.getDimension()) {
+        if (this.columnCount != v.getDimension()) {
             throw new IllegalArgumentException("Vector length should equal the number of matrix columns");
         }
 
         Vector dest = new Vector(this.rowCount);
 
-        for(int i = 0; i < this.rowCount; i++) {
+        for (int i = 0; i < this.rowCount; i++) {
             dest.set(i, v.dot(this.getRow(i)));
         }
 
@@ -312,7 +311,7 @@ public final class Matrix {
      *
      * @return A new matrix containing the result
      * @throws UnsupportedOperationException If this is not a square matrix
-     * @throws IllegalStateException If this matrix is singular
+     * @throws IllegalStateException         If this matrix is singular
      */
     public Matrix inverse() {
         return LUDecomposition.decompose(this).inverse();
@@ -381,7 +380,7 @@ public final class Matrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public Matrix subtractAndSet(Matrix m) {
-        if(this.rowCount != m.rowCount || this.columnCount != m.columnCount) {
+        if (this.rowCount != m.rowCount || this.columnCount != m.columnCount) {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
 
@@ -434,13 +433,13 @@ public final class Matrix {
      */
     public Matrix multiplyAndSet(Matrix m) {
         // We have to modify this matrix, which means its dimensions must stay the same, which means it has to be square, and the same size as the other matrix
-        if(this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
+        if (this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
             throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
         }
 
         Matrix result = this.multiply(m);
 
-        for(int i = 0; i < this.rowCount; i++) {
+        for (int i = 0; i < this.rowCount; i++) {
             this.setRow(i, result.getRow(i));
         }
 
@@ -501,7 +500,7 @@ public final class Matrix {
      * Returns whether this matrix has the same dimensions as the given matrix, and all elements of this matrix are
      * within {@code tolerance} of the corresponding elements in the given matrix
      *
-     * @param other The matrix to test against
+     * @param other     The matrix to test against
      * @param tolerance The maximum amount each element is allowed to differ
      * @return Whether this matrix is close enough to the given matrix
      */
@@ -568,10 +567,10 @@ public final class Matrix {
      * @throws ParseException If the input is malformed
      */
     public static Matrix fromString(String raw) {
-       StringParser parser = StringParser.of(raw);
-       Matrix mat = parse(parser);
-       parser.expectEof();
-       return mat;
+        StringParser parser = StringParser.of(raw);
+        Matrix mat = parse(parser);
+        parser.expectEof();
+        return mat;
     }
 
     /**
@@ -614,7 +613,7 @@ public final class Matrix {
     public static Matrix fromBigMatrix(BigMatrix m) {
         Matrix p = new Matrix(m.getRowCount(), m.getColumnCount());
 
-        for(int i = 0; i < p.rowCount; i++) {
+        for (int i = 0; i < p.rowCount; i++) {
             p.setRow(i, Vector.fromBigVector(m.getRow(i)));
         }
 

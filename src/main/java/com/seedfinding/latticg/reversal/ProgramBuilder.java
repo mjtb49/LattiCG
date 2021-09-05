@@ -1,7 +1,7 @@
 package com.seedfinding.latticg.reversal;
 
-import com.seedfinding.latticg.util.LCG;
 import com.seedfinding.latticg.reversal.calltype.CallType;
+import com.seedfinding.latticg.util.LCG;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;

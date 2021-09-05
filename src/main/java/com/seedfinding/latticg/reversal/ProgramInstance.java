@@ -1,15 +1,15 @@
 package com.seedfinding.latticg.reversal;
 
-import com.seedfinding.latticg.reversal.calltype.java.NextBooleanCall;
-import com.seedfinding.latticg.reversal.calltype.java.NextFloatCall;
-import org.jetbrains.annotations.ApiStatus;
 import com.seedfinding.latticg.RandomReverser;
 import com.seedfinding.latticg.reversal.calltype.CallType;
+import com.seedfinding.latticg.reversal.calltype.java.NextBooleanCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextDoubleCall;
+import com.seedfinding.latticg.reversal.calltype.java.NextFloatCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextIntCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextLongCall;
 import com.seedfinding.latticg.reversal.calltype.java.UnboundedNextIntCall;
 import com.seedfinding.latticg.util.LCG;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ProgramInstance {
         }
 
         RandomReverser reverser = new RandomReverser();
-        if (this.program.isVerbose()){
+        if (this.program.isVerbose()) {
             reverser.setVerbose(true);
         }
         List<CallType<?>> calls = program.getCalls();

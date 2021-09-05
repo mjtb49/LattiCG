@@ -15,11 +15,10 @@ import java.util.function.IntToDoubleFunction;
 public final class Vector {
 
     double[] numbers;
-    private int dimension;
-
     // to support views over a backing array, for internal use by Matrix
     int startPos = 0;
     int step = 1;
+    private int dimension;
 
     /**
      * Constructs the zero vector of the given dimension
@@ -89,7 +88,7 @@ public final class Vector {
     /**
      * Sets the element at the given index in the vector
      *
-     * @param i The index
+     * @param i     The index
      * @param value The value to put in that index
      * @throws IndexOutOfBoundsException If {@code i} is out of bounds
      */
@@ -119,7 +118,7 @@ public final class Vector {
     public double magnitudeSq() {
         double magnitude = 0.0D;
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             magnitude += this.get(i) * this.get(i);
         }
 
@@ -132,8 +131,8 @@ public final class Vector {
      * @return Whether this vector is the zero vector
      */
     public boolean isZero() {
-        for(int i = 0; i < this.getDimension(); i++) {
-            if(this.get(i) != 0.0D) return false;
+        for (int i = 0; i < this.getDimension(); i++) {
+            if (this.get(i) != 0.0D) return false;
         }
 
         return true;
@@ -229,7 +228,7 @@ public final class Vector {
     public Vector addAndSet(Vector a) {
         assertSameDimension(a);
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) + a.get(i));
         }
 
@@ -247,7 +246,7 @@ public final class Vector {
     public Vector subtractAndSet(Vector a) {
         assertSameDimension(a);
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) - a.get(i));
         }
 
@@ -261,7 +260,7 @@ public final class Vector {
      * @return This vector
      */
     public Vector multiplyAndSet(double scalar) {
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) * scalar);
         }
 
@@ -275,7 +274,7 @@ public final class Vector {
      * @return This vector
      */
     public Vector divideAndSet(double scalar) {
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             this.set(i, this.get(i) / scalar);
         }
 
@@ -310,7 +309,7 @@ public final class Vector {
 
         double dot = 0.0D;
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             dot += this.get(i) * v.get(i);
         }
 
@@ -355,7 +354,7 @@ public final class Vector {
             return new Vector(Arrays.copyOfRange(numbers, startPos, startPos + dimension));
         } else {
             Vector dest = new Vector(this.getDimension());
-            for(int i = 0; i < dest.getDimension(); i++) {
+            for (int i = 0; i < dest.getDimension(); i++) {
                 dest.set(i, this.get(i));
             }
             return dest;
@@ -372,7 +371,7 @@ public final class Vector {
      * Returns whether this vector has the same dimension as the given vector, and all elements of this vector are
      * within {@code tolerance} of the corresponding elements in the given vector
      *
-     * @param other The vector to test against
+     * @param other     The vector to test against
      * @param tolerance The maximum amount each element is allowed to differ
      * @return Whether this vector is close enough to the given vector
      */
@@ -409,7 +408,7 @@ public final class Vector {
     public String toString() {
         StringBuilder sb = new StringBuilder("{");
 
-        for(int i = 0; i < this.getDimension(); i++) {
+        for (int i = 0; i < this.getDimension(); i++) {
             sb.append(this.get(i)).append(i == this.getDimension() - 1 ? "" : ", ");
         }
 
@@ -462,7 +461,7 @@ public final class Vector {
     public static Vector fromBigVector(BigVector v) {
         Vector p = new Vector(v.getDimension());
 
-        for(int i = 0; i < p.getDimension(); i++) {
+        for (int i = 0; i < p.getDimension(); i++) {
             p.set(i, v.get(i).toDouble());
         }
 

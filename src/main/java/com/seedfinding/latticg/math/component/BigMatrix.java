@@ -1,10 +1,10 @@
 package com.seedfinding.latticg.math.component;
 
 import com.seedfinding.latticg.math.decomposition.LUDecomposition;
-import com.seedfinding.latticg.util.StringUtils;
 import com.seedfinding.latticg.reversal.asm.ParseException;
 import com.seedfinding.latticg.reversal.asm.StringParser;
 import com.seedfinding.latticg.reversal.asm.Token;
+import com.seedfinding.latticg.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +15,16 @@ import java.util.List;
  */
 public final class BigMatrix {
 
-    private BigFraction[] numbers;
-    private int rowCount;
-    private int columnCount;
-
+    private final BigFraction[] numbers;
+    private final int rowCount;
+    private final int columnCount;
+    private final int underlyingColumnCount;
     private int startIndex = 0;
-    private int underlyingColumnCount;
 
     /**
      * Constructs the zero matrix of the given size
      *
-     * @param rowCount The number of rows
+     * @param rowCount    The number of rows
      * @param columnCount The number of columns
      * @throws IllegalArgumentException If {@code rowCount} or {@code columnCount} isn't positive
      */
@@ -45,16 +44,16 @@ public final class BigMatrix {
     /**
      * Constructs a matrix of the given size, using the given function to fill in each element.
      *
-     * @param rowCount The number of rows
+     * @param rowCount    The number of rows
      * @param columnCount The number of columns
-     * @param gen The function to call for each element of the matrix
+     * @param gen         The function to call for each element of the matrix
      */
     public BigMatrix(int rowCount, int columnCount, DataProvider gen) {
         this.rowCount = rowCount;
         this.columnCount = columnCount;
         this.underlyingColumnCount = columnCount;
 
-        if(rowCount <= 0 || columnCount <= 0) {
+        if (rowCount <= 0 || columnCount <= 0) {
             throw new IllegalArgumentException("Matrix dimensions cannot be less or equal to 0");
         }
 
@@ -119,8 +118,8 @@ public final class BigMatrix {
     /**
      * Sets a single value in the matrix
      *
-     * @param row The row of the value to set
-     * @param col The column of the value to set
+     * @param row   The row of the value to set
+     * @param col   The column of the value to set
      * @param value The value to set
      * @throws IndexOutOfBoundsException If {@code row} or {@code col} is out of bounds
      */
@@ -163,9 +162,9 @@ public final class BigMatrix {
      * Sets the row at the given index to be the same as the given vector. Copies that vector into this matrix
      *
      * @param rowIndex The index of the row to set
-     * @param newRow The vector to set the row to
-     * @throws IllegalArgumentException If the dimension of the given vector is not equal to the number of columns in
-     *                                  this matrix
+     * @param newRow   The vector to set the row to
+     * @throws IllegalArgumentException  If the dimension of the given vector is not equal to the number of columns in
+     *                                   this matrix
      * @throws IndexOutOfBoundsException If {@code rowIndex} is out of bounds
      */
     public void setRow(int rowIndex, BigVector newRow) {
@@ -189,9 +188,9 @@ public final class BigMatrix {
      * Sets the column at the given index to be the same as the given vector. Copies that vector into this matrix
      *
      * @param columnIndex The index of the column to set
-     * @param newColumn The vector to set the column to
-     * @throws IllegalArgumentException If the dimension of the given vector is not equal to the number of rows in this
-     *                                  matrix
+     * @param newColumn   The vector to set the column to
+     * @throws IllegalArgumentException  If the dimension of the given vector is not equal to the number of rows in this
+     *                                   matrix
      * @throws IndexOutOfBoundsException If {@code columnIndex} is out of bounds
      */
     public void setColumn(int columnIndex, BigVector newColumn) {
@@ -211,9 +210,9 @@ public final class BigMatrix {
      * Gets a submatrix <i>view</i> starting at the given position and of the given size. Modifying this matrix will
      * modify the original matrix
      *
-     * @param startRow The row of the top of the submatrix
+     * @param startRow    The row of the top of the submatrix
      * @param startColumn The column on the left of the submatrix
-     * @param rowCount The number of rows in the submatrix
+     * @param rowCount    The number of rows in the submatrix
      * @param columnCount The number of columns in the submatrix
      * @return A view of the submatrix
      * @throws IndexOutOfBoundsException If {@code startRow}, {@code startColumn}, {@code rowCount} or
@@ -292,13 +291,13 @@ public final class BigMatrix {
      *                                  this matrix
      */
     public BigVector multiply(BigVector v) {
-        if(this.columnCount != v.getDimension()) {
+        if (this.columnCount != v.getDimension()) {
             throw new IllegalArgumentException("Vector length should equal the number of matrix columns");
         }
 
         BigVector dest = new BigVector(this.rowCount);
 
-        for(int i = 0; i < this.rowCount; i++) {
+        for (int i = 0; i < this.rowCount; i++) {
             dest.set(i, v.dot(this.getRow(i)));
         }
 
@@ -322,7 +321,7 @@ public final class BigMatrix {
      *
      * @return A new matrix containing the result
      * @throws UnsupportedOperationException If this is not a square matrix
-     * @throws IllegalStateException If this matrix is singular
+     * @throws IllegalStateException         If this matrix is singular
      */
     public BigMatrix inverse() {
         return LUDecomposition.decompose(this).inverse();
@@ -350,8 +349,8 @@ public final class BigMatrix {
      * @return A new matrix containing the result
      * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
      */
-    public BigMatrix swapElements(int row1,int col1, int row2,int col2) {
-        return copy().swapElementsAndSet(row1,col1, row2,col2);
+    public BigMatrix swapElements(int row1, int col1, int row2, int col2) {
+        return copy().swapElementsAndSet(row1, col1, row2, col2);
     }
 
     /**
@@ -377,7 +376,7 @@ public final class BigMatrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public BigMatrix addAndSet(BigMatrix m) {
-        if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+        if (this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
             throw new IllegalArgumentException("Adding two matrices with different dimensions");
         }
 
@@ -405,7 +404,7 @@ public final class BigMatrix {
      * @throws IllegalArgumentException If the given matrix is not the same size as this matrix
      */
     public BigMatrix subtractAndSet(BigMatrix m) {
-        if(this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
+        if (this.getRowCount() != m.getRowCount() || this.getColumnCount() != m.getColumnCount()) {
             throw new IllegalArgumentException("Subtracting two matrices with different dimensions");
         }
 
@@ -458,13 +457,13 @@ public final class BigMatrix {
      */
     public BigMatrix multiplyAndSet(BigMatrix m) {
         // We have to modify this matrix, which means its dimensions must stay the same, which means it has to be square, and the same size as the other matrix
-        if(this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
+        if (this.rowCount != this.columnCount || m.rowCount != m.columnCount || this.rowCount != m.columnCount) {
             throw new IllegalArgumentException("Multiplying two matrices with disallowed dimensions");
         }
 
         BigMatrix result = this.multiply(m);
 
-        for(int i = 0; i < this.getRowCount(); i++) {
+        for (int i = 0; i < this.getRowCount(); i++) {
             this.setRow(i, result.getRow(i));
         }
 
@@ -507,10 +506,10 @@ public final class BigMatrix {
      * @return This matrix
      * @throws IndexOutOfBoundsException If {@code row1}, {@code col1}, {@code row2} or {@code col2} is out of bounds
      */
-    public BigMatrix swapElementsAndSet(int row1,int col1, int row2,int col2) {
+    public BigMatrix swapElementsAndSet(int row1, int col1, int row2, int col2) {
         BigFraction temp = this.get(row1, col1);
-        this.set(row1,col1, this.get(row2,col2));
-        this.set(row2,col2, temp);
+        this.set(row1, col1, this.get(row2, col2));
+        this.set(row2, col2, temp);
         return this;
     }
 
@@ -518,21 +517,21 @@ public final class BigMatrix {
      * Place the row at endIndex before startIndex and shifts all the rows in between
      *
      * @param startIndex The starting index to swap
-     * @param endIndex The ending index to swap
+     * @param endIndex   The ending index to swap
      * @return This matrix
      * @throws IllegalArgumentException If {@code startIndex} is greater than {@code endIndex}
      */
-    public BigMatrix shiftRows(int startIndex, int endIndex){
-        if (endIndex<startIndex){
+    public BigMatrix shiftRows(int startIndex, int endIndex) {
+        if (endIndex < startIndex) {
             throw new IllegalArgumentException("The ending index should be greater or equals to the starting one");
         }
-        if (startIndex==endIndex){return this;}
+        if (startIndex == endIndex) {return this;}
         for (int col = 0; col < this.getColumnCount(); col++) {
-            BigFraction last=this.get(endIndex,col);
-            for (int row = endIndex; row >startIndex; row--) {
-                this.set(row,col,this.get(row-1,col));
+            BigFraction last = this.get(endIndex, col);
+            for (int row = endIndex; row > startIndex; row--) {
+                this.set(row, col, this.get(row - 1, col));
             }
-            this.set(startIndex,col,last);
+            this.set(startIndex, col, last);
         }
         return this;
     }
@@ -569,7 +568,7 @@ public final class BigMatrix {
      * @return The formatted matrix
      */
     public String toPrettyString(boolean approximate) {
-        return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> approximate?String.valueOf(get(row, column).toDouble()):get(row,column).toString());
+        return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> approximate ? String.valueOf(get(row, column).toDouble()) : get(row, column).toString());
     }
 
     @Override
@@ -616,7 +615,7 @@ public final class BigMatrix {
     public String toString() {
         StringBuilder sb = new StringBuilder("{");
 
-        for(int i = 0; i < this.getRowCount(); i++) {
+        for (int i = 0; i < this.getRowCount(); i++) {
             sb.append(this.getRow(i)).append(i == this.getRowCount() - 1 ? "" : ", ");
         }
 

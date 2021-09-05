@@ -1,10 +1,10 @@
 package com.seedfinding.latticg.math.lattice;
 
-import org.junit.Test;
 import com.seedfinding.latticg.math.component.BigFraction;
 import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.optimize.Optimize;
 import com.seedfinding.latticg.util.Pair;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,12 +16,12 @@ public class OptimizeTest {
         BigVector gradient = new BigVector(1, 1, 1, 1);
 
         Optimize optimize = Optimize.Builder
-                .ofSize(4)
-                .withLowerBound(0, lower).withUpperBound(0, upper)
-                .withLowerBound(1, lower).withUpperBound(1, upper)
-                .withLowerBound(2, lower).withUpperBound(2, upper)
-                .withLowerBound(3, lower).withUpperBound(3, upper)
-                .build();
+            .ofSize(4)
+            .withLowerBound(0, lower).withUpperBound(0, upper)
+            .withLowerBound(1, lower).withUpperBound(1, upper)
+            .withLowerBound(2, lower).withUpperBound(2, upper)
+            .withLowerBound(3, lower).withUpperBound(3, upper)
+            .build();
 
         Pair<BigVector, BigFraction> result = optimize.minimize(gradient);
 
@@ -51,7 +51,7 @@ public class OptimizeTest {
 //        builder.withEqual(BigVector.fromString("{1/281474976710656, -1/140737488355328, -1/281474976710656, 0, -3/281474976710656, 0, 1/281474976710656, 1/140737488355328, 1/140737488355328, 1/281474976710656, 0, 1/70368744177664, 1/140737488355328, 1/281474976710656, -19/140737488355328, 1/140737488355328, -1/70368744177664}"), BigFraction.parse("-16"));
 
         Optimize optimize = builder.build()
-                .withStrictBound(BigVector.fromString("{1/281474976710656, -1/140737488355328, -1/281474976710656, 0, -3/281474976710656, 0, 1/281474976710656, 1/140737488355328, 1/140737488355328, 1/281474976710656, 0, 1/70368744177664, 1/140737488355328, 1/281474976710656, -19/140737488355328, 1/140737488355328, -1/70368744177664}"), BigFraction.parse("-16"));
+            .withStrictBound(BigVector.fromString("{1/281474976710656, -1/140737488355328, -1/281474976710656, 0, -3/281474976710656, 0, 1/281474976710656, 1/140737488355328, 1/140737488355328, 1/281474976710656, 0, 1/70368744177664, 1/140737488355328, 1/281474976710656, -19/140737488355328, 1/140737488355328, -1/70368744177664}"), BigFraction.parse("-16"));
 
         Pair<BigVector, BigFraction> min = optimize.minimize(BigVector.fromString("{-1/281474976710656, 0, -3/281474976710656, 0, 1/140737488355328, 0, 0, 1/281474976710656, 0, 3/281474976710656, 1/140737488355328, 1/70368744177664, 0, 1/281474976710656, -69/281474976710656, -1/70368744177664, -1/70368744177664}"));
         Pair<BigVector, BigFraction> max = optimize.maximize(BigVector.fromString("{-1/281474976710656, 0, -3/281474976710656, 0, 1/140737488355328, 0, 0, 1/281474976710656, 0, 3/281474976710656, 1/140737488355328, 1/70368744177664, 0, 1/281474976710656, -69/281474976710656, -1/70368744177664, -1/70368744177664}"));

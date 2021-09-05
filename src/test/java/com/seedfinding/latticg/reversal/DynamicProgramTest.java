@@ -1,8 +1,8 @@
 package com.seedfinding.latticg.reversal;
 
 import com.seedfinding.latticg.reversal.calltype.java.JavaCalls;
-import org.junit.Test;
 import com.seedfinding.latticg.util.LCG;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
@@ -11,7 +11,9 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.stream.LongStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DynamicProgramTest {
 
@@ -24,89 +26,89 @@ public class DynamicProgramTest {
     @Test
     public void testInitialSkip() {
         assertStreamEquals(
-                DynamicProgram.create(LCG.JAVA)
-                        .skip(1)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .reverse(),
-                120305458776662L,
-                189728072343791L,
-                259150685910920L
+            DynamicProgram.create(LCG.JAVA)
+                .skip(1)
+                .add(JavaCalls.nextFloat(), 0f)
+                .add(JavaCalls.nextFloat(), 0f)
+                .reverse(),
+            120305458776662L,
+            189728072343791L,
+            259150685910920L
         );
     }
 
     @Test
     public void testNextFloatsZero() {
         assertStreamEquals(
-                DynamicProgram.create(LCG.JAVA)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .reverse(),
-                107048004364969L,
-                97890873098190L,
-                88733741831411L
+            DynamicProgram.create(LCG.JAVA)
+                .add(JavaCalls.nextFloat(), 0f)
+                .add(JavaCalls.nextFloat(), 0f)
+                .reverse(),
+            107048004364969L,
+            97890873098190L,
+            88733741831411L
         );
     }
 
     @Test
     public void testNextFloatsGap() {
         assertStreamEquals(
-                DynamicProgram.create(LCG.JAVA)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .skip(1)
-                        .add(JavaCalls.nextFloat(), 0f)
-                        .reverse(),
-                237852402139752L
+            DynamicProgram.create(LCG.JAVA)
+                .add(JavaCalls.nextFloat(), 0f)
+                .skip(1)
+                .add(JavaCalls.nextFloat(), 0f)
+                .reverse(),
+            237852402139752L
         );
     }
 
     @Test
     public void test16NextInt8() {
         assertStreamEquals(
-                DynamicProgram.create(LCG.JAVA)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .add(JavaCalls.nextInt(8), 0)
-                        .reverse(),
-                211804640834172L
+            DynamicProgram.create(LCG.JAVA)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .add(JavaCalls.nextInt(8), 0)
+                .reverse(),
+            211804640834172L
         );
     }
 
     @Test
     public void testNextInt8UpperBound() {
         assertStreamEquals(
-                DynamicProgram.create(LCG.JAVA)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .add(JavaCalls.nextInt(8), 7)
-                        .reverse(),
-                224925009941018L
+            DynamicProgram.create(LCG.JAVA)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .add(JavaCalls.nextInt(8), 7)
+                .reverse(),
+            224925009941018L
         );
     }
 
@@ -135,7 +137,7 @@ public class DynamicProgramTest {
         System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
         // assert out
         assertEquals(overrideOut.toString().replaceAll("\r\n", "\n"),
-                "Call Indices: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]\n" +
+            "Call Indices: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]\n" +
                 "Looking for points on:\n" +
                 "[              1     25214903917 205749139540585 233752471717045  55986898099985 120950523281469  76790647859193  61282721086213 128954768138017 177269950146317  19927021227657  92070806603349]\n" +
                 "[281474976710656               0               0               0               0               0               0               0               0               0               0               0]\n" +

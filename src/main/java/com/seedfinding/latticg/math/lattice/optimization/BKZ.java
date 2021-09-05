@@ -1,8 +1,8 @@
 package com.seedfinding.latticg.math.lattice.optimization;
 
+import com.seedfinding.latticg.math.component.BigFraction;
 import com.seedfinding.latticg.math.component.BigMatrix;
 import com.seedfinding.latticg.math.component.BigVector;
-import com.seedfinding.latticg.math.component.BigFraction;
 import com.seedfinding.latticg.math.lattice.LLL.LLL;
 import com.seedfinding.latticg.math.lattice.LLL.Params;
 import com.seedfinding.latticg.math.lattice.LLL.Result;
@@ -10,17 +10,9 @@ import com.seedfinding.latticg.math.lattice.LLL.Result;
 import java.math.BigInteger;
 
 public class BKZ {
-    private Params params;
-    private BigMatrix basis;
-    private BigMatrix baseGSO; // this is the Gram-Schmidt (almost Orthogonal thus GSO) basis
-    private BigMatrix mu; // those are the mu that are used in the Gram-Schimdt process*
-    private BigVector norms; // those are simply the magnitude of each GS vectors
-    private LLL lll;
-    private int nbRows;
-    private int nbCols;
     private final BigFraction redFudgeFactor;
-    private BigVector BKZConstant = null;
-    private BigVector BKZTresh = null;
+    private final Params params;
+    private final LLL lll;
     BigFraction[] cT;
     BigFraction[] y;
     BigInteger[] v;
@@ -28,6 +20,14 @@ public class BKZ {
     BigInteger[] d;
     BigVector u;
     BigInteger[] uT;
+    private BigMatrix basis;
+    private BigMatrix baseGSO; // this is the Gram-Schmidt (almost Orthogonal thus GSO) basis
+    private BigMatrix mu; // those are the mu that are used in the Gram-Schimdt process*
+    private BigVector norms; // those are simply the magnitude of each GS vectors
+    private int nbRows;
+    private int nbCols;
+    private BigVector BKZConstant = null;
+    private BigVector BKZTresh = null;
 
     public BKZ(BigMatrix lattice, Params params) {
         this.params = params;
@@ -138,7 +138,7 @@ public class BKZ {
                 }
                 if (s > 0) {
                     //we treat the case that the new vector is b[s] (j < s <= k)
-                    basis.shiftRows(j-1,s-1);
+                    basis.shiftRows(j - 1, s - 1);
                     //baseGSO.shiftRows(j-1,s-1);
                     //norms.shiftElements(j-1,s-1);
                     result = LLL.reduce(basis, params);
@@ -147,14 +147,14 @@ public class BKZ {
                     //general case
                     BigVector newVec = new BigVector(nbCols);
                     for (int i = 0; i < nbCols; i++) {
-                        newVec.set(i,BigFraction.ZERO);
+                        newVec.set(i, BigFraction.ZERO);
                     }
                     for (int i = j; i <= k; i++) {
-                        if (uvec.get(i).equals(BigFraction.ZERO)){
+                        if (uvec.get(i).equals(BigFraction.ZERO)) {
                             continue;
                         }
                         for (int l = 0; l < nbCols; l++) {
-                            newVec.set(l,newVec.get(l).add(uvec.get(i).multiply(basis.get(i-1,l))));
+                            newVec.set(l, newVec.get(l).add(uvec.get(i).multiply(basis.get(i - 1, l))));
                         }
                     }
 
@@ -231,7 +231,7 @@ public class BKZ {
                     t--;
                     y[t] = BigFraction.ZERO;
                     for (int i = t + 1; i <= s; i++) {
-                        y[t] = y[t].add(blockMu.get(i-1, t-1).multiply(uT[i]));
+                        y[t] = y[t].add(blockMu.get(i - 1, t - 1).multiply(uT[i]));
                     }
                     uT[t] = v[t] = y[t].round().negate();
                     delta[t] = BigInteger.ZERO;
@@ -259,7 +259,7 @@ public class BKZ {
                 uT[t] = v[t].add(delta[t]);
             }
         }
-        return new Object[]{cbar, u};
+        return new Object[] {cbar, u};
     }
 
     private void printVec(BigFraction[] vec, String msg) {

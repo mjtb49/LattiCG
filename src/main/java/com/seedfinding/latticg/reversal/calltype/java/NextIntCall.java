@@ -11,7 +11,7 @@ public class NextIntCall extends RangeableCallType<Integer> {
     private final Integer ABS_MAX;
 
     @ApiStatus.Internal
-    NextIntCall(int bound) {
+    protected NextIntCall(int bound) {
         super(Integer.class);
         this.bound = bound;
         ABS_MAX = bound;

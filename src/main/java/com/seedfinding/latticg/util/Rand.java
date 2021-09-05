@@ -68,7 +68,7 @@ public class Rand {
 
     public int next(int bits) {
         this.seed = lcg.nextSeed(this.seed);
-        return (int)(this.seed >>> (48 - bits));
+        return (int) (this.seed >>> (48 - bits));
     }
 
     public void advance(long calls) {
@@ -88,12 +88,12 @@ public class Rand {
     }
 
     public int nextInt(int bound) {
-        if(bound <= 0) {
+        if (bound <= 0) {
             throw new IllegalArgumentException("bound must be positive");
         }
 
-        if((bound & -bound) == bound) {
-            return (int)((bound * (long)this.next(31)) >> 31);
+        if ((bound & -bound) == bound) {
+            return (int) ((bound * (long) this.next(31)) >> 31);
         }
 
         int bits, value;
@@ -101,21 +101,21 @@ public class Rand {
         do {
             bits = this.next(31);
             value = bits % bound;
-        } while(bits - value + (bound - 1) < 0);
+        } while (bits - value + (bound - 1) < 0);
 
         return value;
     }
 
     public float nextFloat() {
-        return this.next(24) / ((float)(1 << 24));
+        return this.next(24) / ((float) (1 << 24));
     }
 
     public long nextLong() {
-        return ((long)(this.next(32)) << 32) + this.next(32);
+        return ((long) (this.next(32)) << 32) + this.next(32);
     }
 
     public double nextDouble() {
-        return (((long)this.next(26) << 27) + this.next(27)) / (double)(1L << 53);
+        return (((long) this.next(26) << 27) + this.next(27)) / (double) (1L << 53);
     }
 
     public Random asRandomView() {
@@ -135,9 +135,9 @@ public class Rand {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this)return true;
-        if(!(obj instanceof Rand))return false;
-        Rand rand = (Rand)obj;
+        if (obj == this) return true;
+        if (!(obj instanceof Rand)) return false;
+        Rand rand = (Rand) obj;
         return rand.getSeed() == this.getSeed();
     }
 
@@ -171,6 +171,7 @@ public class Rand {
 
     private static class SeedFieldHolder {
         static final Field FIELD;
+
         static {
             try {
                 FIELD = Random.class.getDeclaredField("seed");

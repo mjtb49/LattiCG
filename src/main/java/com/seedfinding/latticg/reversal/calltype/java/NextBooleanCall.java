@@ -1,16 +1,15 @@
 package com.seedfinding.latticg.reversal.calltype.java;
 
-import org.jetbrains.annotations.ApiStatus;
 import com.seedfinding.latticg.reversal.calltype.CallType;
+import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
 public class NextBooleanCall extends CallType<Boolean> {
-    private final boolean inverted;
-
     @ApiStatus.Internal
     static final NextBooleanCall EQUAL_TO_TRUE = new NextBooleanCall(false);
     @ApiStatus.Internal
     static final NextBooleanCall EQUAL_TO_FALSE = new NextBooleanCall(true);
+    private final boolean inverted;
 
     private NextBooleanCall(boolean inverted) {
         super(Boolean.class);
