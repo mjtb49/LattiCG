@@ -161,22 +161,16 @@ public final class StringParser {
     public Class<?> consumeClass() {
         Token firstToken = consume();
         switch (firstToken.getText()) {
-            case "boolean":
-                return boolean.class;
-            case "char":
-                return char.class;
-            case "double":
-                return double.class;
-            case "float":
-                return float.class;
-            case "int":
-                return int.class;
-            case "long":
-                return long.class;
-            case "short":
-                return short.class;
-            case "void":
-                return void.class;
+            //@formatter:off
+            case "boolean": return boolean.class;
+            case "char":    return char.class;
+            case "double":  return double.class;
+            case "float":   return float.class;
+            case "int":     return int.class;
+            case "long":    return long.class;
+            case "short":   return short.class;
+            case "void":    return void.class;
+            //@formatter:on
         }
 
         StringBuilder className = new StringBuilder(firstToken.getText());
