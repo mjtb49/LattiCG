@@ -6,13 +6,6 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 public class GaussJordan {
-    @FunctionalInterface
-    public interface ReduceColumnPredicate {
-        ReduceColumnPredicate ALWAYS = (pivotColumn, pivotRows) -> true;
-
-        boolean test(int pivotColumn, int[] pivotRows);
-    }
-
     private GaussJordan() { }
 
     private static void forAll(BigMatrix matrix, Collection<BigMatrix> others, Consumer<BigMatrix> action) {
@@ -63,7 +56,7 @@ public class GaussJordan {
 
             do {
                 ++pivotColumn;
-            } while(pivotColumn < matrix.getColumnCount() && !reduceColumn.test(pivotColumn, pivotRows));
+            } while (pivotColumn < matrix.getColumnCount() && !reduceColumn.test(pivotColumn, pivotRows));
         }
 
         return pivotRows;
@@ -87,5 +80,12 @@ public class GaussJordan {
 
     public static int[] reduce(BigMatrix matrix) {
         return reduce(matrix, Collections.emptyList(), ReduceColumnPredicate.ALWAYS);
+    }
+
+    @FunctionalInterface
+    public interface ReduceColumnPredicate {
+        ReduceColumnPredicate ALWAYS = (pivotColumn, pivotRows) -> true;
+
+        boolean test(int pivotColumn, int[] pivotRows);
     }
 }

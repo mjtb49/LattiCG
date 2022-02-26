@@ -6,7 +6,9 @@ import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.component.GaussJordan;
 import com.seedfinding.latticg.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Optimize {
     private final BigMatrix transform;
@@ -249,7 +251,7 @@ public class Optimize {
         BigMatrix finalTable = new BigMatrix(rows, finalCols);
 
         for (int c0 = 0, c1 = 0; c0 < finalCols - 1; ++c0, ++c1) {
-            for (;; ++c1) {
+            for (; ; ++c1) {
                 if (nonbasics[c1] >= realVariables) {
                     continue;
                 }

@@ -5,7 +5,7 @@ import java.math.BigInteger;
 public class Mth {
 
     public static double gcd(double a, double b) {
-        while(b != 0) {
+        while (b != 0) {
             a %= b;
             double temp = a;
             a = b;
@@ -27,8 +27,8 @@ public class Mth {
         long inv = 0;
         long b = 1;
 
-        for(int i = 0; i < mod; i++) {
-            if((b & 1) == 1) {
+        for (int i = 0; i < mod; i++) {
+            if ((b & 1) == 1) {
                 inv |= 1L << i;
                 b = (b - x) >> 1;
             } else {

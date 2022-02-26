@@ -35,6 +35,11 @@ compileTestKotlin {
     }
 }
 
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

@@ -2,15 +2,17 @@ package com.seedfinding.latticg.reversal;
 
 import com.seedfinding.latticg.reversal.calltype.CallType;
 import com.seedfinding.latticg.util.LCG;
+import com.seedfinding.latticg.util.Rand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.LongStream;
 
 public final class DynamicProgram {
-    private boolean verbose = false;
     private final ProgramBuilder programBuilder;
     private final List<Object> values = new ArrayList<>();
+    private boolean verbose = false;
     private boolean valid = true;
 
     private DynamicProgram(LCG lcg) {
@@ -32,14 +34,15 @@ public final class DynamicProgram {
         return add(callType, true);
     }
 
-    public DynamicProgram skip(long steps) {
+    public DynamicProgram filteredSkip(Predicate<Rand> filter, long steps) {
         checkValid();
-        programBuilder.skip(steps);
+        programBuilder.filteredSkip(filter, steps);
         return this;
     }
 
-    public DynamicProgram setVerbose(boolean verbose) {
-        this.verbose = verbose;
+    public DynamicProgram skip(long steps) {
+        checkValid();
+        programBuilder.skip(steps);
         return this;
     }
 
@@ -66,5 +69,10 @@ public final class DynamicProgram {
 
     public boolean isVerbose() {
         return verbose;
+    }
+
+    public DynamicProgram setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        return this;
     }
 }

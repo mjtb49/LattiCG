@@ -2,7 +2,9 @@ package com.seedfinding.latticg.math.lattice.enumeration;
 
 import com.seedfinding.latticg.math.component.BigVector;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 
 class SearchSpliterator implements Spliterator<BigVector> {

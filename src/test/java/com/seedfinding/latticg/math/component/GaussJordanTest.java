@@ -2,7 +2,8 @@ package com.seedfinding.latticg.math.component;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class GaussJordanTest {
     @Test
@@ -33,7 +34,7 @@ public class GaussJordanTest {
 
         int[] pivotRows = GaussJordan.reduce(m);
 
-        assertArrayEquals(pivotRows, new int[] { 0, 1, -1, -1, 2 });
+        assertArrayEquals(pivotRows, new int[] {0, 1, -1, -1, 2});
         assertEquals(m, BigMatrix.fromString("{{1, 0, -1, -2, 0}, {0, 1, 2, 3, 0}, {0, 0, 0, 0, 1}, {0, 0, 0, 0, 0}}"));
     }
 
@@ -42,7 +43,7 @@ public class GaussJordanTest {
         BigMatrix m = BigMatrix.fromString("{{1, 0, 0, 0},  {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}}");
         int[] pivotRows = GaussJordan.reduce(m);
 
-        assertArrayEquals(pivotRows, new int[] { 0, 1, -1, -1 });
+        assertArrayEquals(pivotRows, new int[] {0, 1, -1, -1});
         assertEquals(m, BigMatrix.fromString("{{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}"));
     }
 }

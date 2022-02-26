@@ -1,7 +1,7 @@
 package com.seedfinding.latticg.reversal.asm;
 
-import org.jetbrains.annotations.ApiStatus;
 import com.seedfinding.latticg.util.Pair;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -20,11 +20,10 @@ import java.util.regex.Pattern;
 public final class StringParser {
 
     private final List<Token> tokens;
-    private int cursor = 0;
-
     private static final Pattern HEX_VALUE_PATTERN = Pattern.compile("0[Xx][0-9a-fA-F]+");
     private static final Pattern BINARY_VALUE_PATTERN = Pattern.compile("0[Bb][01]+");
     private static final Pattern DECIMAL_VALUE_PATTERN = Pattern.compile("[0-9]+");
+    private int cursor = 0;
 
     private StringParser(List<Token> tokens) {
         this.tokens = tokens;
@@ -162,14 +161,16 @@ public final class StringParser {
     public Class<?> consumeClass() {
         Token firstToken = consume();
         switch (firstToken.getText()) {
+            //@formatter:off
             case "boolean": return boolean.class;
-            case "char": return char.class;
-            case "double": return double.class;
-            case "float": return float.class;
-            case "int": return int.class;
-            case "long": return long.class;
-            case "short": return short.class;
-            case "void": return void.class;
+            case "char":    return char.class;
+            case "double":  return double.class;
+            case "float":   return float.class;
+            case "int":     return int.class;
+            case "long":    return long.class;
+            case "short":   return short.class;
+            case "void":    return void.class;
+            //@formatter:on
         }
 
         StringBuilder className = new StringBuilder(firstToken.getText());

@@ -6,7 +6,11 @@ import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.optimize.Optimize;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Spliterator;
 
 class SearchNode {
     private final int size;

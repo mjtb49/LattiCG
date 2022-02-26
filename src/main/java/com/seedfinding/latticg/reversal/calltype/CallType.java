@@ -6,9 +6,15 @@ package com.seedfinding.latticg.reversal.calltype;
 public abstract class CallType<T> {
 
     private final Class<T> type;
+    private final int numCalls;
 
-    public CallType(Class<T> type) {
+    public CallType(Class<T> type, int numCalls) {
         this.type = type;
+        this.numCalls = numCalls;
+    }
+
+    public int getNumCalls() {
+        return numCalls;
     }
 
     public final Class<T> getType() {

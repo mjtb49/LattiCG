@@ -4,10 +4,10 @@ import com.seedfinding.latticg.math.component.BigFraction;
 
 public class Params {
     public BigFraction delta = new BigFraction(75, 100);
-    public boolean debug=false;
+    public boolean debug = false;
     public int maxStage = -1;
-    public int pruneFactor=0; // set to [10-15] for BlockSize >= 30.
-    public static BigFraction recommendedDelta =new BigFraction(99,100);
+    public int pruneFactor = 0; // set to [10-15] for BlockSize >= 30.
+    public static BigFraction recommendedDelta = new BigFraction(99, 100);
 
     public Params setPruneFactor(int pruneFactor) {
         this.pruneFactor = pruneFactor;

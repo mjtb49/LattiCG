@@ -5,7 +5,10 @@ import org.junit.Test;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /** @noinspection CodeBlock2Expr */
 public class MatrixTest {
@@ -182,7 +185,7 @@ public class MatrixTest {
     @Test(expected = IllegalStateException.class)
     public void testInverseSingular() {
         Matrix m = Matrix.fromString(
-                "{{0, 1, 1, 2, 3}," +
+            "{{0, 1, 1, 2, 3}," +
                 "{5, 8, 13, 21, 34}," +
                 "{55, 89, 144, 233, 377}," +
                 "{610, 987, 1597, 2584, 4181}," +
@@ -194,18 +197,18 @@ public class MatrixTest {
     @Test
     public void testInvesre5x5() {
         testMatrixFlavors(Matrix.fromString(
-                "{{1, 8, 24, 7, 16}," +
-                        "{4, 5, 6, 22, 25}," +
-                        "{10, 20, 18, 12, 9}," +
-                        "{2, 13, 3, 23, 11}," +
-                        "{19, 14, 21, 15, 17}}"
+            "{{1, 8, 24, 7, 16}," +
+                "{4, 5, 6, 22, 25}," +
+                "{10, 20, 18, 12, 9}," +
+                "{2, 13, 3, 23, 11}," +
+                "{19, 14, 21, 15, 17}}"
         ), m -> {
             Matrix expected = Matrix.fromString(
-                    "{{-9516, -1107, -4077, -3855, 15237}," +
-                            "{-12486, 16731, 39465, -18660, -21672}," +
-                            "{16955, -18494, -20727, 15324, 12297}," +
-                            "{9837, -20547, -31365, 31833, 16965}," +
-                            "{-8706, 28434, 25335, -27342, -15984}}"
+                "{{-9516, -1107, -4077, -3855, 15237}," +
+                    "{-12486, 16731, 39465, -18660, -21672}," +
+                    "{16955, -18494, -20727, 15324, 12297}," +
+                    "{9837, -20547, -31365, 31833, 16965}," +
+                    "{-8706, 28434, 25335, -27342, -15984}}"
             ).divide(227079);
             assertTrue(m.inverse().equals(expected, 0.00000001));
         });

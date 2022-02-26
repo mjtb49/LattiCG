@@ -1,8 +1,8 @@
 package com.seedfinding.latticg.reversal.calltype.java;
 
 import com.seedfinding.latticg.reversal.calltype.RangeCallType;
-import org.jetbrains.annotations.ApiStatus;
 import com.seedfinding.latticg.reversal.calltype.RangeableCallType;
+import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
 public class NextFloatCall extends RangeableCallType<Float> {
@@ -13,7 +13,7 @@ public class NextFloatCall extends RangeableCallType<Float> {
     private static final Float ABS_MAX = 1f;
 
     private NextFloatCall() {
-        super(Float.class);
+        super(Float.class, 1);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class NextFloatCall extends RangeableCallType<Float> {
     @ApiStatus.Internal
     public static class FloatRange extends RangeCallType<Float> {
         public FloatRange(Float min, Float max, boolean minStrict, boolean maxStrict, boolean inverted) {
-            super(min, max, minStrict, maxStrict, inverted);
+            super(min, max, minStrict, maxStrict, inverted, 1);
         }
 
         @Override

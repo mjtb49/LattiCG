@@ -10,8 +10,8 @@ public abstract class RangeCallType<T extends Comparable<T>> extends CallType<Bo
     private final boolean maxStrict;
     private final boolean inverted;
 
-    public RangeCallType(T min, T max, boolean minStrict, boolean maxStrict, boolean inverted) {
-        super(Boolean.class);
+    public RangeCallType(T min, T max, boolean minStrict, boolean maxStrict, boolean inverted, int numCalls) {
+        super(Boolean.class, numCalls);
         if (min.compareTo(max) > 0) {
             throw new IllegalArgumentException(String.format("min (%s) > max (%s)", min, max));
         }

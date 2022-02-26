@@ -4,8 +4,8 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
 public abstract class RangeableCallType<T extends Comparable<T>> extends CallType<T> {
-    public RangeableCallType(Class<T> type) {
-        super(type);
+    public RangeableCallType(Class<T> type, int numCalls) {
+        super(type, numCalls);
     }
 
     @Override
