@@ -1,9 +1,6 @@
 package com.seedfinding.latticg.math.component;
 
 import com.seedfinding.latticg.math.decomposition.LUDecomposition;
-import com.seedfinding.latticg.reversal.asm.ParseException;
-import com.seedfinding.latticg.reversal.asm.StringParser;
-import com.seedfinding.latticg.reversal.asm.Token;
 import com.seedfinding.latticg.util.StringUtils;
 
 import java.util.ArrayList;
@@ -559,49 +556,27 @@ public final class Matrix {
         return sb.append("}").toString();
     }
 
-    /**
-     * Parses a string in wolfram-style matrix notation
-     *
-     * @param raw The string in wolfram-style matrix notation
-     * @return The parsed matrix
-     * @throws ParseException If the input is malformed
-     */
-    public static Matrix fromString(String raw) {
-        StringParser parser = StringParser.of(raw);
-        Matrix mat = parse(parser);
-        parser.expectEof();
-        return mat;
-    }
-
-    /**
-     * Parses a matrix from a string parser
-     *
-     * @param parser The parser to parse the matrix from
-     * @return The parsed matrix
-     * @throws ParseException If the input is malformed
-     */
-    public static Matrix parse(StringParser parser) {
-        Token firstToken = parser.expect("{");
+    public static Matrix fromString(String str) {
+        str = str.trim();
+        if (!str.startsWith("{") || !str.endsWith("}")) {
+            throw new IllegalArgumentException("Illegal Matrix format");
+        }
         List<Vector> rows = new ArrayList<>();
-        while (!parser.peekNotEof().getText().equals("}")) {
-            if (!rows.isEmpty()) {
-                parser.expect(",");
-            }
-            Vector row = Vector.parse(parser);
-            rows.add(row);
-            if (row.getDimension() != rows.get(0).getDimension()) {
-                throw new ParseException("Rows of matrix do not have equal dimension", firstToken);
-            }
+        int vectorEnd;
+        for (int vectorStart = str.indexOf('{', 1); vectorStart >= 0; vectorStart = str.indexOf('{', vectorEnd + 1)) {
+            vectorEnd = str.indexOf('}', vectorStart + 1);
+            rows.add(Vector.fromString(str.substring(vectorStart, vectorEnd + 1)));
         }
-        parser.expect("}");
+
         if (rows.isEmpty()) {
-            throw new ParseException("Empty matrix", firstToken);
+            return new Matrix(0, 0);
         }
-        Matrix mat = new Matrix(rows.size(), rows.get(0).getDimension());
+
+        Matrix matrix = new Matrix(rows.size(), rows.get(0).getDimension());
         for (int i = 0; i < rows.size(); i++) {
-            mat.setRow(i, rows.get(i));
+            matrix.setRow(i, rows.get(i));
         }
-        return mat;
+        return matrix;
     }
 
     /**

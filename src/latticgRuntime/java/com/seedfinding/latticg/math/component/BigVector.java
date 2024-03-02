@@ -1,14 +1,8 @@
 package com.seedfinding.latticg.math.component;
 
-import com.seedfinding.latticg.reversal.asm.ParseException;
-import com.seedfinding.latticg.reversal.asm.StringParser;
-import com.seedfinding.latticg.reversal.asm.Token;
-
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * A vector with {@link BigFraction} elements
@@ -459,43 +453,6 @@ public final class BigVector {
         }
 
         return sb.append("]").toString();
-    }
-
-    /**
-     * Parses a string in wolfram-style vector notation
-     *
-     * @param raw The string in wolfram-style vector notation
-     * @return The parsed vector
-     * @throws ParseException If the input is malformed
-     */
-    public static BigVector fromString(String raw) {
-        StringParser parser = StringParser.of(raw);
-        BigVector vec = parse(parser);
-        parser.expectEof();
-        return vec;
-    }
-
-    /**
-     * Parses a vector from a string parser
-     *
-     * @param parser The parser to parse the vector from
-     * @return The parsed vector
-     * @throws ParseException If the input is malformed
-     */
-    public static BigVector parse(StringParser parser) {
-        Token firstToken = parser.expect("{");
-        List<BigFraction> numbers = new ArrayList<>();
-        while (!parser.peekNotEof().getText().equals("}")) {
-            if (!numbers.isEmpty()) {
-                parser.expect(",");
-            }
-            numbers.add(BigFraction.parse(parser));
-        }
-        parser.expect("}");
-        if (numbers.isEmpty()) {
-            throw new ParseException("Empty vector", firstToken);
-        }
-        return new BigVector(numbers.toArray(new BigFraction[0]));
     }
 
     /**

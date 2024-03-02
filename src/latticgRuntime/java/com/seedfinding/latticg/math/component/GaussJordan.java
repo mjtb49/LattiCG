@@ -1,10 +1,13 @@
 package com.seedfinding.latticg.math.component;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Consumer;
 
+@ApiStatus.Internal
 public class GaussJordan {
     private GaussJordan() { }
 

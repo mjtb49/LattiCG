@@ -1,14 +1,6 @@
 package com.seedfinding.latticg.math.component;
 
-import com.seedfinding.latticg.math.decomposition.LUDecomposition;
-import com.seedfinding.latticg.reversal.asm.ParseException;
-import com.seedfinding.latticg.reversal.asm.StringParser;
-import com.seedfinding.latticg.reversal.asm.Token;
-import com.seedfinding.latticg.util.StringUtils;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * A matrix of {@link BigFraction} values
@@ -316,18 +308,6 @@ public final class BigMatrix {
     }
 
     /**
-     * Computes the inverse of this matrix, {@code this}<sup>-1</sup>, stores the result in a new matrix and returns
-     * that matrix
-     *
-     * @return A new matrix containing the result
-     * @throws UnsupportedOperationException If this is not a square matrix
-     * @throws IllegalStateException         If this matrix is singular
-     */
-    public BigMatrix inverse() {
-        return LUDecomposition.decompose(this).inverse();
-    }
-
-    /**
      * Swaps the two rows at the given indices, stores the result in a new matrix and returns that matrix
      *
      * @param row1 The row to swap with {@code row2}
@@ -552,25 +532,6 @@ public final class BigMatrix {
         return dest;
     }
 
-    /**
-     * Formats this matrix nicely into a human-readable multi-line string
-     *
-     * @return The formatted matrix
-     */
-    public String toPrettyString() {
-        return toPrettyString(false);
-    }
-
-    /**
-     * Formats this matrix nicely into a human-readable multi-line string
-     *
-     * @param approximate a boolean to specify if the result should be converted to double
-     * @return The formatted matrix
-     */
-    public String toPrettyString(boolean approximate) {
-        return StringUtils.tableToString(getRowCount(), getColumnCount(), (row, column) -> approximate ? String.valueOf(get(row, column).toDouble()) : get(row, column).toString());
-    }
-
     @Override
     public int hashCode() {
         int h = 0;
@@ -620,51 +581,6 @@ public final class BigMatrix {
         }
 
         return sb.append("}").toString();
-    }
-
-    /**
-     * Parses a string in wolfram-style matrix notation
-     *
-     * @param raw The string in wolfram-style matrix notation
-     * @return The parsed matrix
-     * @throws ParseException If the input is malformed
-     */
-    public static BigMatrix fromString(String raw) {
-        StringParser parser = StringParser.of(raw);
-        BigMatrix mat = parse(parser);
-        parser.expectEof();
-        return mat;
-    }
-
-    /**
-     * Parses a matrix from a string parser
-     *
-     * @param parser The parser to parse the matrix from
-     * @return The parsed matrix
-     * @throws ParseException If the input is malformed
-     */
-    public static BigMatrix parse(StringParser parser) {
-        Token firstToken = parser.expect("{");
-        List<BigVector> rows = new ArrayList<>();
-        while (!parser.peekNotEof().getText().equals("}")) {
-            if (!rows.isEmpty()) {
-                parser.expect(",");
-            }
-            BigVector row = BigVector.parse(parser);
-            rows.add(row);
-            if (row.getDimension() != rows.get(0).getDimension()) {
-                throw new ParseException("Rows of matrix do not have equal dimension", firstToken);
-            }
-        }
-        parser.expect("}");
-        if (rows.isEmpty()) {
-            throw new ParseException("Empty matrix", firstToken);
-        }
-        BigMatrix mat = new BigMatrix(rows.size(), rows.get(0).getDimension());
-        for (int i = 0; i < rows.size(); i++) {
-            mat.setRow(i, rows.get(i));
-        }
-        return mat;
     }
 
     /**

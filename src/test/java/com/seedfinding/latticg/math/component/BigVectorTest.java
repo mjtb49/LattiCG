@@ -81,7 +81,7 @@ public class BigVectorTest {
     @Test
     public void testMultiplyMatrix1() {
         BigVector a = new BigVector(2, 3);
-        BigMatrix b = BigMatrix.fromString("{{5, 7}, {11, 13}}");
+        BigMatrix b = BigMatrixUtil.fromString("{{5, 7}, {11, 13}}");
         assertEquals(new BigVector(43, 53), a.multiply(b));
         assertEquals(new BigVector(2, 3), a);
     }
@@ -89,7 +89,7 @@ public class BigVectorTest {
     @Test
     public void testMultiplyMatrix2() {
         BigVector a = new BigVector(2, 3, 5);
-        BigMatrix b = BigMatrix.fromString("{{7, 11}, {13, 17}, {19, 23}}");
+        BigMatrix b = BigMatrixUtil.fromString("{{7, 11}, {13, 17}, {19, 23}}");
         assertEquals(new BigVector(148, 188), a.multiply(b));
         assertEquals(new BigVector(2, 3, 5), a);
     }
@@ -97,7 +97,7 @@ public class BigVectorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testMultiplyMatrixFail() {
         BigVector a = new BigVector(2, 3, 5);
-        BigMatrix b = BigMatrix.fromString("{{7, 11, 13}, {17, 19, 23}}");
+        BigMatrix b = BigMatrixUtil.fromString("{{7, 11, 13}, {17, 19, 23}}");
         a.multiply(b);
     }
 

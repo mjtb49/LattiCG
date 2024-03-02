@@ -2,6 +2,7 @@ package com.seedfinding.latticg.math.decomposition;
 
 import com.seedfinding.latticg.math.component.BigFraction;
 import com.seedfinding.latticg.math.component.BigMatrix;
+import com.seedfinding.latticg.math.component.BigMatrixUtil;
 import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.component.Matrix;
 import com.seedfinding.latticg.math.component.Vector;
@@ -305,9 +306,9 @@ public class LUDecomposition {
 
         public String toPrettyString() {
             StringBuilder sb = new StringBuilder();
-            String[] uStuff = this.U.toPrettyString().split(Pattern.quote("\n"));
-            String[] lStuff = this.L.toPrettyString().split(Pattern.quote("\n"));
-            String[] pStuff = this.P.toPrettyString().split(Pattern.quote("\n"));
+            String[] uStuff = BigMatrixUtil.toPrettyString(this.U).split(Pattern.quote("\n"));
+            String[] lStuff = BigMatrixUtil.toPrettyString(this.L).split(Pattern.quote("\n"));
+            String[] pStuff = BigMatrixUtil.toPrettyString(this.P).split(Pattern.quote("\n"));
 
             for (int i = 0; i < lStuff.length; i++) {
                 sb.append(lStuff[i]).append("  ").append(uStuff[i]).append("  ").append(pStuff[i]);

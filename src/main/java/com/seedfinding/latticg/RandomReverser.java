@@ -2,6 +2,7 @@ package com.seedfinding.latticg;
 
 import com.seedfinding.latticg.math.component.BigFraction;
 import com.seedfinding.latticg.math.component.BigMatrix;
+import com.seedfinding.latticg.math.component.BigMatrixUtil;
 import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.lattice.LLL.LLL;
 import com.seedfinding.latticg.math.lattice.LLL.Params;
@@ -123,23 +124,23 @@ public class RandomReverser {
 
         BigMatrix unscaledLattice = lattice;
         if (verbose)
-            System.out.println("Looking for points on:\n" + unscaledLattice.toPrettyString());
+            System.out.println("Looking for points on:\n" + BigMatrixUtil.toPrettyString(unscaledLattice));
 
         BigMatrix scaledLattice = unscaledLattice.multiply(scales);
         Params params = new Params().setDelta(Params.recommendedDelta).setDebug(false);
         if (verbose)
-            System.out.println("Reducing:\n" + scaledLattice.toPrettyString());
+            System.out.println("Reducing:\n" + BigMatrixUtil.toPrettyString(scaledLattice));
         // BigMatrix transformations = BigMatrix.identityMatrix(dimensions);
         Result result = LLL.reduce(scaledLattice, params);
         //System.out.println("found:\n" + transformations.multiply(unscaledLattice).toPrettyString());
         if (verbose) {
-            System.out.println("Found Reduced Scaled Basis:\n" + result.getReducedBasis().toPrettyString());
+            System.out.println("Found Reduced Scaled Basis:\n" + BigMatrixUtil.toPrettyString(result.getReducedBasis()));
             // System.out.println("Found Reduced Basis:\n" + result.getTransformations().multiply(unscaledLattice).toPrettyString());
-            System.out.println("Found Reduced Basis:\n" + result.getReducedBasis().multiply(scales.inverse()).toPrettyString());
+            System.out.println("Found Reduced Basis:\n" + BigMatrixUtil.toPrettyString(result.getReducedBasis().multiply(BigMatrixUtil.inverse(scales))));
         }
         //Matrix m = new Matrix.Factory().fromBigMatrix(result.multiply(scales.inverse()));
         // lattice = result.getTransformations().multiply(unscaledLattice);
-        lattice = result.getReducedBasis().multiply(scales.inverse());
+        lattice = result.getReducedBasis().multiply(BigMatrixUtil.inverse(scales));
     }
 
     private void addMeasuredSeed(long min, long max) {

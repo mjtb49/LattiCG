@@ -1,4 +1,4 @@
-package com.seedfinding.latticg.math.lattice.enumeration;
+package com.seedfinding.latticg.math.lattice.enumerate;
 
 import com.seedfinding.latticg.math.component.BigVector;
 

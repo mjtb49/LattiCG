@@ -154,7 +154,7 @@ public class SystemSolver {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("This system has ").append(this.type).append(".\n\n");
-            sb.append("Result: \n").append(this.result.toPrettyString()).append("\n\n");
+            sb.append("Result: \n").append(BigMatrixUtil.toPrettyString(this.result)).append("\n\n");
             sb.append("Remainder: \n").append(this.remainder.toString());
             return sb.toString();
         }
