@@ -1,11 +1,12 @@
 package com.seedfinding.latticg;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RandomReverserTest {
     public static void main(String[] args) {
-        RandomReverser device = new RandomReverser();
+        RandomReverser device = new RandomReverser(new ArrayList<>());
         Random r = new Random();
 
         long seed = r.nextLong() & ((1L << 48) - 1);
