@@ -142,11 +142,33 @@ public final class SerializeUtil {
     }
 
     private static boolean isPrintable(char ch) {
-        Character.UnicodeBlock block = Character.UnicodeBlock.of(ch);
-        return !Character.isISOControl(ch) &&
-            ch != KeyEvent.CHAR_UNDEFINED &&
-            block != null &&
-            block != Character.UnicodeBlock.SPECIALS;
+        switch (Character.getType(ch)) {
+            case Character.UPPERCASE_LETTER:
+            case Character.LOWERCASE_LETTER:
+            case Character.TITLECASE_LETTER:
+            case Character.MODIFIER_LETTER:
+            case Character.OTHER_LETTER:
+            case Character.NON_SPACING_MARK:
+            case Character.ENCLOSING_MARK:
+            case Character.COMBINING_SPACING_MARK:
+            case Character.DECIMAL_DIGIT_NUMBER:
+            case Character.LETTER_NUMBER:
+            case Character.OTHER_NUMBER:
+            case Character.SPACE_SEPARATOR:
+            case Character.DASH_PUNCTUATION:
+            case Character.START_PUNCTUATION:
+            case Character.END_PUNCTUATION:
+            case Character.CONNECTOR_PUNCTUATION:
+            case Character.OTHER_PUNCTUATION:
+            case Character.MATH_SYMBOL:
+            case Character.CURRENCY_SYMBOL:
+            case Character.MODIFIER_SYMBOL:
+            case Character.OTHER_SYMBOL:
+            case Character.INITIAL_QUOTE_PUNCTUATION:
+            case Character.FINAL_QUOTE_PUNCTUATION:
+                return true;
+        }
+        return false;
     }
 
     private static final class ByteVector {
