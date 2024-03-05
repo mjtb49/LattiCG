@@ -1,0 +1,167 @@
+package com.seedfinding.latticg.generator;
+
+import com.seedfinding.latticg.math.component.BigFraction;
+import com.seedfinding.latticg.math.component.BigMatrix;
+import com.seedfinding.latticg.math.component.BigVector;
+
+import java.awt.event.KeyEvent;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.util.Arrays;
+
+public final class SerializeUtil {
+    private SerializeUtil() {
+    }
+
+    public static String matrixToStringLiteral(BigMatrix matrix) {
+        ByteVector buf = new ByteVector();
+        writeBigMatrix(buf, matrix);
+        return bufToStringLiteral(buf);
+    }
+
+    private static void writeBigMatrix(ByteVector buf, BigMatrix matrix) {
+        writeVarInt(buf, matrix.getRowCount());
+        if (matrix.getRowCount() == 0) {
+            return;
+        }
+        writeVarInt(buf, matrix.getColumnCount());
+
+        for (int i = 0; i < matrix.getRowCount(); i++) {
+            writeBigVector(buf, matrix.getRow(i), false);
+        }
+    }
+
+    public static String vectorToStringLiteral(BigVector vector) {
+        ByteVector buf = new ByteVector();
+        writeBigVector(buf, vector, true);
+        return bufToStringLiteral(buf);
+    }
+
+    private static void writeBigVector(ByteVector buf, BigVector vector, boolean includeLength) {
+        if (includeLength) {
+            writeVarInt(buf, vector.getDimension());
+        }
+        for (int i = 0; i < vector.getDimension(); i++) {
+            writeBigFraction(buf, vector.get(i));
+        }
+    }
+
+    public static String fractionToStringLiteral(BigFraction fraction) {
+        ByteVector buf = new ByteVector();
+        writeBigFraction(buf, fraction);
+        return bufToStringLiteral(buf);
+    }
+
+    private static void writeBigFraction(ByteVector buf, BigFraction fraction) {
+        writeBigInt(buf, fraction.getNumerator());
+        writeBigInt(buf, fraction.getDenominator());
+    }
+
+    public static String bigIntToStringLiteral(BigInteger value) {
+        ByteVector buf = new ByteVector();
+        writeBigInt(buf, value);
+        return bufToStringLiteral(buf);
+    }
+
+    private static void writeBigInt(ByteVector buf, BigInteger value) {
+        if (value.signum() == -1) {
+            value = value.negate().shiftLeft(1).setBit(0);
+        } else {
+            value = value.shiftLeft(1);
+        }
+
+        do {
+            byte b = (byte) (value.intValue() & 0x7F);
+            value = value.shiftRight(7);
+            if (value.signum() != 0) {
+                b |= (byte) 0x80;
+            }
+            buf.add(b);
+        } while (value.signum() != 0);
+    }
+
+    private static void writeVarInt(ByteVector buf, int value) {
+        do {
+            byte b = (byte) (value & 0x7F);
+            value >>>= 7;
+            if (value != 0) {
+                b |= (byte) 0x80;
+            }
+            buf.add(b);
+        } while (value != 0);
+    }
+
+    private static String bufToStringLiteral(ByteVector buf) {
+        StringBuilder result = new StringBuilder("\"");
+
+        CharBuffer chars = ByteBuffer.wrap(buf.toArray()).asCharBuffer();
+        boolean justPrintedOctal = false;
+        while (chars.hasRemaining()) {
+            char ch = chars.get();
+            switch (ch) {
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\r':
+                    result.append("\\r");
+                    break;
+                case '\f':
+                    result.append("\\f");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                case '"':
+                    result.append("\\\"");
+                    break;
+                case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+                    if (justPrintedOctal) {
+                        result.append('\\').append(Integer.toOctalString(ch));
+                        continue;
+                    } else {
+                        result.append(ch);
+                    }
+                    break;
+                default:
+                    if (Character.isISOControl(ch)) {
+                        result.append('\\').append(Integer.toOctalString(ch));
+                        justPrintedOctal = true;
+                        continue;
+                    } else if (isPrintable(ch)) {
+                        result.append(ch);
+                    } else {
+                        result.append(String.format("\\u%04x", (int) ch));
+                    }
+                    break;
+            }
+            justPrintedOctal = false;
+        }
+
+        return result.append("\"").toString();
+    }
+
+    private static boolean isPrintable(char ch) {
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(ch);
+        return !Character.isISOControl(ch) &&
+            ch != KeyEvent.CHAR_UNDEFINED &&
+            block != null &&
+            block != Character.UnicodeBlock.SPECIALS;
+    }
+
+    private static final class ByteVector {
+        private byte[] array = new byte[16];
+        private int size = 0;
+
+        public void add(byte b) {
+            if (size >= array.length) {
+                array = Arrays.copyOf(array, array.length * 2);
+            }
+            array[size++] = b;
+        }
+
+        public byte[] toArray() {
+            return Arrays.copyOf(array, size);
+        }
+    }
+}

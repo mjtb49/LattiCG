@@ -92,10 +92,13 @@ public class ProgramInstance {
                 }
                 // if we have the full range [0.0f;1.0f) then we don't observe that call
                 if (floatRange.getMin() == 0.0f && !floatRange.isMinStrict() && floatRange.getMax() == 1.0f && floatRange.isMaxStrict()) {
-                    value = false;
-                }
-                if (value) {
+                    reverser.addUnmeasuredSeeds(1);
+                } else if (value) {
                     reverser.addNextFloatCall(floatRange.getMin(), floatRange.getMax(), !floatRange.isMinStrict(), !floatRange.isMaxStrict());
+                } else if (floatRange.getMin() == 0.0f && !floatRange.isMinStrict()) {
+                    reverser.addNextFloatCall(floatRange.getMax(), 1.0f, floatRange.isMaxStrict(), false);
+                } else if (floatRange.getMax() == 1.0f && floatRange.isMaxStrict()) {
+                    reverser.addNextFloatCall(0.0f, floatRange.getMin(), true, floatRange.isMinStrict());
                 } else {
                     // TODO support this
                     reverser.addUnmeasuredSeeds(1);
@@ -116,10 +119,13 @@ public class ProgramInstance {
                 }
                 // if we use the full range no need of monitoring that call
                 if (intRange.getBound() == (max - min + 1)) {
-                    value = false;
-                }
-                if (value) {
+                    reverser.addUnmeasuredSeeds(1);
+                } else if (value) {
                     reverser.addNextIntCall(intRange.getBound(), min, max);
+                } else if (min == 0) {
+                    reverser.addNextIntCall(intRange.getBound(), max + 1, intRange.getBound() - 1);
+                } else if (max == intRange.getBound() - 1) {
+                    reverser.addNextIntCall(intRange.getBound(), 0, min - 1);
                 } else {
                     // TODO: support this
                     reverser.addUnmeasuredSeeds(1);
@@ -140,9 +146,8 @@ public class ProgramInstance {
                 }
                 // if we use the full range no need of monitoring that call
                 if (min == Integer.MIN_VALUE && max == Integer.MAX_VALUE) {
-                    value = false;
-                }
-                if (value) {
+                    reverser.addUnmeasuredSeeds(1);
+                } else if (value) {
                     reverser.addNextIntCall(min, max);
                 } else {
                     // TODO: support this
@@ -156,10 +161,13 @@ public class ProgramInstance {
                 }
                 // if we have the full range [0.0D;1.0D) then we don't observe that call
                 if (doubleRange.getMin() == 0.0D && !doubleRange.isMinStrict() && doubleRange.getMax() == 1.0D && doubleRange.isMaxStrict()) {
-                    value = false;
-                }
-                if (value) {
+                    reverser.addUnmeasuredSeeds(2);
+                } else if (value) {
                     reverser.addNextDoubleCall(doubleRange.getMin(), doubleRange.getMax(), !doubleRange.isMinStrict(), !doubleRange.isMaxStrict());
+                } else if (doubleRange.getMin() == 0.0D && !doubleRange.isMinStrict()) {
+                    reverser.addNextDoubleCall(doubleRange.getMax(), 1.0D, doubleRange.isMaxStrict(), false);
+                } else if (doubleRange.getMax() == 1.0D && doubleRange.isMaxStrict()) {
+                    reverser.addNextDoubleCall(0.0D, doubleRange.getMin(), true, doubleRange.isMinStrict());
                 } else {
                     // TODO support this
                     reverser.addUnmeasuredSeeds(2);

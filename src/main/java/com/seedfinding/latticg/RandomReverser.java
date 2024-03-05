@@ -442,4 +442,41 @@ public class RandomReverser {
         this.verbose = verbose;
     }
 
+    public GenerationInfo createGenerationInfo() {
+        if (dimensions == 0) {
+            return new GenerationInfo(0, new BigMatrix(0, 0), new BigVector(new BigFraction[0]), new LCG(1, 0, 1L << 48), 1);
+        }
+
+        createLattice();
+        BigVector offset = new BigVector(dimensions);
+        Rand rand = Rand.ofInternalSeed(0L);
+
+        for (int i = 0; i < dimensions; i++) {
+            offset.set(i, new BigFraction(rand.getSeed()));
+
+            if (i != dimensions - 1) {
+                rand.advance(callIndices.get(i + 1) - callIndices.get(i));
+            }
+        }
+
+        LCG r = LCG.JAVA.combine(-callIndices.get(0));
+
+        return new GenerationInfo(dimensions, lattice.transpose(), offset, r, successChance);
+    }
+
+    public static final class GenerationInfo {
+        public final int dimensions;
+        public final BigMatrix basis;
+        public final BigVector offset;
+        public final LCG r;
+        public final double successChance;
+
+        private GenerationInfo(int dimensions, BigMatrix basis, BigVector offset, LCG r, double successChance) {
+            this.dimensions = dimensions;
+            this.basis = basis;
+            this.offset = offset;
+            this.r = r;
+            this.successChance = successChance;
+        }
+    }
 }

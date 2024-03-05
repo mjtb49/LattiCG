@@ -513,6 +513,14 @@ public class Optimize {
             return this;
         }
 
+        public Builder withLowerBound(int lhs, long rhs) {
+            return withLowerBound(lhs, new BigFraction(rhs));
+        }
+
+        public Builder withUpperBound(int lhs, long rhs) {
+            return withUpperBound(lhs, new BigFraction(rhs));
+        }
+
         public Builder withStrictBound(int lhs, BigFraction rhs) {
             this.checkLHS(lhs);
             this.add(0, BigVector.basis(this.size, lhs), rhs);
