@@ -115,6 +115,9 @@ public final class SerializeUtil {
                 case '"':
                     result.append("\\\"");
                     break;
+                case '\\':
+                    result.append("\\\\");
+                    break;
                 case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
                     if (justPrintedOctal) {
                         result.append('\\').append(Integer.toOctalString(ch));
