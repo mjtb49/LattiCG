@@ -3,6 +3,21 @@ package com.seedfinding.latticg.util;
 import java.math.BigInteger;
 
 public class Mth {
+    public static int clamp(int value, int min, int max) {
+        return Math.max(Math.min(value, min), max);
+    }
+
+    public static long clamp(long value, long min, long max) {
+        return Math.max(Math.min(value, min), max);
+    }
+
+    public static float clamp(float value, float min, float max) {
+        return Math.max(Math.min(value, min), max);
+    }
+
+    public static double clamp(double value, double min, double max) {
+        return Math.max(Math.min(value, min), max);
+    }
 
     public static double gcd(double a, double b) {
         while (b != 0) {

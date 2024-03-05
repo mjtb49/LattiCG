@@ -15,6 +15,7 @@ import com.seedfinding.latticg.reversal.calltype.java.NextIntCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextLongCall;
 import com.seedfinding.latticg.reversal.calltype.java.UnboundedNextIntCall;
 import com.seedfinding.latticg.util.DeserializeRt;
+import com.seedfinding.latticg.util.Mth;
 
 import java.util.Collections;
 import java.util.List;
@@ -112,6 +113,17 @@ public final class ClassGenerator {
                 reverser.addNextDoubleCall(0.0D, 0.5D);
             } else if (call instanceof NextLongCall.LongRange) {
                 reverser.addNextLongCall(0, Long.MAX_VALUE);
+            } else if (call instanceof NextFloatCall.Ranged) {
+                reverser.addNextFloatCall(0, Mth.clamp(((NextFloatCall.Ranged) call).getExpectedSize(), 0, 1));
+            } else if (call instanceof NextIntCall.Ranged) {
+                NextIntCall.Ranged rangedCall = (NextIntCall.Ranged) call;
+                reverser.addNextIntCall(rangedCall.getBound(), 0, Mth.clamp(rangedCall.getExpectedSize(), 0, rangedCall.getBound() - 1));
+            } else if (call instanceof UnboundedNextIntCall.Ranged) {
+                reverser.addNextIntCall(0, ((UnboundedNextIntCall.Ranged) call).getExpectedSize());
+            } else if (call instanceof NextDoubleCall.Ranged) {
+                reverser.addNextDoubleCall(0, Mth.clamp(((NextDoubleCall.Ranged) call).getExpectedSize(), 0x1.0p-26, 1));
+            } else if (call instanceof NextLongCall.Ranged) {
+                reverser.addNextLongCall(0, Math.max(((NextLongCall.Ranged) call).getExpectedSize(), 1L << 32));
             } else {
                 throw new IllegalStateException("ClassGenerator does not support " + call.getClass().getSimpleName() + " call type");
             }
@@ -123,26 +135,30 @@ public final class ClassGenerator {
         appendClassName(classBody, BigMatrix.class);
         classBody.append(" BASIS = ");
         appendClassName(classBody, DeserializeRt.class);
-        classBody.append(".mat(").append(SerializeUtil.matrixToStringLiteral(generationInfo.basis)).append(");\n");
+        classBody.append(".mat(\n");
+        classBody.append(SerializeUtil.matrixToStringLiteral(TAB2, generationInfo.basis)).append(");\n");
 
         BigMatrix rootInverse = BigMatrixUtil.inverse(generationInfo.basis);
         classBody.append(TAB + "private static final ");
         appendClassName(classBody, BigMatrix.class);
         classBody.append(" ROOT_INV = ");
         appendClassName(classBody, DeserializeRt.class);
-        classBody.append(".mat(").append(SerializeUtil.matrixToStringLiteral(rootInverse)).append(");\n");
+        classBody.append(".mat(\n");
+        classBody.append(SerializeUtil.matrixToStringLiteral(TAB2, rootInverse)).append(");\n");
 
         classBody.append(TAB + "private static final ");
         appendClassName(classBody, BigVector.class);
         classBody.append(" ORIGIN = ");
         appendClassName(classBody, DeserializeRt.class);
-        classBody.append(".vec(").append(SerializeUtil.vectorToStringLiteral(generationInfo.offset)).append(");\n");
+        classBody.append(".vec(\n");
+        classBody.append(SerializeUtil.vectorToStringLiteral(TAB2, generationInfo.offset)).append(");\n");
 
         classBody.append(TAB + "private static final ");
         appendClassName(classBody, BigVector.class);
         classBody.append(" ROOT_ORIGIN = ");
         appendClassName(classBody, DeserializeRt.class);
-        classBody.append(".vec(").append(SerializeUtil.vectorToStringLiteral(rootInverse.multiply(generationInfo.offset))).append(");\n\n");
+        classBody.append(".vec(\n");
+        classBody.append(SerializeUtil.vectorToStringLiteral(TAB2, rootInverse.multiply(generationInfo.offset))).append(");\n\n");
 
         classBody.append(TAB + "/**\n");
         classBody.append(TAB + " * Finds all values of {@code seed} that could produce the given results in the following code:\n");
@@ -208,7 +224,28 @@ public final class ClassGenerator {
             } else if (call instanceof NextLongCall.LongRange) {
                 String varName = "nextLong" + (++nextLongs);
                 longRangeCall((NextLongCall.LongRange) call, varName);
+            } else if (call instanceof NextFloatCall.Ranged) {
+                nextFloats++;
+                floatRangedCall("minNextFloat" + nextFloats, "maxNextFloat" + nextFloats, nextFloats);
+            } else if (call instanceof NextIntCall.Ranged) {
+                nextInts++;
+                intRangedCall((NextIntCall.Ranged) call, "minNextInt" + nextInts, "maxNextInt" + nextInts, nextInts);
+            } else if (call instanceof UnboundedNextIntCall.Ranged) {
+                nextInts++;
+                unboundedIntRangedCall("minNextInt" + nextInts, "maxNextInt" + nextInts, nextInts);
+            } else if (call instanceof NextDoubleCall.Ranged) {
+                nextDoubles++;
+                doubleRangedCall("minNextDouble" + nextDoubles, "maxNextDoubles" + nextDoubles, nextDoubles);
+            } else if (call instanceof NextLongCall.Ranged) {
+                nextLongs++;
+                longRangedCall("minNextLong" + nextLongs, "maxNextLongs" + nextLongs, nextLongs);
+            } else {
+                throw new AssertionError("Unknown call type should have been caught in previous loop");
             }
+        }
+
+        if (latticeIndex != generationInfo.dimensions) {
+            throw new AssertionError("Not all dimensions in the lattice have been accounted for");
         }
 
         classBody.append(TAB + " * }</pre>\n");
@@ -500,17 +537,17 @@ public final class ClassGenerator {
         if (hasLowerBound || hasUpperBound) {
             String ifTrue, ifFalse;
             if (hasLowerBound) {
-                boolean lowerOffset = call.isMinStrict() && (minLong & 0x3fffff) == 0x3fffff;
+                boolean lowerOffset = call.isMinStrict() && (minLong & 0x7ffffff) == 0x7ffffff;
                 ifTrue = String.format(TAB3 + "builder.withLowerBound(%d, %s(long) (%f * 0x1.0p53)%s >> 27 << 22).withUpperBound(%d, (1L << 48) - 1);\n",
                     latticeIndex, lowerOffset ? "(" : "", call.getMin(), lowerOffset ? " + 1)" : "", latticeIndex);
-                boolean upperOffset = call.isMinStrict() || (minLong & 0x3fffff) != 0;
+                boolean upperOffset = call.isMinStrict() || (minLong & 0x7ffffff) != 0;
                 ifFalse = String.format(TAB3 + "builder.withLowerBound(%d, 0).withUpperBound(%d, (%s(long) (%f * 0x1.0p53)%s >> 27 << 22) - 1);\n",
                     latticeIndex, latticeIndex, upperOffset ? "(" : "", call.getMin(), upperOffset ? " + 1)" : "");
             } else {
-                boolean upperOffset = !call.isMaxStrict() || (maxLong & 0x3fffff) != 0;
+                boolean upperOffset = !call.isMaxStrict() || (maxLong & 0x7ffffff) != 0;
                 ifTrue = String.format(TAB3 + "builder.withLowerBound(%d, 0).withUpperBound(%d, (%s(long) (%f * 0x1.0p53)%s >> 27 << 22) - 1);\n",
                     latticeIndex, latticeIndex, upperOffset ? "(" : "", call.getMax(), upperOffset ? " + 1)" : "");
-                boolean lowerOffset = !call.isMaxStrict() && (maxLong & 0x3fffff) == 0x3fffff;
+                boolean lowerOffset = !call.isMaxStrict() && (maxLong & 0x7ffffff) == 0x7ffffff;
                 ifFalse = String.format(TAB3 + "builder.withLowerBound(%d, %s(long) (%f * 0x1.0p53)%s >> 27 << 22).withUpperBound(%d, (1L << 48) - 1);\n",
                     latticeIndex, lowerOffset ? "(" : "", call.getMax(), lowerOffset ? " + 1)" : "", latticeIndex);
             }
@@ -536,6 +573,101 @@ public final class ClassGenerator {
     private void longRangeCall(NextLongCall.LongRange call, String varName) {
         // TODO: wait for Matthew to fix the bounds on addNextLongCall
         throw new IllegalStateException("ClassGenerator does not support unbounded nextLong() ranges");
+    }
+
+    private void floatRangedCall(String minVarName, String maxVarName, int nextFloats) {
+        classBody.append(String.format(TAB + " *    float nextFloat%d = rand.nextFloat();\n", nextFloats));
+        classBody.append(String.format(TAB + " *    assert nextFloat%d >= %s && nextFloat%d < %s;\n", nextFloats, minVarName, nextFloats, maxVarName));
+        parameters.append("float ").append(minVarName).append(", float ").append(maxVarName);
+
+        boundsConfig.append(String.format(TAB2 + "if (%s >= %s) {\n", minVarName, maxVarName));
+        boundsConfig.append(TAB3 + "return ");
+        appendClassName(boundsConfig, LongStream.class);
+        boundsConfig.append(".empty();\n");
+        boundsConfig.append(TAB2 + "}\n");
+
+        boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) (%s * 0x1.0p24f) << 24).withUpperBound(%d, (long) (%s * 0x1.0p24f) << 24);\n",
+            latticeIndex, minVarName, latticeIndex, maxVarName));
+        latticeIndex++;
+    }
+
+    private void intRangedCall(NextIntCall.Ranged call, String minVarName, String maxVarName, int nextInts) {
+        classBody.append(String.format(TAB + " *    int nextInt%d = rand.nextInt(%d);\n", nextInts, call.getBound()));
+        classBody.append(String.format(TAB + " *    assert nextInt%d >= %s && nextInt%d < %s;\n", nextInts, minVarName, nextInts, maxVarName));
+        parameters.append("int ").append(minVarName).append(", int ").append(maxVarName);
+
+        boundsConfig.append(String.format(TAB2 + "if (%s >= %s) {\n", minVarName, maxVarName));
+        boundsConfig.append(TAB3 + "return ");
+        appendClassName(boundsConfig, LongStream.class);
+        boundsConfig.append(".empty();\n");
+        boundsConfig.append(TAB2 + "}\n");
+
+        if ((call.getBound() & -call.getBound()) == call.getBound()) {
+            int log = Integer.numberOfTrailingZeros(call.getBound());
+            classBody.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) %s << %d).withUpperBound(%d, ((long) %s << %d) - 1);\n",
+                latticeIndex, minVarName, 48 - log, latticeIndex, maxVarName, 48 - log));
+            latticeIndex++;
+        } else {
+            long residue = (1L << 48) % ((long) call.getBound() << 17);
+            boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, 0).withUpperBound(%d, (1L << 48) - %d);\n",
+                latticeIndex, latticeIndex, residue));
+            latticeIndex++;
+
+            classBody.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) %s << 17).withUpperBound(%d, ((long) %s << 17) - 1);\n",
+                latticeIndex, minVarName, latticeIndex, maxVarName));
+            latticeIndex++;
+        }
+    }
+
+    private void unboundedIntRangedCall(String minVarName, String maxVarName, int nextInts) {
+        classBody.append(String.format(TAB + " *    int nextInt%d = rand.nextInt();\n", nextInts));
+        classBody.append(String.format(TAB + " *    assert nextInt%d >= %s && nextInt%d < %s;\n", nextInts, minVarName, nextInts, maxVarName));
+        parameters.append("int ").append(minVarName).append(", int ").append(maxVarName);
+
+        boundsConfig.append(String.format(TAB2 + "if (%s >= %s) {\n", minVarName, maxVarName));
+        boundsConfig.append(TAB3 + "return ");
+        appendClassName(boundsConfig, LongStream.class);
+        boundsConfig.append(".empty();\n");
+        boundsConfig.append(TAB2 + "}\n");
+
+        classBody.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) %s << 16).withUpperBound(%d, ((long) %s << 16) - 1);\n",
+            latticeIndex, minVarName, latticeIndex, maxVarName));
+        latticeIndex++;
+    }
+
+    private void doubleRangedCall(String minVarName, String maxVarName, int nextDoubles) {
+        classBody.append(String.format(TAB + " *    double nextDouble%d = rand.nextDouble();\n", nextDoubles));
+        classBody.append(String.format(TAB + " *    assert nextDouble%d >= %s && nextDouble%d < %s;\n", nextDoubles, minVarName, nextDoubles, maxVarName));
+        parameters.append("double ").append(minVarName).append(", double ").append(maxVarName);
+
+        boundsConfig.append(String.format(TAB2 + "if (%s >= %s) {\n", minVarName, maxVarName));
+        boundsConfig.append(TAB3 + "return ");
+        appendClassName(boundsConfig, LongStream.class);
+        boundsConfig.append(".empty();\n");
+        boundsConfig.append(TAB2 + "}\n");
+
+        boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) (%s * 0x1.0p53) >> 27 << 22).withUpperBound(%d, (((long) (%s * 0x1.0p53) + 0x7ffffff) >> 27 << 22) - 1);\n",
+            latticeIndex, minVarName, latticeIndex, maxVarName));
+        latticeIndex++;
+    }
+
+    private void longRangedCall(String minVarName, String maxVarName, int nextLongs) {
+        classBody.append(String.format(TAB + " *    long nextLong%d = rand.nextLong();\n", nextLongs));
+        classBody.append(String.format(TAB + " *    assert nextLong%d >= %s && nextLong%d < %s;\n", nextLongs, minVarName, nextLongs, maxVarName));
+        parameters.append("long ").append(minVarName).append(", long ").append(maxVarName);
+
+        String minFirstSeedName = "longMinFirstSeed" + nextLongs;
+        boundsConfig.append(String.format(TAB2 + "long %s = %s >>> 32 << 16;\n", minFirstSeedName, minVarName));
+        boundsConfig.append(String.format(TAB2 + "if (%s < 0) {\n", minVarName));
+        boundsConfig.append(String.format(TAB3 + "%s += (1L << 16);\n", minFirstSeedName));
+        boundsConfig.append(TAB2 + "}\n");
+        String maxFirstSeedName = "longMaxFirstSeed" + nextLongs;
+        boundsConfig.append(String.format(TAB2 + "long %s = ((%s + 0xffffffffL) >>> 32 << 16) - 1;\n", maxFirstSeedName, maxVarName));
+        boundsConfig.append(String.format(TAB2 + "if (%s < 0) {\n", maxVarName));
+        boundsConfig.append(String.format(TAB3 + "%s += (1L << 16);\n", maxFirstSeedName));
+        boundsConfig.append(TAB2 + "}\n");
+        boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, %s).withUpperBound(%d, %s);\n", latticeIndex, minFirstSeedName, latticeIndex, maxFirstSeedName));
+        latticeIndex++;
     }
 
     private void appendClassName(StringBuilder sb, Class<?> clazz) {

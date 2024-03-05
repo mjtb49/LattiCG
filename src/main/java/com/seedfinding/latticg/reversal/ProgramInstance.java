@@ -9,6 +9,7 @@ import com.seedfinding.latticg.reversal.calltype.java.NextIntCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextLongCall;
 import com.seedfinding.latticg.reversal.calltype.java.UnboundedNextIntCall;
 import com.seedfinding.latticg.util.LCG;
+import com.seedfinding.latticg.util.Range;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class ProgramInstance {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public LongStream reverse() {
         if (!LCG.JAVA.equals(program.getLcg())) {
             throw new IllegalStateException("Only the Java LCG is currently supported");
@@ -192,6 +194,22 @@ public class ProgramInstance {
                     // TODO: support this
                     reverser.addUnmeasuredSeeds(2);
                 }
+            } else if (call instanceof NextFloatCall.Ranged) {
+                Range<Float> value = (Range<Float>) observation;
+                reverser.addNextFloatCall(Math.max(0, value.min()), Math.min(1, value.max()), value.minInclusive(), value.maxInclusive());
+            } else if (call instanceof NextIntCall.Ranged) {
+                Range<Integer> value = (Range<Integer>) observation;
+                int bound = ((NextIntCall.Ranged) call).getBound();
+                reverser.addNextIntCall(bound, Math.max(0, value.minInclusive() ? value.min() : value.min() + 1), Math.min(bound - 1, value.maxInclusive() ? value.max() : value.max() - 1));
+            } else if (call instanceof UnboundedNextIntCall.Ranged) {
+                Range<Integer> value = (Range<Integer>) observation;
+                reverser.addNextIntCall(value.maxInclusive() ? value.min() : value.min() + 1, value.maxInclusive() ? value.max() : value.max() - 1);
+            } else if (call instanceof NextDoubleCall.Ranged) {
+                Range<Double> value = (Range<Double>) observation;
+                reverser.addNextDoubleCall(Math.max(0, value.min()), Math.min(1, value.max()), value.minInclusive(), value.maxInclusive());
+            } else if (call instanceof NextLongCall.Ranged) {
+                Range<Long> value = (Range<Long>) observation;
+                reverser.addNextLongCall(value.minInclusive() ? value.min() : value.min() + 1, value.maxInclusive() ? value.max() : value.max() - 1);
             } else {
                 throw new IllegalStateException("Unsupported call type: " + call.getClass().getName());
             }

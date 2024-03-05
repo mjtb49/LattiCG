@@ -1,5 +1,7 @@
 package com.seedfinding.latticg.reversal.calltype;
 
+import com.seedfinding.latticg.util.Range;
+
 /**
  * Represents a type of random call you are expecting
  */
@@ -63,6 +65,14 @@ public abstract class CallType<T> {
 
     public CallType<Boolean> greaterThanEqual(T value) {
         return lessThan(value).not();
+    }
+
+    public CallType<Range<T>> ranged() {
+        throw unsupported("range");
+    }
+
+    public CallType<Range<T>> ranged(T expectedSize) {
+        throw unsupported("range");
     }
 
     private UnsupportedOperationException unsupported(String methodName) {

@@ -1,7 +1,9 @@
 package com.seedfinding.latticg.reversal.calltype.java;
 
+import com.seedfinding.latticg.reversal.calltype.CallType;
 import com.seedfinding.latticg.reversal.calltype.RangeCallType;
 import com.seedfinding.latticg.reversal.calltype.RangeableCallType;
+import com.seedfinding.latticg.util.Range;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Experimental
@@ -36,6 +38,16 @@ public class NextIntCall extends RangeableCallType<Integer> {
         return bound;
     }
 
+    @Override
+    public CallType<Range<Integer>> ranged() {
+        return new Ranged(bound, bound / 2);
+    }
+
+    @Override
+    public CallType<Range<Integer>> ranged(Integer expectedSize) {
+        return new Ranged(bound, expectedSize);
+    }
+
     @ApiStatus.Internal
     public static class IntRange extends RangeCallType<Integer> {
         private final int bound;
@@ -52,6 +64,56 @@ public class NextIntCall extends RangeableCallType<Integer> {
 
         public int getBound() {
             return bound;
+        }
+    }
+
+    @ApiStatus.Internal
+    public static final class Ranged extends CallType<Range<Integer>> {
+        private final int bound;
+        private final int expectedSize;
+
+        private Ranged(int bound, int expectedSize) {
+            super(Range.type(), 1);
+            this.bound = bound;
+            this.expectedSize = expectedSize;
+        }
+
+        public int getBound() {
+            return bound;
+        }
+
+        public int getExpectedSize() {
+            return expectedSize;
+        }
+
+        @Override
+        public CallType<Range<Integer>> not() {
+            return new RangedInverted(bound, expectedSize);
+        }
+    }
+
+    @ApiStatus.Internal
+    public static final class RangedInverted extends CallType<Range<Integer>> {
+        private final int bound;
+        private final int expectedSize;
+
+        private RangedInverted(int bound, int expectedSize) {
+            super(Range.type(), 1);
+            this.bound = bound;
+            this.expectedSize = expectedSize;
+        }
+
+        public int getBound() {
+            return bound;
+        }
+
+        public int getExpectedSize() {
+            return expectedSize;
+        }
+
+        @Override
+        public CallType<Range<Integer>> not() {
+            return new Ranged(bound, expectedSize);
         }
     }
 }

@@ -373,7 +373,7 @@ public class RandomReverser {
      * @param maxInclusive true if the high end of the valid range should be inclusive
      */
     public void addNextDoubleCall(double min, double max, boolean minInclusive, boolean maxInclusive) {
-        if (max < min || min < 0.0D || max >= 1.0D && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
+        if (max < min || min < 0.0D || (maxInclusive ? max >= 1.0D : max > 1.0D) && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
             throw new IllegalArgumentException(String.format("Bounds should be 0<=/<min<=/<max but were min: %f " +
                 "max: %f with min included : %s and max included %s", min, max, minInclusive, maxInclusive));
         }

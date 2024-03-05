@@ -14,10 +14,10 @@ public final class SerializeUtil {
     private SerializeUtil() {
     }
 
-    public static String matrixToStringLiteral(BigMatrix matrix) {
+    public static String matrixToStringLiteral(String indent, BigMatrix matrix) {
         ByteVector buf = new ByteVector();
         writeBigMatrix(buf, matrix);
-        return bufToStringLiteral(buf);
+        return bufToStringLiteral(indent, buf);
     }
 
     private static void writeBigMatrix(ByteVector buf, BigMatrix matrix) {
@@ -32,10 +32,10 @@ public final class SerializeUtil {
         }
     }
 
-    public static String vectorToStringLiteral(BigVector vector) {
+    public static String vectorToStringLiteral(String indent, BigVector vector) {
         ByteVector buf = new ByteVector();
         writeBigVector(buf, vector, true);
-        return bufToStringLiteral(buf);
+        return bufToStringLiteral(indent, buf);
     }
 
     private static void writeBigVector(ByteVector buf, BigVector vector, boolean includeLength) {
@@ -47,10 +47,10 @@ public final class SerializeUtil {
         }
     }
 
-    public static String fractionToStringLiteral(BigFraction fraction) {
+    public static String fractionToStringLiteral(String indent, BigFraction fraction) {
         ByteVector buf = new ByteVector();
         writeBigFraction(buf, fraction);
-        return bufToStringLiteral(buf);
+        return bufToStringLiteral(indent, buf);
     }
 
     private static void writeBigFraction(ByteVector buf, BigFraction fraction) {
@@ -58,10 +58,10 @@ public final class SerializeUtil {
         writeBigInt(buf, fraction.getDenominator());
     }
 
-    public static String bigIntToStringLiteral(BigInteger value) {
+    public static String bigIntToStringLiteral(String indent, BigInteger value) {
         ByteVector buf = new ByteVector();
         writeBigInt(buf, value);
-        return bufToStringLiteral(buf);
+        return bufToStringLiteral(indent, buf);
     }
 
     private static void writeBigInt(ByteVector buf, BigInteger value) {
@@ -92,12 +92,20 @@ public final class SerializeUtil {
         } while (value != 0);
     }
 
-    private static String bufToStringLiteral(ByteVector buf) {
-        StringBuilder result = new StringBuilder("\"");
+    private static String bufToStringLiteral(String indent, ByteVector buf) {
+        StringBuilder result = new StringBuilder(indent).append("\"");
+
+        int lineStartIndex = indent.length();
 
         CharBuffer chars = ByteBuffer.wrap(buf.toEvenLengthArray()).asCharBuffer();
         boolean justPrintedOctal = false;
         while (chars.hasRemaining()) {
+            if (result.length() - lineStartIndex >= 126) {
+                result.append("\" +\n").append(indent);
+                lineStartIndex = result.length();
+                result.append("\"");
+            }
+
             char ch = chars.get();
             switch (ch) {
                 case '\n':
