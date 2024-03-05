@@ -95,7 +95,7 @@ public final class SerializeUtil {
     private static String bufToStringLiteral(ByteVector buf) {
         StringBuilder result = new StringBuilder("\"");
 
-        CharBuffer chars = ByteBuffer.wrap(buf.toArray()).asCharBuffer();
+        CharBuffer chars = ByteBuffer.wrap(buf.toEvenLengthArray()).asCharBuffer();
         boolean justPrintedOctal = false;
         while (chars.hasRemaining()) {
             char ch = chars.get();
@@ -160,8 +160,8 @@ public final class SerializeUtil {
             array[size++] = b;
         }
 
-        public byte[] toArray() {
-            return Arrays.copyOf(array, size);
+        public byte[] toEvenLengthArray() {
+            return Arrays.copyOf(array, (size + 1) & ~1);
         }
     }
 }

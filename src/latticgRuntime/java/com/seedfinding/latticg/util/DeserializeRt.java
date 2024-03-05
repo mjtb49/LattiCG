@@ -101,7 +101,7 @@ public final class DeserializeRt {
         for (int i = 0; i < str.length(); i++) {
             chars.put(str.charAt(i));
         }
-        result.flip();
+        result.limit(chars.position() * 2);
         return result;
     }
 }
