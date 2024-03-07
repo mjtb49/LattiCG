@@ -1,14 +1,15 @@
 package com.seedfinding.latticg.math.component;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** @noinspection CodeBlock2Expr */
 public class MatrixTest {
@@ -91,9 +92,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddFail() {
-        new Matrix(2, 2).add(new Matrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).add(new Matrix(2, 3)));
     }
 
     @Test
@@ -104,9 +105,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractFail() {
-        new Matrix(2, 2).subtract(new Matrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).subtract(new Matrix(2, 3)));
     }
 
     @Test
@@ -135,9 +136,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyMatrixFail() {
-        new Matrix(1, 2).multiply(new Matrix(1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(1, 2).multiply(new Matrix(1, 2)));
     }
 
     @Test
@@ -149,9 +150,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyVectorFail() {
-        new Matrix(2, 2).multiply(new Vector(3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).multiply(new Vector(3)));
     }
 
     @Test
@@ -182,16 +183,18 @@ public class MatrixTest {
         assertEquals(Matrix.fromString("{{0.125}}"), Matrix.fromString("{{8}}").inverse());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testInverseSingular() {
-        Matrix m = Matrix.fromString(
-            "{{0, 1, 1, 2, 3}," +
-                "{5, 8, 13, 21, 34}," +
-                "{55, 89, 144, 233, 377}," +
-                "{610, 987, 1597, 2584, 4181}," +
-                "{6765, 10946, 17711, 28657, 46368}}"
-        );
-        m.inverse();
+        assertThrows(IllegalStateException.class, () -> {
+            Matrix m = Matrix.fromString(
+                "{{0, 1, 1, 2, 3}," +
+                    "{5, 8, 13, 21, 34}," +
+                    "{55, 89, 144, 233, 377}," +
+                    "{610, 987, 1597, 2584, 4181}," +
+                    "{6765, 10946, 17711, 28657, 46368}}"
+            );
+            m.inverse();
+        });
     }
 
     @Test
@@ -214,9 +217,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testInverseNonSquare() {
-        new Matrix(1, 2).inverse();
+        assertThrows(UnsupportedOperationException.class, () -> new Matrix(1, 2).inverse());
     }
 
     @Test
@@ -244,9 +247,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddAndSetFail() {
-        new Matrix(2, 2).addAndSet(new Matrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).addAndSet(new Matrix(2, 3)));
     }
 
     @Test
@@ -258,9 +261,9 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractAndSetFail() {
-        new Matrix(2, 2).subtractAndSet(new Matrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).subtractAndSet(new Matrix(2, 3)));
     }
 
     @Test
@@ -281,14 +284,14 @@ public class MatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyAndSetMatrixFail() {
-        new Matrix(1, 2).multiplyAndSet(new Matrix(1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(1, 2).multiplyAndSet(new Matrix(1, 2)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyAndSetNonSquare() {
-        new Matrix(2, 2).multiplyAndSet(new Matrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new Matrix(2, 2).multiplyAndSet(new Matrix(2, 3)));
     }
 
     @Test

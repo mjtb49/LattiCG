@@ -1,8 +1,9 @@
 package com.seedfinding.latticg.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MthTest {
 
@@ -31,10 +32,9 @@ public class MthTest {
         assertEquals(0.25, Mth.gcd(0.75, 1), 0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testModInverse0() {
-        //noinspection ResultOfMethodCallIgnored
-        Mth.modInverse(0, 16);
+        assertThrows(IllegalArgumentException.class, () -> Mth.modInverse(0, 16));
     }
 
     @Test
@@ -42,10 +42,9 @@ public class MthTest {
         assertEquals(1, Mth.modInverse(1, 16));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testModInverse2() {
-        //noinspection ResultOfMethodCallIgnored
-        Mth.modInverse(2, 16);
+        assertThrows(IllegalArgumentException.class, () -> Mth.modInverse(2, 16));
     }
 
     @Test

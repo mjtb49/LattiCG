@@ -1,12 +1,13 @@
 package com.seedfinding.latticg.math.component;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VectorTest {
 
@@ -58,9 +59,9 @@ public class VectorTest {
         assertEquals(new Vector(1, 2, 3, 4, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddFail() {
-        new Vector(1, 2).add(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).add(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -71,9 +72,9 @@ public class VectorTest {
         assertEquals(new Vector(1, 2, 3, 4, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractFail() {
-        new Vector(1, 2).subtract(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).subtract(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -99,11 +100,13 @@ public class VectorTest {
         assertEquals(new Vector(2, 3, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyMatrixFail() {
-        Vector a = new Vector(2, 3, 5);
-        Matrix b = Matrix.fromString("{{7, 11, 13}, {17, 19, 23}}");
-        a.multiply(b);
+        assertThrows(IllegalArgumentException.class, () -> {
+            Vector a = new Vector(2, 3, 5);
+            Matrix b = Matrix.fromString("{{7, 11, 13}, {17, 19, 23}}");
+            a.multiply(b);
+        });
     }
 
     @Test
@@ -129,9 +132,9 @@ public class VectorTest {
         assertEquals(new Vector(6, 5, 9, 0, 4), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddAndSetFail() {
-        new Vector(1, 2).addAndSet(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).addAndSet(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -143,9 +146,9 @@ public class VectorTest {
         assertEquals(new Vector(6, 5, 9, 0, 4), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractAndSetFail() {
-        new Vector(1, 2).subtractAndSet(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).subtractAndSet(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -180,9 +183,9 @@ public class VectorTest {
         assertEquals(112, b.dot(a), 0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDotFail() {
-        new Vector(1, 2).dot(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).dot(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -192,9 +195,9 @@ public class VectorTest {
         assertEquals(56.0 / 19, a.gramSchmidtCoefficient(b), 0.00000001);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGramSchmidtCoefficientFail() {
-        new Vector(1, 2).gramSchmidtCoefficient(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).gramSchmidtCoefficient(new Vector(3, 4, 5)));
     }
 
     @Test
@@ -204,9 +207,9 @@ public class VectorTest {
         assertTrue(new Vector(112.0 / 19, 168.0 / 19, 280.0 / 19).equals(a.projectOnto(b), 0.00000001));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testProjectOntoFail() {
-        new Vector(1, 2).projectOnto(new Vector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new Vector(1, 2).projectOnto(new Vector(3, 4, 5)));
     }
 
     @Test

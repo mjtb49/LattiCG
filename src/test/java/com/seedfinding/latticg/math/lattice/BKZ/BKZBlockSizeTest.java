@@ -6,12 +6,13 @@ import com.seedfinding.latticg.math.component.BigMatrixUtil;
 import com.seedfinding.latticg.math.lattice.LLL.Params;
 import com.seedfinding.latticg.math.lattice.LLL.Result;
 import com.seedfinding.latticg.math.lattice.optimization.BKZ;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static com.seedfinding.latticg.math.lattice.LLL.Params.recommendedDelta;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 //@formatter:off
 /**
  * The following C++ code was used, you need to input a matrix in a file like that [[1 2][3 4]]
@@ -63,7 +64,7 @@ public class BKZBlockSizeTest {
     static BigMatrix control = null;
     static Params params = null;
 
-    @BeforeClass
+    @BeforeAll
     public static void initMatrix() {
         basis = BigMatrixUtil.fromString(
             "{{1,25214903917,205749139540585,233752471717045,55986898099985,120950523281469,76790647859193,61282721086213,128954768138017,177269950146317,19927021227657,92070806603349}," +
@@ -102,14 +103,14 @@ public class BKZBlockSizeTest {
         assertEquals(BigMatrixUtil.toPrettyString(basis), BigMatrixUtil.toPrettyString(control));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testZero() {
-        Result result = BKZ.reduce(basis, 0, params);
+        assertThrows(IllegalArgumentException.class, () -> BKZ.reduce(basis, 0, params));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testOne() {
-        Result result = BKZ.reduce(basis, 1, params);
+        assertThrows(IllegalArgumentException.class, () -> BKZ.reduce(basis, 1, params));
     }
 
     @Test
@@ -324,10 +325,12 @@ public class BKZBlockSizeTest {
         assertEquals(BigMatrixUtil.toPrettyString(expected), BigMatrixUtil.toPrettyString(result.getReducedBasis()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testThirteen() {
-        Result result = BKZ.reduce(basis, 13, params);
-        // TODO compute it for test
+        assertThrows(IllegalArgumentException.class, () -> {
+            Result result = BKZ.reduce(basis, 13, params);
+            // TODO compute it for test
+        });
     }
 
 

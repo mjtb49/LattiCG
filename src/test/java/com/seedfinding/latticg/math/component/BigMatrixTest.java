@@ -1,13 +1,14 @@
 package com.seedfinding.latticg.math.component;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** @noinspection CodeBlock2Expr */
 public class BigMatrixTest {
@@ -86,9 +87,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddFail() {
-        new BigMatrix(2, 2).add(new BigMatrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).add(new BigMatrix(2, 3)));
     }
 
     @Test
@@ -99,9 +100,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractFail() {
-        new BigMatrix(2, 2).subtract(new BigMatrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).subtract(new BigMatrix(2, 3)));
     }
 
     @Test
@@ -128,9 +129,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyMatrixFail() {
-        new BigMatrix(1, 2).multiply(new BigMatrix(1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(1, 2).multiply(new BigMatrix(1, 2)));
     }
 
     @Test
@@ -142,9 +143,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyVectorFail() {
-        new BigMatrix(2, 2).multiply(new BigVector(3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).multiply(new BigVector(3)));
     }
 
     @Test
@@ -173,16 +174,18 @@ public class BigMatrixTest {
         assertEquals(BigMatrixUtil.fromString("{{1/8}}"), BigMatrixUtil.inverse(BigMatrixUtil.fromString("{{8}}")));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testInverseSingular() {
-        BigMatrix m = BigMatrixUtil.fromString(
-            "{{0, 1, 1, 2, 3}," +
-                "{5, 8, 13, 21, 34}," +
-                "{55, 89, 144, 233, 377}," +
-                "{610, 987, 1597, 2584, 4181}," +
-                "{6765, 10946, 17711, 28657, 46368}}"
-        );
-        BigMatrixUtil.inverse(m);
+        assertThrows(IllegalStateException.class, () -> {
+            BigMatrix m = BigMatrixUtil.fromString(
+                "{{0, 1, 1, 2, 3}," +
+                    "{5, 8, 13, 21, 34}," +
+                    "{55, 89, 144, 233, 377}," +
+                    "{610, 987, 1597, 2584, 4181}," +
+                    "{6765, 10946, 17711, 28657, 46368}}"
+            );
+            BigMatrixUtil.inverse(m);
+        });
     }
 
     @Test
@@ -205,9 +208,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testInverseNonSquare() {
-        BigMatrixUtil.inverse(new BigMatrix(1, 2));
+        assertThrows(UnsupportedOperationException.class, () -> BigMatrixUtil.inverse(new BigMatrix(1, 2)));
     }
 
     @Test
@@ -235,9 +238,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddAndSetFail() {
-        new BigMatrix(2, 2).addAndSet(new BigMatrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).addAndSet(new BigMatrix(2, 3)));
     }
 
     @Test
@@ -249,9 +252,9 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractAndSetFail() {
-        new BigMatrix(2, 2).subtractAndSet(new BigMatrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).subtractAndSet(new BigMatrix(2, 3)));
     }
 
     @Test
@@ -263,14 +266,14 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyAndSetFail() {
-        new BigMatrix(1, 2).multiplyAndSet(new BigMatrix(1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(1, 2).multiplyAndSet(new BigMatrix(1, 2)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyAndSetNonSquare() {
-        new BigMatrix(2, 2).multiplyAndSet(new BigMatrix(2, 3));
+        assertThrows(IllegalArgumentException.class, () -> new BigMatrix(2, 2).multiplyAndSet(new BigMatrix(2, 3)));
     }
 
     @Test
@@ -319,10 +322,12 @@ public class BigMatrixTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testShiftRowsFail() {
-        testMatrixFlavors(BigMatrixUtil.fromString("{{1, 2}, {3, 4}}"), m -> {
-            BigMatrix result = m.shiftRows(1, 0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            testMatrixFlavors(BigMatrixUtil.fromString("{{1, 2}, {3, 4}}"), m -> {
+                BigMatrix result = m.shiftRows(1, 0);
+            });
         });
     }
 
