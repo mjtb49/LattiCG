@@ -1,19 +1,22 @@
 package com.seedfinding.latticg.math.component;
 
-import org.junit.Test;
+import com.seedfinding.latticg.math.lattice.optimization.BKZ;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BigFractionTest {
 
-    @Test(expected = ArithmeticException.class)
+    @Test
     public void testConstructDivideZero() {
-        new BigFraction(1, 0);
+        assertThrows(ArithmeticException.class, () -> new BigFraction(1, 0));
+
     }
 
     @Test
@@ -101,9 +104,9 @@ public class BigFractionTest {
         assertEquals(new BigFraction(7, 143), a.divide(13));
     }
 
-    @Test(expected = ArithmeticException.class)
+    @Test
     public void testDivisionByZero() {
-        new BigFraction(1).divide(0);
+        assertThrows(ArithmeticException.class, () -> new BigFraction(1).divide(0));
     }
 
     @Test
@@ -126,9 +129,9 @@ public class BigFractionTest {
         assertEquals(BigFraction.HALF, new BigFraction(2).reciprocal());
     }
 
-    @Test(expected = ArithmeticException.class)
+    @Test
     public void testReciprocalZero() {
-        BigFraction.ZERO.reciprocal();
+        assertThrows(ArithmeticException.class, BigFraction.ZERO::reciprocal);
     }
 
     @Test

@@ -40,10 +40,12 @@ pipeline {
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
                     artifactPath = filesByGlob[0].path;
                     javadocPath = filesByGlob[1].path;
-                    sourcePath = filesByGlob[2].path;
+                    runtimePath = filesByGlob[2].path;
+                    sourcePath = filesByGlob[3].path;
                     if(fileExists(artifactPath) && fileExists(javadocPath) && fileExists(sourcePath)) {
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
                         echo "*** File: ${javadocPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        echo "*** File: ${runtimePath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
                         echo "*** File: ${sourcePath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
                         nexusArtifactUploader(
                             nexusVersion: NEXUS_VERSION,
@@ -65,6 +67,10 @@ pipeline {
                                 [artifactId: pom.artifactId,
                                 classifier: 'sources',
                                 file: sourcePath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: 'rt',
+                                file: runtimePath,
                                 type: pom.packaging],
                                 [artifactId: pom.artifactId,
                                 classifier: '',

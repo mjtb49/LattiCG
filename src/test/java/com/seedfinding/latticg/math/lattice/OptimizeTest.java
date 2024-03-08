@@ -6,9 +6,9 @@ import com.seedfinding.latticg.math.component.BigVector;
 import com.seedfinding.latticg.math.component.BigVectorUtil;
 import com.seedfinding.latticg.math.optimize.Optimize;
 import com.seedfinding.latticg.util.Pair;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OptimizeTest {
     @Test

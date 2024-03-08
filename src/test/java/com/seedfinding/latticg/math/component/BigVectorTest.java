@@ -1,12 +1,13 @@
 package com.seedfinding.latticg.math.component;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BigVectorTest {
 
@@ -53,9 +54,9 @@ public class BigVectorTest {
         assertEquals(new BigVector(1, 2, 3, 4, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddFail() {
-        new BigVector(1, 2).add(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, ()-> new BigVector(1, 2).add(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -66,9 +67,9 @@ public class BigVectorTest {
         assertEquals(new BigVector(1, 2, 3, 4, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractFail() {
-        new BigVector(1, 2).subtract(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).subtract(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -94,11 +95,13 @@ public class BigVectorTest {
         assertEquals(new BigVector(2, 3, 5), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMultiplyMatrixFail() {
-        BigVector a = new BigVector(2, 3, 5);
-        BigMatrix b = BigMatrixUtil.fromString("{{7, 11, 13}, {17, 19, 23}}");
-        a.multiply(b);
+        assertThrows(IllegalArgumentException.class, () -> {
+            BigVector a = new BigVector(2, 3, 5);
+            BigMatrix b = BigMatrixUtil.fromString("{{7, 11, 13}, {17, 19, 23}}");
+            a.multiply(b);
+        });
     }
 
     @Test
@@ -125,9 +128,9 @@ public class BigVectorTest {
         assertEquals(new BigVector(6, 5, 9, 0, 4), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testAddAndSetFail() {
-        new BigVector(1, 2).addAndSet(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).addAndSet(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -139,9 +142,9 @@ public class BigVectorTest {
         assertEquals(new BigVector(6, 5, 9, 0, 4), a);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSubtractAndSetFail() {
-        new BigVector(1, 2).subtractAndSet(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).subtractAndSet(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -176,9 +179,9 @@ public class BigVectorTest {
         assertEquals(new BigFraction(112), b.dot(a));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDotFail() {
-        new BigVector(1, 2).dot(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).dot(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -188,9 +191,9 @@ public class BigVectorTest {
         assertEquals(new BigFraction(56, 19), a.gramSchmidtCoefficient(b));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGramSchmidtCoefficientFail() {
-        new BigVector(1, 2).gramSchmidtCoefficient(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).gramSchmidtCoefficient(new BigVector(3, 4, 5)));
     }
 
     @Test
@@ -205,9 +208,9 @@ public class BigVectorTest {
         assertEquals(expected, a.projectOnto(b));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testProjectOntoFail() {
-        new BigVector(1, 2).projectOnto(new BigVector(3, 4, 5));
+        assertThrows(IllegalArgumentException.class, () -> new BigVector(1, 2).projectOnto(new BigVector(3, 4, 5)));
     }
 
     @Test
