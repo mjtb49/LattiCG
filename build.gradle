@@ -76,6 +76,7 @@ test {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId = 'latticg'
             from components.java
             versionMapping {
                 usage('java-api') {
