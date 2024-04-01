@@ -130,7 +130,7 @@ public class JavaRandomReverser extends RandomReverser{
         if (max + 1 == min) { // escape the divide by zero on sides later
             throw new IllegalArgumentException("nextLong bounds give no actual constraint");
         }
-        //TODO warn about / check for the sign bit making a result wrong, 1/4th of results can be false positives in worst case
+        //TODO warn about / check for edge cases of large intervals being ruled out by the bottom bits (if later if statement fails)
         boolean minSignBit = ((min & 0x8000_0000L) != 0); //Would a long having value min run into a negative (int) cast
         boolean maxSignBit = ((max & 0x8000_0000L) != 0); //Would a long having value max run into a negative (int) cast
         long minFirstSeed, maxFirstSeed;
@@ -147,13 +147,12 @@ public class JavaRandomReverser extends RandomReverser{
             maxFirstSeed = (((max >>> 32) + 1) << 16) - 1;
         }
         addMeasuredSeed(minFirstSeed, maxFirstSeed);
-        //TODO maybe we can get a constraint in more circumstances, and maybe the min < max constraint can be removed.
-        if (min >>> 32 == max >>> 32 && min < max) { //Can we even talk about the second seed?
+
+        if (max-min < 1L<<32 && 0 <= max-min) { //Can we even talk about the second seed?
             addMeasuredSeed((min & 0xffff_ffffL) << 16, (((max & 0xffff_ffffL) + 1) << 16) - 1);
         } else {
             addUnmeasuredSeeds(1);
         }
-
     }
 
     public void consumeNextLongCalls(int numCalls) {
@@ -177,7 +176,7 @@ public class JavaRandomReverser extends RandomReverser{
         }
         double minInc = min;
         double maxInc = max;
-
+        //TODO warn about / check for edge cases of large intervals being ruled out by the bottom bits (if later if statement fails)
         if (!minInclusive) {
             minInc = Math.nextUp(min);
         }
@@ -199,8 +198,7 @@ public class JavaRandomReverser extends RandomReverser{
 
         addMeasuredSeed(minSeed1, maxSeed1);
 
-        //TODO this is not the only time we can speak about the second half. What if maxLong >>> 27 - minLong >>> 27 == 1. The min < max constraint is also maybe unneeded
-        if (minLong >>> 27 == maxLong >>> 27 && min < max) { //Can we even say anything about the second half
+        if (((maxLong - minLong) % (1L << 53)) < (1L << 27)) { //Can we even say anything about the second half?
             long minSeed2 = (minLong & 0x7ffffff) << 21;
             long maxSeed2 = ((maxLong & 0x7ffffff) << 21) | 0x1fffff;
 
