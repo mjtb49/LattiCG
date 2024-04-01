@@ -1,6 +1,6 @@
 package com.seedfinding.latticg.generator;
 
-import com.seedfinding.latticg.RandomReverser;
+import com.seedfinding.latticg.JavaRandomReverser;
 import com.seedfinding.latticg.math.component.BigMatrix;
 import com.seedfinding.latticg.math.component.BigMatrixUtil;
 import com.seedfinding.latticg.math.component.BigVector;
@@ -82,7 +82,7 @@ public final class ClassGenerator {
             throw new IllegalStateException("ClassGenerator does not support filtered skips");
         }
 
-        RandomReverser reverser = new RandomReverser(Collections.emptyList());
+        JavaRandomReverser reverser = new JavaRandomReverser(Collections.emptyList());
 
         List<CallType<?>> calls = program.getCalls();
         List<Long> skips = program.getSkips();
@@ -129,7 +129,7 @@ public final class ClassGenerator {
             }
         }
 
-        RandomReverser.GenerationInfo generationInfo = reverser.createGenerationInfo();
+        JavaRandomReverser.GenerationInfo generationInfo = reverser.createGenerationInfo();
 
         classBody.append(TAB + "private static final ");
         appendClassName(classBody, BigMatrix.class);

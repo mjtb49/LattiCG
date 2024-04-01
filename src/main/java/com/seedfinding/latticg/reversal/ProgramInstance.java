@@ -1,6 +1,6 @@
 package com.seedfinding.latticg.reversal;
 
-import com.seedfinding.latticg.RandomReverser;
+import com.seedfinding.latticg.JavaRandomReverser;
 import com.seedfinding.latticg.reversal.calltype.CallType;
 import com.seedfinding.latticg.reversal.calltype.java.NextBooleanCall;
 import com.seedfinding.latticg.reversal.calltype.java.NextDoubleCall;
@@ -52,7 +52,7 @@ public class ProgramInstance {
             throw new IllegalStateException("Not all specified calls have been given observations");
         }
 
-        RandomReverser reverser = new RandomReverser(program.getFilteredSkips());
+        JavaRandomReverser reverser = new JavaRandomReverser(program.getFilteredSkips());
         if (this.program.isVerbose()) {
             reverser.setVerbose(true);
         }
