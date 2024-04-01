@@ -37,8 +37,12 @@ public class RandomReverser {
 
     @ApiStatus.Internal
     public RandomReverser(LCG lcg, List<FilteredSkip> filteredSkips) {
-        this.MOD = BigInteger.valueOf(lcg.modulus);
-        this.MULT = BigInteger.valueOf(lcg.multiplier);
+        if (lcg.modulus > 0) {
+            this.MOD = BigInteger.valueOf(lcg.modulus);
+        } else {
+            this.MOD = BigInteger.valueOf(lcg.modulus).add(BigInteger.valueOf(2).pow(64));
+        }
+        this.MULT = BigInteger.valueOf(lcg.multiplier).mod(MOD);
         this.lcg = lcg;
 
         this.verbose = false;
@@ -61,7 +65,7 @@ public class RandomReverser {
         BigVector lower = new BigVector(dimensions);
         BigVector upper = new BigVector(dimensions);
         BigVector offset = new BigVector(dimensions);
-        Rand rand = Rand.ofInternalSeed(0L);
+        Rand rand = Rand.ofInternalSeed(lcg, 0L);
 
         for (int i = 0; i < dimensions; i++) {
             lower.set(i, new BigFraction(mins.get(i)));

@@ -9,10 +9,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RandomReverserTest {
     public static void main(String[] args) {
-        JavaRandomReverser device = new JavaRandomReverser(new ArrayList<>());
-        final int k = 5;
+        LCG lcg = new LCG(7567025607324980273L, 5279421, 0);
+        RandomReverser device = new RandomReverser(lcg, new ArrayList<>());
+        final int k = 2;
         for (int i =0; i < k; i++)
-            device.addNextIntCall(20000,20000-10,10);
+            device.addMeasuredSeed(0, 20000000000L);
 
         device.setVerbose(true);
         long start = System.nanoTime();
@@ -20,9 +21,11 @@ public class RandomReverserTest {
         device.findAllValidSeeds().forEach(s -> {
             count.incrementAndGet();
             String string = s + "";
-            Random r = new Random(s ^ 0x5deece66dL);
-            for (int i =0; i < k; i++)
-                string += " " + r.nextInt(20000);
+            //Random r = new Random(s ^ 0x5deece66dL);
+            for (int i =0; i < k; i++) {
+                s = lcg.nextSeed(s);
+                string += " " + s;
+            }
             System.out.println(string);
         });
         if (count.get() == 1)
