@@ -32,24 +32,23 @@ public class JavaRandomReverser extends RandomReverser{
             throw new IllegalArgumentException(String.format("Bad bound for nextInt call can only be positive : %d", n));
         }
 
-        if (max < min || min < 0 || max >= n) {
-            throw new IllegalArgumentException(String.format("Bounds should be 0<=min<=max<%d but were min: %d max: %d", n, min, max));
-        }
-
+        // if (max < min || min < 0 || max >= n) {
+        //     throw new IllegalArgumentException(String.format("Bounds should be 0<=min<=max<%d but were min: %d max: %d", n, min, max));
+        // }
 
         if ((n & (-n)) == n) {// if n is a power of 2
             int log = Long.numberOfTrailingZeros(n);
-            addMeasuredSeed(min * (1L << (48 - log)), (max + 1) * (1L << (48 - log)) - 1);
+            addMeasuredSeed(min * (1L << (48 - log)), max * (1L << (48 - log)) + (1L << (48 - log))  - 1);
         } else {
             addModuloMeasuredSeed(min * (1L << 17), (max * (1L << 17)) | 0x1ffff, n * (1L << 17));
         }
     }
 
     public void addNextIntCall(int min, int max) {
-        if (max < min || min <= Integer.MIN_VALUE || max >= Integer.MAX_VALUE) {
-            throw new IndexOutOfBoundsException(String.format("Bounds should be -2^31<=min<=max<(2^31)-1 but were min: %d max: %d", min, max));
-        }
-        addMeasuredSeed(min * (1L << (16)), (max + 1) * (1L << (16)) - 1);
+        // if (max < min) {
+        //     throw new IndexOutOfBoundsException(String.format("Bounds should satisfy min<=max but were min: %d max: %d", min, max));
+        // }
+        addMeasuredSeed(min * (1L << (16)), max * (1L << 16) + (1L << 16) - 1);
     }
 
     public void consumeNextIntCalls(int numCalls, int bound) {
@@ -83,8 +82,9 @@ public class JavaRandomReverser extends RandomReverser{
      * @param maxInclusive true if the high end of the valid range should be inclusive
      */
     public void addNextFloatCall(float min, float max, boolean minInclusive, boolean maxInclusive) {
-        if (max < min || min < 0.0f || max >= 1.0f && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
-            throw new IllegalArgumentException(String.format("Bounds should be 0<=/<min<=/<max but were min: %f " +
+        // I think these constraints are unremoveable due to float precision worries.
+        if (min < 0.0f || max < 0.0f || min > 1.0f || max > 1.0f) {
+            throw new IllegalArgumentException(String.format("Bounds should have 0 <= min, max <=1 but were min: %f " +
                 "max: %f with min included : %s and max included %s", min, max, minInclusive, maxInclusive));
         }
         float minInc = min;
@@ -102,9 +102,9 @@ public class JavaRandomReverser extends RandomReverser{
         long minLong = (long) StrictMath.ceil(minInc * 0x1.0p24f);
         long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p24f) - 1;
 
-        if (maxLong < minLong) {
-            throw new IllegalArgumentException("call has no valid range");
-        }
+        // if (maxLong < minLong) {
+        //     throw new IllegalArgumentException("call has no valid range");
+        // }
 
         long minSeed = minLong << 24;
         long maxSeed = (maxLong << 24) | 0xffffff;
@@ -127,13 +127,12 @@ public class JavaRandomReverser extends RandomReverser{
     }
 
     public void addNextLongCall(long min, long max) {
-        // TODO fix that call for (1L<<63)-1 to (1L<<63) and so on, a lot of results are not interpreted correctly
-        if (max - min + 1 == 0) { // escape the divide by zero on sides later
-            throw new IllegalArgumentException("Not valid bounds");
+        if (max + 1 == min) { // escape the divide by zero on sides later
+            throw new IllegalArgumentException("nextLong bounds give no actual constraint");
         }
         //TODO warn about / check for the sign bit making a result wrong, 1/4th of results can be false positives in worst case
-        boolean minSignBit = ((min & 0x8000_0000) != 0); //Would a long having value min run into a negative (int) cast
-        boolean maxSignBit = ((max & 0x8000_0000) != 0); //Would a long having value max run into a negative (int) cast
+        boolean minSignBit = ((min & 0x8000_0000L) != 0); //Would a long having value min run into a negative (int) cast
+        boolean maxSignBit = ((max & 0x8000_0000L) != 0); //Would a long having value max run into a negative (int) cast
         long minFirstSeed, maxFirstSeed;
 
         if (minSignBit) {
@@ -148,7 +147,8 @@ public class JavaRandomReverser extends RandomReverser{
             maxFirstSeed = (((max >>> 32) + 1) << 16) - 1;
         }
         addMeasuredSeed(minFirstSeed, maxFirstSeed);
-        if (min >>> 32 == max >>> 32) { //Can we even talk about the second seed?
+        //TODO maybe we can get a constraint in more circumstances, and maybe the min < max constraint can be removed.
+        if (min >>> 32 == max >>> 32 && min < max) { //Can we even talk about the second seed?
             addMeasuredSeed((min & 0xffff_ffffL) << 16, (((max & 0xffff_ffffL) + 1) << 16) - 1);
         } else {
             addUnmeasuredSeeds(1);
@@ -170,8 +170,9 @@ public class JavaRandomReverser extends RandomReverser{
      * @param maxInclusive true if the high end of the valid range should be inclusive
      */
     public void addNextDoubleCall(double min, double max, boolean minInclusive, boolean maxInclusive) {
-        if (max < min || min < 0.0D || (maxInclusive ? max >= 1.0D : max > 1.0D) && maxInclusive || (!(minInclusive && maxInclusive) && max == min)) {
-            throw new IllegalArgumentException(String.format("Bounds should be 0<=/<min<=/<max but were min: %f " +
+        // I think these constraints are unremoveable due to float precision worries.
+        if (min < 0.0d || max < 0.0d || min > 1.0d || max > 1.0d) {
+            throw new IllegalArgumentException(String.format("Bounds should have 0 <= min, max <=1 but were min: %f " +
                 "max: %f with min included : %s and max included %s", min, max, minInclusive, maxInclusive));
         }
         double minInc = min;
@@ -189,17 +190,17 @@ public class JavaRandomReverser extends RandomReverser{
         long minLong = (long) StrictMath.ceil(minInc * 0x1.0p53);
         long maxLong = (long) StrictMath.ceil(maxInc * 0x1.0p53) - 1;
 
-        if (maxLong < minLong) {
-            throw new IllegalArgumentException("call has no valid range");
-        }
+        // if (maxLong < minLong) {
+        //     throw new IllegalArgumentException("call has no valid range");
+        // }
 
         long minSeed1 = (minLong >> 27) << 22;
         long maxSeed1 = ((maxLong >> 27) << 22) | 0x3fffff;
 
         addMeasuredSeed(minSeed1, maxSeed1);
 
-        //TODO this is not the only time we can speak about the second half. What if maxLong >>> 27 - minLong >>> 27 == 1
-        if (minLong >>> 27 == maxLong >>> 27) { //Can we even say anything about the second half
+        //TODO this is not the only time we can speak about the second half. What if maxLong >>> 27 - minLong >>> 27 == 1. The min < max constraint is also maybe unneeded
+        if (minLong >>> 27 == maxLong >>> 27 && min < max) { //Can we even say anything about the second half
             long minSeed2 = (minLong & 0x7ffffff) << 21;
             long maxSeed2 = ((maxLong & 0x7ffffff) << 21) | 0x1fffff;
 
