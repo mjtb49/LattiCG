@@ -609,7 +609,7 @@ public final class ClassGenerator {
             latticeIndex++;
         } else {
             long residue = (1L << 48) % ((long) call.getBound() << 17);
-            boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, 0).withUpperBound(%d, (1L << 48) - %d);\n",
+            boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, 0).withUpperBound(%d, (1L << 48) - %dL);\n",
                 latticeIndex, latticeIndex, residue));
             latticeIndex++;
 
