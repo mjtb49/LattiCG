@@ -613,7 +613,7 @@ public final class ClassGenerator {
                 latticeIndex, latticeIndex, residue));
             latticeIndex++;
 
-            classBody.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) %s << 17).withUpperBound(%d, ((long) %s << 17) - 1);\n",
+            boundsConfig.append(String.format(TAB2 + "builder.withLowerBound(%d, (long) %s << 17).withUpperBound(%d, ((long) %s << 17) - 1);\n",
                 latticeIndex, minVarName, latticeIndex, maxVarName));
             latticeIndex++;
         }
